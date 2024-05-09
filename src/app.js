@@ -15,10 +15,22 @@ app.use(morgan(morganFormat)); // log requests to the console
 // init global variable
 global.config = config;
 global.logger = require('./services/logger.service');
+// handle error 
+app.use((req, res, next) => {
+    const error = new Error('Not found');
+    error.status = 404;
+    next(error);
+})
+
+app.use((error, req, res, next) => {
+    const statusCode = error.status || 500;
+    res.status(statusCode).json({
+        status: 'error',
+        code: statusCode,
+        message: error.message || 'Internal Server Error'
+    })
+})
 //init route
 app.use('/v1/api', require('./routes/index'));
-// init db
-require('./dbs/init.mongoDB');
-
 
 module.exports = app;
