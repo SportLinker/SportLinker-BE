@@ -1,8 +1,3 @@
-## Clone project 
-
-```bash
-$ git clone https://github.com/HuynhChiBao1109/node_structure.git
-```
 ## Install environment and library
 ```bash
 $ npm ci
@@ -18,3 +13,14 @@ $ npm run dev
 ```bash
 $ npm run start
 ```
+
+## Library
+```bash
+$ 
+```
+
+## Third party
+```bash
+$ 
+```
+
