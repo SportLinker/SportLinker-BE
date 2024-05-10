@@ -15,6 +15,8 @@ app.use(morgan(morganFormat)); // log requests to the console
 // init global variable
 global.config = config;
 global.logger = require('./services/logger.service');
+// connect to database
+require('./configs/mySQL.config');
 // handle error 
 app.use((req, res, next) => {
     const error = new Error('Not found');
