@@ -1,34 +1,44 @@
 const mysql = require('mysql2')
 
-const pool = mysql.createPool({
-    host: global.config.get('MYSQL_HOST'),
-    port: global.config.get('MYSQL_PORT'),
-    user: global.config.get('MYSQL_USER'),
-    password: global.config.get('MYSQL_PASSWORD'),
-    database: global.config.get('MYSQL_DATABASE'),
-})
-
 class MySQLConnection {
     constructor() {
-        this.connect()
+        if (!MySQLConnection.instance) {
+            this.pool = mysql.createPool({
+                host: global.config.get('MYSQL_HOST'),
+                port: global.config.get('MYSQL_PORT'),
+                user: global.config.get('MYSQL_USER'),
+                password: global.config.get('MYSQL_PASSWORD'),
+                database: global.config.get('MYSQL_DATABASE'),
+            })
+            MySQLConnection.instance = this
+        }
+        return MySQLConnection.instance
     }
 
-    connect(type = 'mysql') {
-        pool.getConnection((err, connection) => {
-                if (err) {
-                    global.logger.error('Error connecting to MySQL: ', err)
-                }
-                global.logger.info('Connected to MySQL successfully');
+    async connect(type = 'mysql') {
+        this.pool.getConnection((err, connection) => {
+            if (err) {
+                global.logger.error(`Error connecting to MySQL: ${err.message}`)
+            }
+            if (connection) {
+                global.logger.info(
+                    `Connected to MySQL as ID: ${connection.threadId}`
+                )
+                connection.release()
+            }
         })
     }
 
-    static getInstance() {
-        if (!MySQLConnection.instance) {
-            MySQLConnection.instance = new MySQLConnection();
-        }
-        return MySQLConnection.instance;
+    async disconnect() {
+        this.pool.end((err) => {
+            if (err) {
+                global.logger.error(
+                    `Error disconnecting from MySQL: ${err.message}`
+                )
+            }
+            global.logger.info('Disconnected from MySQL')
+        })
     }
 }
 
-const instanceMySQL = MySQLConnection.getInstance();
-module.exports = instanceMySQL;
+module.exports = new MySQLConnection()

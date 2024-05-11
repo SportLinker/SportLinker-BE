@@ -8,7 +8,11 @@ const logger = winston.createLogger({
         new winston.transports.Console({
             format: winston.format.printf(
                 // format log : [time] [level] [message]
-                (info) => `[${time.getTimeByFormat('YYYY/MM/DD h:mm:ss')}] [${info.level}] ${info.message}`,
+                (info) => {
+                    return `[${time.getTimeByFormat(
+                        'YYYY-MM-DD hh:mm:ss'
+                    )}] [${info.level.toUpperCase()}] ${info.message}`
+                }
             ),
         }),
         new winston.transports.File({
