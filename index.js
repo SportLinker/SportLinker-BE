@@ -2,7 +2,11 @@ const app = require('./src/app')
 const http = require('http')
 const server = http.createServer(app)
 // connect socket
-const io = require('socket.io')(server)
+const io = require('socket.io')(server, {
+    cors: {
+        origin: 'http://localhost:3000',
+    },
+})
 
 io.on('connection', (socket) => {
     console.log('Socket connected')
@@ -16,12 +20,13 @@ process.on('SIGINT', () => {
     console.log('Process terminated')
     process.exit()
 })
-
 // Attach event listener for uncaught exceptions
 process.on('uncaughtException', (err) => {
     console.error('Uncaught exception occurred:', err)
     process.exit(1)
 })
+// catch process nodemon restart
+process.once('SIGUSR2', () => global.mySQLConnection.disconnect())
 
 server.listen(global.config.get('APP_PORT'), () => {
     global.logger.info(

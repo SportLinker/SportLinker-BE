@@ -19,13 +19,10 @@ class MySQLConnection {
         this.pool.getConnection((err, connection) => {
             if (err) {
                 global.logger.error(`Error connecting to MySQL: ${err.message}`)
+                return
             }
-            if (connection) {
-                global.logger.info(
-                    `Connected to MySQL as ID: ${connection.threadId}`
-                )
-                connection.release()
-            }
+            global.logger.info('Connected to MySQL')
+            connection.release()
         })
     }
 

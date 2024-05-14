@@ -3,6 +3,7 @@ const compression = require('compression')
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
 const config = require('./configs/index')
 // init middleware
 app.use(helmet()) // secure app by setting various HTTP headers
@@ -13,12 +14,7 @@ app.use(express.urlencoded({ extended: false })) // parse application/x-www-form
 const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev'
 app.use(morgan(morganFormat)) // log requests to the console
 // config cors
-const corsOption = {
-    origin: config.get('CLIENT_HOST'),
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}
-app.use(require('cors')(corsOption))
+app.use(cors()) // enable cors
 // init global variable
 global.config = config
 global.logger = require('./services/logger.service')
@@ -27,7 +23,10 @@ const MySQLConnection = require('./configs/mySQL.config')
 MySQLConnection.connect()
 global.mySQLConnection = MySQLConnection
 // connect to database Redis
-// require('./configs/redis.config');
+const RedisConnection = require('./configs/redis.config')
+RedisConnection.connect()
+// test fnc
+// require('./test/index').connectDB()
 // handle error
 app.use((req, res, next) => {
     const error = new Error('Not found')
