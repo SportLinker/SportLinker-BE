@@ -9,42 +9,58 @@ const StatusCode = {
 }
 
 const ReasonStatusCode = {
-    BAD_REQUEST: 'Bad request error',
-    UNAUTHORIZED: 'Unauthorized error',
-    FORBIDDEN: 'Forbidden error',
-    NOT_FOUND: 'Not found error',
-    CONFLICT: 'Conflict error',
+    BAD_REQUEST: 'Bad request',
+    UNAUTHORIZED: 'Unauthorized',
+    FORBIDDEN: 'Forbidden',
+    NOT_FOUND: 'Not found',
+    CONFLICT: 'Conflict',
 }
 
-
 class ErrorResponse extends Error {
-    constructor(message, status) {
-        super(message);
-        this.status = status;
+    constructor(message, statusCode, reasonStatusCode) {
+        super(message)
+        this.statusCode = statusCode
+        this.reasonStatusCode = reasonStatusCode
     }
 }
 
 class ConflictRequestError extends ErrorResponse {
-    constructor(message = ReasonStatusCode.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
-        super(message, statusCode);
+    constructor(
+        message,
+        statusCode = StatusCode.CONFLICT,
+        reasonStatusCode = ReasonStatusCode.CONFLICT
+    ) {
+        super(message, statusCode, reasonStatusCode)
     }
 }
 
 class BadRequestError extends ErrorResponse {
-    constructor(message = ReasonStatusCode.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
-        super(message, statusCode);
+    constructor(
+        message,
+        statusCode = StatusCode.BAD_REQUEST,
+        reasonStatusCode = ReasonStatusCode.BAD_REQUEST
+    ) {
+        super(message, statusCode, reasonStatusCode)
     }
 }
 
 class UnauthorizedError extends ErrorResponse {
-    constructor(message = ReasonStatusCode.UNAUTHORIZED, statusCode = StatusCode.UNAUTHORIZED) {
-        super(message, statusCode);
+    constructor(
+        message,
+        statusCode = StatusCode.UNAUTHORIZED,
+        reasonStatusCode = ReasonStatusCode.UNAUTHORIZED
+    ) {
+        super(message, statusCode, reasonStatusCode)
     }
 }
 
 class ForbiddenError extends ErrorResponse {
-    constructor(message = ReasonStatusCode.FORBIDDEN, statusCode = StatusCode.FORBIDDEN) {
-        super(message, statusCode);
+    constructor(
+        message,
+        statusCode = StatusCode.FORBIDDEN,
+        reasonStatusCode = ReasonStatusCode.FORBIDDEN
+    ) {
+        super(message, statusCode, reasonStatusCode)
     }
 }
 
@@ -52,5 +68,5 @@ module.exports = {
     ConflictRequestError,
     BadRequestError,
     UnauthorizedError,
-    ForbiddenError
+    ForbiddenError,
 }

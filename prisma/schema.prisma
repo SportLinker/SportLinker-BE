@@ -12,3 +12,79 @@ datasource db {
   provider = "mysql"
   url      = env("MYSQL_URL")
 }
+
+// define 
+// field first 
+// relation second
+
+// User
+model User {
+  id               String      @id @default(cuid())
+  phone            String?     @unique
+  email            String?     @unique
+  name             String
+  password         String
+  bio              String?
+  avatar_url       String?
+  gender           UserGender
+  date_of_birth    DateTime?
+  role             UserRole    @default(player)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime?   @updatedAt
+  last_active_time DateTime?
+  AuthenOTPs       AuthenOTP[]
+  Wallet           Wallet?
+  Favorite         Favorite[]
+}
+
+enum UserRole {
+  player
+  admin
+  coach
+  stadium
+  staff
+}
+
+enum UserGender {
+  men
+  women
+  other
+}
+
+// Authen OTP
+model AuthenOTP {
+  id         String   @id @default(cuid())
+  user_id    String
+  created_at DateTime @default(now())
+  expired_at DateTime
+  type       OTPType
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
+enum OTPType {
+  sms
+  email
+}
+
+// Wallet
+model Wallet {
+  id        String   @id @default(cuid())
+  user_id   String   @unique
+  amount    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [user_id], references: [id])
+}
+
+model Sport {
+  sport_name String     @id @unique
+  Favorite   Favorite[]
+}
+
+model Favorite {
+  favorite_id    String @id @default(cuid())
+  user_id        String
+  sport_favorite String
+  user           User   @relation(fields: [user_id], references: [id])
+  sport          Sport  @relation(fields: [sport_favorite], references: [sport_name])
+}
