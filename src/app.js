@@ -42,6 +42,14 @@ app.use((error, req, res, next) => {
         message: error.message || 'Internal Server Error',
     })
 })
+
+app.get('/', (req, res) => {
+    res.json({
+        status: 'success',
+        code: 200,
+        message: 'Hello',
+    })
+})
 //init route
 app.use('/v1/api', require('./routes/index'))
 

@@ -14,4 +14,4 @@ class Oauth2 {
     }
 }
 
-module.exports = new Oauth2()
+module.exports = new Oauth2().oauth2Client

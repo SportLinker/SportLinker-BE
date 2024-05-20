@@ -12,4 +12,4 @@ class Prisma {
     }
 }
 
-module.exports = new Prisma()
+module.exports = new Prisma().client
