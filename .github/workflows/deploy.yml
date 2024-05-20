@@ -1,16 +1,37 @@
-on: push
-name: 🚀 Deploy website on push
-jobs:
-    web-deploy:
-        name: 🎉 Deploy
-        runs-on: ubuntu-latest
-        steps:
-            - name: 🚚 Get latest code
-              uses: actions/checkout@v4
+name: Deploy Node.js to cPanel
 
-            - name: 📂 Sync files
-              uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
               with:
-                  server: ${{ secrets.FTP_SERVER }}
-                  username: ${{ secrets.FTP_USERNAME }}
-                  password: ${{ secrets.FTP_PASSWORD }}
+                  node-version: '20'
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build the project
+              run: npm run build
+
+            - name: Deploy to cPanel via FTP
+              uses: sportlinker_be@api.sportlinker
+              with:
+                  ftp-server: ${{ secrets.CPANEL_FTP_SERVER }}
+                  ftp-username: ${{ secrets.CPANEL_FTP_USERNAME }}
+                  ftp-password: ${{ secrets.CPANEL_FTP_PASSWORD }}
+                  local-dir: build
+                  server-dir: /public_html
+
+            - name: Post-deployment cleanup
+              run: echo "Deployment complete!"
