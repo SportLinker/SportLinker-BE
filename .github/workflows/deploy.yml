@@ -1,37 +1,26 @@
-name: Deploy Node.js to cPanel
-
-on:
-    push:
-        branches:
-            - main
-
+on: push
+name: 🚀 Deploy website on push
 jobs:
-    deploy:
+    web-deploy:
+        name: 🎉 Deploy
         runs-on: ubuntu-latest
-
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+            - name: 🚚 Get latest code
+              uses: actions/checkout@v4
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
+            - name: Use Node.js 20
+              uses: actions/setup-node@v2
               with:
-                  node-version: '16'
+                  node-version: '20'
 
-            - name: Install dependencies
-              run: npm install
+            - name: 🔨 Build Project
+              run: |
+                  npm install
+                  npm run build
 
-            - name: Build the project
-              run: npm run build
-
-            - name: Deploy to cPanel via FTP
-              uses: SamKirkland/FTP-Deploy-Action@4.3.0
+            - name: 📂 Sync files
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.5
               with:
-                  ftp-server: ${{ secrets.CPANEL_FTP_SERVER }}
-                  ftp-username: ${{ secrets.CPANEL_FTP_USERNAME }}
-                  ftp-password: ${{ secrets.CPANEL_FTP_PASSWORD }}
-                  local-dir: build
-                  server-dir: /public_html
-
-            - name: Post-deployment cleanup
-              run: echo "Deployment complete!"
+                  server: ${{ secrets.FTP_SERVER }}
+                  username: ${{ secrets.FTP_USERNAME }}
+                  password: ${{ secrets.FTP_PASSWORD }}
