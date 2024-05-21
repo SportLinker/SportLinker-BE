@@ -15,7 +15,7 @@ datasource db {
 
 // define 
 // field first 
-// relation second
+// relation second'
 
 // User
 model User {
