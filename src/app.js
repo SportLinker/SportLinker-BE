@@ -44,6 +44,12 @@ app.use((error, req, res, next) => {
         message: error.message || 'Internal Server Error',
     })
 })
+
+app.get('/', (req, res) => {
+    res.json({
+        message: 'hello',
+    })
+})
 //
 
 module.exports = app
