@@ -1,20 +1,21 @@
 'use strict'
 
 const { CREATED, Ok } = require('../core/sucess.response')
-const AuthenService = require('../services/access.service')
+const AuthenService = require('../services/authen.service')
 
 class AuthenController {
-    logout = async (req, res, next) => {
+    async login(req, res, next) {
         new Ok({
-            message: 'Logout OK',
-            metadata: await AuthenService.logout({ keyStore: req.keyStore }),
+            message: 'Login OK',
+            metadata: await AuthenService.login(req.body, req.query.type),
         }).send(res)
     }
 
-    register = async (req, res, next) => {
+    async register(req, res, next) {
+        console.log('register')
         new CREATED({
-            message: 'Register OK',
-            metadata: await AuthenService.register(req.body),
+            message: 'Register sucessfully',
+            metadata: await AuthenService.register(req.body, req.query.type),
         }).send(res)
     }
 }

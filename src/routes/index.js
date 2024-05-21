@@ -11,7 +11,7 @@ fs.readdirSync(__dirname).forEach((file) => {
         try {
             router.use(`/${routerName}`, require(`./${file}`))
         } catch (err) {
-
+            console.error(`Error loading router: ${routerName}, error: ${err}`)
         }
     }
 })

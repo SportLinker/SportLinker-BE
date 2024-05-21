@@ -19,14 +19,16 @@ app.use(cors()) // enable cors
 global.config = config
 global.logger = require('./services/logger.service')
 // connect to database MySQL
-const MySQLConnection = require('./configs/mySQL.config')
-MySQLConnection.connect()
-global.mySQLConnection = MySQLConnection
+// const MySQLConnection = require('./configs/mySQL.config')
+// MySQLConnection.connect()
+// global.mySQLConnection = MySQLConnection
 // connect to database Redis
 const RedisConnection = require('./configs/redis.config')
 RedisConnection.connect()
 // test fnc
 // require('./test/index').connectDB()
+//init route
+app.use('/v1/api', require('./routes/index'))
 // handle error
 app.use((req, res, next) => {
     const error = new Error('Not found')
@@ -42,16 +44,6 @@ app.use((error, req, res, next) => {
         message: error.message || 'Internal Server Error',
     })
 })
-
-app.get('/', (req, res) => {
-    res.json({
-        status: 'success',
-        code: 200,
-        message: 'Hello',
-    })
-})
-//init route
-app.use('/v1/api', require('./routes/index'))
 //
 
 module.exports = app

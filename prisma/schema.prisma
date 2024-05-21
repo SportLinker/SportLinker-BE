@@ -32,9 +32,15 @@ model User {
   createdAt        DateTime    @default(now())
   updatedAt        DateTime?   @updatedAt
   last_active_time DateTime?
+  status           UserStatus  @default(inactive)
   AuthenOTPs       AuthenOTP[]
   Wallet           Wallet?
   Favorite         Favorite[]
+}
+
+enum UserStatus {
+  active
+  inactive
 }
 
 enum UserRole {
