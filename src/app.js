@@ -6,29 +6,45 @@ const morgan = require('morgan')
 const cors = require('cors')
 const config = require('./configs/index')
 // init middleware
-app.use(helmet()) // secure app by setting various HTTP headers
-app.use(compression()) // compress all responses
-app.use(express.json()) // parse application/json
-app.use(express.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
+// secure app by setting various HTTP headers
+app.use(helmet())
+// compress all responses
+app.use(compression())
+// parse application/json
+app.use(express.json())
+// parse application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: false }))
 // config morgan
-const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev'
+const morganFormat =
+    config.get('NODE_ENV') === 'production' ? 'combined' : 'dev'
 app.use(morgan(morganFormat)) // log requests to the console
-// config cors
-app.use(cors()) // enable cors
+// config cors]
+const corsOptions = {
+    // allow multiple domains
+    origin: [
+        'https://sport-linker-landing-page.vercel.app',
+        '192.168.15.122:8081',
+        'http://localhost:5173',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+}
+app.use(cors(corsOptions))
 // init global variable
 global.config = config
 global.logger = require('./services/logger.service')
-// connect to database MySQL
-// const MySQLConnection = require('./configs/mySQL.config')
-// MySQLConnection.connect()
-// global.mySQLConnection = MySQLConnection
 // connect to database Redis
 const RedisConnection = require('./configs/redis.config')
 RedisConnection.connect()
 // test fnc
-// require('./test/index').connectDB()
+// require('./test/index').getList()
 //init route
 app.use('/v1/api', require('./routes/index'))
+
+app.get('/', (req, res) => {
+    res.json({
+        message: 'hello',
+    })
+})
 // handle error
 app.use((req, res, next) => {
     const error = new Error('Not found')
@@ -44,12 +60,5 @@ app.use((error, req, res, next) => {
         message: error.message || 'Internal Server Error',
     })
 })
-
-app.get('/', (req, res) => {
-    res.json({
-        message: 'hello',
-    })
-})
-//
 
 module.exports = app

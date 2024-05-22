@@ -8,6 +8,8 @@ const io = require('socket.io')(server, {
     },
 })
 
+global.io = io
+
 io.on('connection', (socket) => {
     console.log('Socket connected')
 })

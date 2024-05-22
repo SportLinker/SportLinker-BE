@@ -3,6 +3,8 @@ const prisma = require('../configs/prisma.config')
 const { BadRequestError } = require('../core/error.response')
 const redisClient = require('../configs/redis.config').client
 const bcrypt = require('bcrypt')
+const crypto = require('node:crypto')
+const authUtil = require('../utils/auth.utils')
 
 class AuthenService {
     loginStrategies = {
@@ -30,41 +32,52 @@ class AuthenService {
     }
 
     async loginWithPhone(user) {
-        // Your phone login logic here
-        return 'phone'
+        // check login
+        const userExist = await prisma.user.findUnique({
+            where: {
+                phone: user.phone,
+            },
+        })
+        if (!userExist) throw new BadRequestError('Invalid phone or password.')
+        // check password
+        const validPass = await bcrypt.compare(
+            user.password,
+            userExist.password
+        )
+        if (!validPass) throw new BadRequestError('Invalid phone or password.')
+        // create token
+        const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+            modulusLength: 4096,
+            publicKeyEncoding: {
+                type: 'spki',
+                format: 'pem',
+            },
+            privateKeyEncoding: {
+                type: 'pkcs8',
+                format: 'pem',
+            },
+        })
+        const token = authUtil.createTokenPair(user, privateKey, publicKey)
+        // save refreshToken , public key to redis
+        await redisClient.set(
+            `keyToken:${userExist.id}`,
+            JSON.stringify({ refreshToken: token.refreshToken, publicKey })
+        )
+        // logs
+        global.logger.info(`User ${userExist.id} login successfully`)
+        return {
+            user: userExist,
+            token: token,
+        }
     }
 
     async register(user, typeRegister) {
-        console.log(user)
         return await this.registerStrategies[typeRegister](user)
     }
 
     async registerWithGoogle(user) {
-        // check email exist
-        const emailExist = await prisma.user.findUnique({
-            where: {
-                email: user.email,
-            },
-        })
-        if (emailExist) throw new BadRequestError('Email already exist')
-        // generate hash password
-        const newPass = await bcrypt.hash(user.password, 8)
-        // create user
-        const newUser = await prisma.user.create({
-            data: {
-                email: user.email,
-                password: newPass,
-                name: user.name,
-                gender: user.gender,
-                role: user.role,
-            },
-        })
-        // create redis favorite list of user
-        await redisClient.set(
-            `favorite:${user.email}`,
-            JSON.stringify([user.favorite])
-        )
-        return newUser
+        // Your Google register logic here
+        return 'google'
     }
 
     async registerWithPhone(user) {
@@ -85,14 +98,17 @@ class AuthenService {
                 name: user.name,
                 gender: user.gender,
                 role: user.role,
+                date_of_birth: user.date_of_birth,
             },
         })
         if (!newUser) throw new BadRequestError('Register fail')
         // create redis favorite list of user
         await redisClient.set(
             `favorite:${newUser.id}`,
-            JSON.stringify([user.favorite])
+            JSON.stringify(user.favorite)
         )
+        // logs
+        global.logger.info(`User ${newUser.id} register successfully`)
         return newUser
     }
 

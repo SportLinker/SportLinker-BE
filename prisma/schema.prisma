@@ -35,7 +35,6 @@ model User {
   status           UserStatus  @default(inactive)
   AuthenOTPs       AuthenOTP[]
   Wallet           Wallet?
-  Favorite         Favorite[]
 }
 
 enum UserStatus {
@@ -83,14 +82,5 @@ model Wallet {
 }
 
 model Sport {
-  sport_name String     @id @unique
-  Favorite   Favorite[]
-}
-
-model Favorite {
-  favorite_id    String @id @default(cuid())
-  user_id        String
-  sport_favorite String
-  user           User   @relation(fields: [user_id], references: [id])
-  sport          Sport  @relation(fields: [sport_favorite], references: [sport_name])
+  sport_name String @id @unique
 }

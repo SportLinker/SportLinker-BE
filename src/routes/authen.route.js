@@ -5,7 +5,7 @@ const AuthenController = require('../controllers/authen.controller')
 
 router.post('/register', asyncHandler(AuthenController.register))
 
-// router.post('/login', asyncHandler(AuthenController.login))
+router.post('/login', asyncHandler(AuthenController.login))
 
 // router.post('/logout', asyncHandler(AuthenController.logout))
 
