@@ -9,7 +9,7 @@ const getListUser = async () => {
 
 const test = async () => {
     global.logger.info('Test log info')
-    await getListUser()
+    // await getListUser()
 }
 
 module.exports = {

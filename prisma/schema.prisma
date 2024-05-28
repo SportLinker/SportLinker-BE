@@ -92,8 +92,8 @@ model Sport {
 
 // Match
 model Match {
-  math_id        String      @id @default(cuid())
-  math_name      String
+  match_id       String      @id @default(cuid())
+  match_name     String
   user_create_id String
   place_id       String
   sport_name     String
@@ -108,6 +108,9 @@ model Match {
   user_create    User        @relation(fields: [user_create_id], references: [id])
   sport          Sport       @relation(fields: [sport_name], references: [sport_name])
   MatchJoin      MatchJoin[]
+
+  // index 
+  @@index([start_time, sport_name], name: "match_index")
 }
 
 model MatchJoin {
@@ -117,8 +120,8 @@ model MatchJoin {
   time_join_at DateTime        @default(now())
   status       MatchJoinStatus @default(pending)
   // Relation
+  match        Match           @relation(fields: [match_id], references: [match_id])
   user_join    User            @relation(fields: [user_join_id], references: [id])
-  match        Match           @relation(fields: [match_id], references: [math_id])
 }
 
 enum MatchStatus {

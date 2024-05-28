@@ -9,58 +9,53 @@ const StatusCode = {
 }
 
 const ReasonStatusCode = {
-    BAD_REQUEST: 'Bad request',
-    UNAUTHORIZED: 'Unauthorized',
-    FORBIDDEN: 'Forbidden',
-    NOT_FOUND: 'Not found',
-    CONFLICT: 'Conflict',
+    BAD_REQUEST: 'Bad request error',
+    UNAUTHORIZED: 'Unauthorized error',
+    FORBIDDEN: 'Forbidden error',
+    NOT_FOUND: 'Not found error',
+    CONFLICT: 'Conflict error',
 }
 
 class ErrorResponse extends Error {
-    constructor(message, statusCode, reasonStatusCode) {
+    constructor(message, status) {
         super(message)
-        this.statusCode = statusCode
-        this.reasonStatusCode = reasonStatusCode
+        this.status = status
     }
 }
 
 class ConflictRequestError extends ErrorResponse {
     constructor(
-        message,
-        statusCode = StatusCode.CONFLICT,
-        reasonStatusCode = ReasonStatusCode.CONFLICT
+        message = ReasonStatusCode.CONFLICT,
+        statusCode = StatusCode.FORBIDDEN
     ) {
-        super(message, statusCode, reasonStatusCode)
+        super(message, statusCode)
     }
 }
 
 class BadRequestError extends ErrorResponse {
     constructor(
-        message,
-        statusCode = StatusCode.BAD_REQUEST,
-        reasonStatusCode = ReasonStatusCode.BAD_REQUEST
+        message = ReasonStatusCode.BAD_REQUEST,
+        statusCode = StatusCode.BAD_REQUEST
     ) {
-        super(message, statusCode, reasonStatusCode)
+        super(message, statusCode)
     }
 }
 
 class UnauthorizedError extends ErrorResponse {
     constructor(
-        message,
-        statusCode = StatusCode.UNAUTHORIZED,
-        reasonStatusCode = ReasonStatusCode.UNAUTHORIZED
+        message = ReasonStatusCode.UNAUTHORIZED,
+        statusCode = StatusCode.UNAUTHORIZED
     ) {
-        super(message, statusCode, reasonStatusCode)
+        super(message, statusCode)
     }
 }
 
 class ForbiddenError extends ErrorResponse {
     constructor(
-        message,
-        statusCode = StatusCode.FORBIDDEN,
-        reasonStatusCode = ReasonStatusCode.FORBIDDEN
+        message = ReasonStatusCode.FORBIDDEN,
+        statusCode = StatusCode.FORBIDDEN
     ) {
-        super(message, statusCode, reasonStatusCode)
+        super(message, statusCode)
     }
 }
 

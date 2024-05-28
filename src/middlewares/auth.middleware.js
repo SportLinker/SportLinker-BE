@@ -1,11 +1,12 @@
 const { asyncHandler } = require('../helpers/asyncHandler.helper')
 const { ForbiddenError, UnauthorizedError } = require('../core/error.response')
 const redis = require('../configs/redis.config').client
+const JWT = require('jsonwebtoken')
 
 const HEADER = {
     CLIENT_ID: 'x-client-id',
     AUTHORIZATION: 'authorization', // access token
-    REFRESHTOKEN: 'refreshToken', // refresh token
+    REFRESHTOKEN: 'refresh', // refresh token
 }
 
 const authentication = asyncHandler(async (req, res, next) => {
@@ -14,16 +15,19 @@ const authentication = asyncHandler(async (req, res, next) => {
     if (!clientId)
         throw new ForbiddenError('Middleware Error: Client ID is required')
     // check if access token exists
-    const keyUser = redis.get(`keyToken:${clientId}`)
+    let keyUser = await redis.get(`keyToken:${clientId}`)
+    console.log(`keyUser:: ${keyUser}`)
     if (!keyUser)
         throw new UnauthorizedError('Middleware Error: Client ID is invalid')
-    // check if access token exists
+    // parse key to object
+    keyUser = JSON.parse(keyUser)
+    // check if refresh token exists
     if (req.headers[HEADER.REFRESHTOKEN]) {
         try {
             // get refresh token
             const refreshToken = req.headers[HEADER.REFRESHTOKEN]
             // decode refresh token
-            const decodeUser = JWT.verify(refreshToken, keyUser.publicKey)
+            const decodeUser = await JWT.verify(refreshToken, keyUser.publicKey)
             // check if client ID match
             if (clientId !== decodeUser.id)
                 throw new UnauthorizedError('Middleware Error: ID not match')
@@ -41,7 +45,9 @@ const authentication = asyncHandler(async (req, res, next) => {
         throw new UnauthorizedError('Middleware Error: You need to login first')
     try {
         // decode access token
-        const decodeUser = JWT.verify(accessToken, keyUser.publicKey)
+        const decodeUser = await JWT.verify(accessToken, keyUser.publicKey)
+        if (!decodeUser)
+            throw new UnauthorizedError('Middleware Error: Invalid token')
         // check if client ID match
         if (clientId !== decodeUser.id)
             throw new UnauthorizedError('Invalid userId')
