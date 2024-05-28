@@ -3,12 +3,12 @@ const prisma = require('../configs/prisma.config')
 
 const getListUser = async () => {
     const listUser = await prisma.user.findMany()
-    console.log('listUser::: ', listUser)
+    global.logger.info('List user:: ', JSON.stringify(listUser))
     return listUser
 }
 
 const test = async () => {
-    console.log(`Test is running`)
+    global.logger.info('Test log info')
     await getListUser()
 }
 
