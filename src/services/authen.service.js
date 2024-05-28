@@ -57,7 +57,14 @@ class AuthenService {
                 format: 'pem',
             },
         })
-        const token = authUtil.createTokenPair(user, privateKey, publicKey)
+        // create payload
+        const payload = {
+            id: userExist.id,
+            phone: userExist.phone,
+            role: userExist.role,
+            name: userExist.name,
+        }
+        const token = authUtil.createTokenPair(payload, privateKey, publicKey)
         // save refreshToken , public key to redis
         await redisClient.set(
             `keyToken:${userExist.id}`,
@@ -91,23 +98,34 @@ class AuthenService {
         // generate hash password
         const newPass = await bcrypt.hash(user.password, 8)
         // create user
-        const newUser = await prisma.user.create({
-            data: {
-                phone: user.phone,
-                password: newPass,
-                name: user.name,
-                gender: user.gender,
-                role: user.role,
-                date_of_birth: user.date_of_birth,
-            },
-        })
-        if (!newUser) throw new BadRequestError('Register fail')
+        const newUser = await prisma.user
+            .create({
+                data: {
+                    phone: user.phone,
+                    password: newPass,
+                    name: user.name,
+                    gender: user.gender,
+                    role: user.role,
+                    date_of_birth: user.date_of_birth,
+                    role: user.role,
+                },
+            })
+            .catch((err) => {
+                throw new BadRequestError(err.message)
+            })
         // create redis favorite list of user
         await redisClient.set(
             `favorite:${newUser.id}`,
             JSON.stringify(user.favorite)
         )
         // logs
+        // creat wallet for this user
+        await prisma.wallet.create({
+            data: {
+                user_id: newUser.id,
+                balance: 0,
+            },
+        })
         global.logger.info(`User ${newUser.id} register successfully`)
         return newUser
     }

@@ -18,9 +18,15 @@ const createTokenPair = async (payload, privateKey, publicKey) => {
         //
         JWT.verify(accessToken, publicKey, (err, decode) => {
             if (err) {
-                console.error('Verify error::', err)
+                global.logger.error(
+                    'AuthUtils::createTokenPair::accessToken::',
+                    err
+                )
             } else {
-                console.log('decode::', decode)
+                global.logger.info(
+                    'AuthUtils::createTokenPair::accessToken::',
+                    decode
+                )
             }
         })
 

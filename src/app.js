@@ -5,7 +5,6 @@ const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
 const config = require('./configs/index')
-// init middleware
 // secure app by setting various HTTP headers
 app.use(helmet())
 // compress all responses
@@ -35,8 +34,11 @@ global.logger = require('./services/logger.service')
 // connect to database Redis
 const RedisConnection = require('./configs/redis.config')
 RedisConnection.connect()
+// connect to database MySQL
+const MySQLConnection = require('./configs/mysql.config')
+MySQLConnection.connect()
 // test fnc
-// require('./test/index').getList()
+require('./test/index').test()
 //init route
 app.use('/v1/api', require('./routes/index'))
 
