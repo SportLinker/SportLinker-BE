@@ -32,7 +32,7 @@ model User {
   createdAt        DateTime    @default(now())
   updatedAt        DateTime?   @updatedAt
   last_active_time DateTime?
-  status           UserStatus  @default(inactive)
+  status           UserStatus  @default(active)
   // Relation
   AuthenOTPs       AuthenOTP[]
   Wallet           Wallet?

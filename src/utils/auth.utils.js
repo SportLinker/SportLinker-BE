@@ -16,15 +16,12 @@ const createTokenPair = async (payload, privateKey, publicKey) => {
         console.log('Generated accessToken::', accessToken)
         console.log('Generated refreshToken::', refreshToken)
         //
-        JWT.verify(accessToken, publicKey, (err, decode) => {
+        await JWT.verify(accessToken, publicKey, (err, decode) => {
             if (err) {
-                global.logger.error(
-                    'AuthUtils::createTokenPair::accessToken::',
-                    err
-                )
+                global.logger.error('AuthUtils::createTokenPair::failed::', err)
             } else {
                 global.logger.info(
-                    'AuthUtils::createTokenPair::accessToken::',
+                    'AuthUtils::createTokenPair::decode::',
                     decode
                 )
             }
@@ -34,7 +31,9 @@ const createTokenPair = async (payload, privateKey, publicKey) => {
             accessToken,
             refreshToken,
         }
-    } catch (error) {}
+    } catch (error) {
+        throw new Error(error)
+    }
 }
 
 module.exports = {

@@ -22,6 +22,11 @@ class AuthenService {
         email: this.forgotPasswordWithEmail,
     }
 
+    // verifyOTPStrategies = {
+    //     phone: this.verifyOTPWithPhone,
+    //     google: this.verifyOTPWithGoogle,
+    // }
+
     async login(user, typeLogin) {
         return await this.loginStrategies[typeLogin](user)
     }
@@ -64,7 +69,12 @@ class AuthenService {
             role: userExist.role,
             name: userExist.name,
         }
-        const token = authUtil.createTokenPair(payload, privateKey, publicKey)
+        const token = await authUtil.createTokenPair(
+            payload,
+            privateKey,
+            publicKey
+        )
+        console.log('token::', token)
         // save refreshToken , public key to redis
         await redisClient.set(
             `keyToken:${userExist.id}`,
