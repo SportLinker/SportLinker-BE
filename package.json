@@ -9,7 +9,7 @@
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "prisma:generate": "npx prisma generate",
     "prisma:push": "npx prisma db push",
-    "build": "npx prisma generate && npx prisma db push && npm run start"
+    "build": "npx prisma generate && npx prisma db push"
   },
   "keywords": [],
   "author": "",
