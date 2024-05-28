@@ -92,23 +92,22 @@ model Sport {
 
 // Match
 model Match {
-  math_id        String        @id @default(cuid())
+  math_id        String      @id @default(cuid())
   math_name      String
   user_create_id String
   place_id       String
   sport_name     String
-  total_join     Int           @default(1)
-  maximum_join   Int           @default(10)
+  total_join     Int         @default(1)
+  maximum_join   Int         @default(10)
   start_time     DateTime
   end_time       DateTime
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
-  status         MatchStatus   @default(upcomming)
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+  status         MatchStatus @default(upcomming)
   // Relation
-  user_create    User          @relation(fields: [user_create_id], references: [id])
-  sport          Sport         @relation(fields: [sport_name], references: [sport_name])
+  user_create    User        @relation(fields: [user_create_id], references: [id])
+  sport          Sport       @relation(fields: [sport_name], references: [sport_name])
   MatchJoin      MatchJoin[]
-  MatchStadium   MatchStadium?
 }
 
 model MatchJoin {
@@ -120,16 +119,6 @@ model MatchJoin {
   // Relation
   user_join    User            @relation(fields: [user_join_id], references: [id])
   match        Match           @relation(fields: [match_id], references: [math_id])
-}
-
-model MatchStadium {
-  match_id             String @id
-  stadium_long         String
-  stadium_lat          String
-  stadium_address      String
-  stadium_thumbnailUrl String
-  // Relation
-  match                Match  @relation(fields: [match_id], references: [math_id])
 }
 
 enum MatchStatus {

@@ -35,8 +35,8 @@ global.logger = require('./services/logger.service')
 const RedisConnection = require('./configs/redis.config')
 RedisConnection.connect()
 // connect to database MySQL
-// const MySQLConnection = require('./configs/mysql.config')
-// MySQLConnection.connect()
+const MySQLConnection = require('./configs/mysql.config')
+MySQLConnection.connect()
 // test fnc
 require('./test/index').test()
 //init route
