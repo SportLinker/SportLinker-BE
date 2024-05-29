@@ -17,6 +17,14 @@ jobs:
               run: |
                   npm install
 
+            - name: Ci package
+              run: |
+                  npm ci
+
+            - name: List installed packages
+              run: |
+                  ls -la node_modules
+
             - name: 🏗️ Build prisma
               run: |
                   npx prisma generate
@@ -27,9 +35,3 @@ jobs:
                   server: ${{ secrets.FTP_SERVER }}
                   username: ${{ secrets.FTP_USERNAME }}
                   password: ${{ secrets.FTP_PASSWORD }}
-                  local-dir: .
-                  server-dir: /path/to/remote/dir
-                  exclude: |
-                      .git*
-                      node_modules
-                      **/node_modules/**  # Loại trừ để đảm bảo rằng không bị bỏ qua thư mục node_modules
