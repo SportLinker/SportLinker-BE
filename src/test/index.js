@@ -9,7 +9,7 @@ const getListUser = async () => {
 }
 
 const test = async () => {
-    global.logger.info('Test log info')
+    global.logger.info('Test log info is running')
     // await getDetailPlace({
     //     placeId: `ChIJa-nS17FrCzERjDFvhpcd85o`,
     // })
