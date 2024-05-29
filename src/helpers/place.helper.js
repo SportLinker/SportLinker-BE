@@ -18,7 +18,7 @@ const getDistance = async ({
     return result
 }
 
-const getDetailPlace = async ({ placeId }) => {
+const getPlaceDetail = async ({ placeId }) => {
     var myHeaders = new Headers()
     myHeaders.append('X-API-KEY', `${global.config.get(`PLACE_X_API_KEY`)}`)
     myHeaders.append('Content-Type', 'application/json')
@@ -39,11 +39,13 @@ const getDetailPlace = async ({ placeId }) => {
         requestOptions
     )
     const convertData = await data.json()
+    console.log('convertData::', convertData)
     const result = convertData.places
-    return result
+    console.log('result::', result)
+    return result[0]
 }
 
 module.exports = {
     getDistance,
-    getDetailPlace,
+    getPlaceDetail,
 }

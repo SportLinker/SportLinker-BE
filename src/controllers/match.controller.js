@@ -10,6 +10,20 @@ class AuthenController {
             metadata: await MatchService.createNewMatch(req.body, req.user.id),
         }).send(res)
     }
+
+    async getListMatch(req, res, next) {
+        new Ok({
+            message: 'Get list match successfully',
+            metadata: await MatchService.getListMatch(
+                req.query.lat,
+                req.query.long,
+                req.query.distance,
+                req.query.start_time,
+                req.query.end_time,
+                req.query.sport_name
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new AuthenController()
