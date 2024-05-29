@@ -13,12 +13,13 @@ const test = async () => {
     // await getDetailPlace({
     //     placeId: `ChIJa-nS17FrCzERjDFvhpcd85o`,
     // })
-    await getDistance({
-        latOrigin: 21.028511,
-        longOrigin: 105.804817,
-        latDestination: 21.027763,
-        longDestination: 105.83416,
-    })
+    // await getDistance({
+    //     latOrigin: 21.028511,
+    //     longOrigin: 105.804817,
+    //     latDestination: 21.027763,
+    //     longDestination: 105.83416,
+    // })
+    getListUser()
 }
 
 module.exports = {
