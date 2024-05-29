@@ -1,7 +1,11 @@
 'use strict'
 const prisma = require('../configs/prisma.config')
 const { BadRequestError } = require('../core/error.response')
-const { getPlaceDetail, isDistanceValid } = require('../helpers/place.helper')
+const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
+const {
+    getUCLHourAndMinute,
+    getStringHourAndMinut,
+} = require('../helpers/timestamp.helper')
 
 class MatchService {
     /**
@@ -55,9 +59,7 @@ class MatchService {
         // create match stadium info
 
         // logs
-        global.logger.info(
-            `Create new match: ${newMatch.id} by user: ${user_create_id}`
-        )
+        global.logger.info(`Create new match: ${newMatch.id} by user: ${user_create_id}`)
         return newMatch
     }
 
@@ -65,58 +67,92 @@ class MatchService {
      *
      * @param {*} lat (lat origin of user)
      * @param {*} long (long origin of user)
-     * @param {*} distance (meters)
-     * @param {*} start_time
-     * @param {*} end_time
+     * @param {*} distance string (meters)
+     * @param {*} start_time float (hour of day)
+     * @param {*} end_time float (hour of day)
      * @param {*} sport_name
      */
     async getListMatch(lat, long, distance, start_time, end_time, sport_name) {
-        //1. Convert range time to hour
-        const hour_start = new Date(start_time).getHours()
-        const hour_end = new Date(end_time).getHours()
-        // 2. Get list match by sport name and now
+        // 1. Get list match by sport name, now time and filter by time
         let listMatchByTimeAndSportName = await prisma.match.findMany({
             where: {
                 start_time: {
                     gte: new Date(),
                 },
                 sport_name: sport_name,
+                status: 'upcomming',
             },
             orderBy: {
                 start_time: 'asc',
             },
+            select: {
+                match_id: true,
+                match_name: true,
+                place_id: true,
+                sport_name: true,
+                total_join: true,
+                maximum_join: true,
+                start_time: true,
+                status: true,
+                match_join: {
+                    select: {
+                        user_join: {
+                            select: {
+                                id: true,
+                                name: true,
+                                avatar_url: true,
+                            },
+                        },
+                    },
+                },
+            },
         })
-        // 3. Filter by hour
-        listMatchByTimeAndSportName = listMatchByTimeAndSportName.filter(
-            (match) => {
-                let match_start_time = new Date(match.start_time).getHours()
-                let match_end_time = new Date(match.end_time).getHours()
-                return (
-                    match_start_time >= start_time && match_end_time <= end_time
-                )
+        // Define listMatchByDistanceValid
+        let listMatchByDistanceValid = []
+        // 3. Filter by distance and time
+        for (let i = 0; i < listMatchByTimeAndSportName.length; i++) {
+            // get start time of match
+            let match_start_time =
+                new Date(listMatchByTimeAndSportName[i].start_time).getHours() +
+                new Date(listMatchByTimeAndSportName[i].start_time).getMinutes() / 60
+            console.log('match_start_time::', match_start_time)
+            // 1. Get detail place of match
+            const placeDetail = await getPlaceDetail({
+                placeId: listMatchByTimeAndSportName[i].place_id,
+            })
+            // 2. Check distance of user and match
+            const distanceMatrix = await getDistance({
+                latOrigin: lat,
+                longOrigin: long,
+                latDestination: placeDetail.latitude,
+                longDestination: placeDetail.longitude,
+            })
+            // 3. If valid distance and time valid push detail place to listMatch
+            // check distance and time
+            if (
+                distanceMatrix.value <= distance &&
+                start_time <= match_start_time &&
+                end_time >= match_start_time
+            ) {
+                listMatchByTimeAndSportName[i].place_detail = placeDetail
+                listMatchByTimeAndSportName[i].distance = distanceMatrix
+                listMatchByDistanceValid.push(listMatchByTimeAndSportName[i])
             }
-        )
-        // 3. Filter by distance, add place detail and group by time
-    }
-
-    static groupByTime = (listMatch) => {}
-
-    static async isDistanceValid({
-        latOrigin,
-        longOrigin,
-        latDestination,
-        longDestination,
-        distanceValid,
-    }) {
-        // const place = await getPlaceDetail({ placeId: placeId })
-        const distance = await isDistanceValid({
-            latOrigin: latOrigin,
-            longOrigin: longOrigin,
-            latDestination: latDestination,
-            longDestination: longDestination,
-        })
-        if (distance < distanceValid) return place
-        return true
+        }
+        // 4. Group by start_time
+        const result = listMatchByDistanceValid.reduce((acc, match) => {
+            const start_time = getStringHourAndMinut(match.start_time)
+            if (!acc[start_time]) {
+                acc[start_time] = {
+                    start_time: start_time,
+                    matches: [],
+                }
+            }
+            acc[start_time].matches.push(match)
+            return acc
+        }, {})
+        // 5. Return result
+        return Object.values(result)
     }
 }
 

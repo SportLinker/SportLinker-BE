@@ -15,6 +15,7 @@ const getDistance = async ({
     const response = await fetch(distanceMatrixAPI)
     const data = await response.json()
     const result = data.rows[0].elements[0].distance
+    console.log('result::', result)
     return result
 }
 
@@ -34,14 +35,9 @@ const getPlaceDetail = async ({ placeId }) => {
         redirect: 'follow',
     }
 
-    const data = await fetch(
-        `${global.config.get(`PLACE_URL`)}`,
-        requestOptions
-    )
+    const data = await fetch(`${global.config.get(`PLACE_URL`)}`, requestOptions)
     const convertData = await data.json()
-    console.log('convertData::', convertData)
     const result = convertData.places
-    console.log('result::', result)
     return result[0]
 }
 

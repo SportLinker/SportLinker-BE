@@ -10,7 +10,7 @@ const getListUser = async () => {
 
 const test = async () => {
     global.logger.info('Test log info is running')
-    // await getDetailPlace({
+    // await getPlaceDetail({
     //     placeId: `ChIJa-nS17FrCzERjDFvhpcd85o`,
     // })
     // await getDistance({
@@ -19,7 +19,9 @@ const test = async () => {
     //     latDestination: 21.027763,
     //     longDestination: 105.83416,
     // })
-    getListUser()
+    // getListUser()
+
+    // time only include hours, minutes of now
 }
 
 module.exports = {

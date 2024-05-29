@@ -99,18 +99,18 @@ model Match {
   sport_name     String
   total_join     Int         @default(1)
   maximum_join   Int         @default(10)
-  start_time     DateTime
-  end_time       DateTime
+  start_time     DateTime    @db.Timestamp
+  end_time       DateTime    @db.Timestamp
   created_at     DateTime    @default(now())
   updated_at     DateTime    @updatedAt
   status         MatchStatus @default(upcomming)
   // Relation
   user_create    User        @relation(fields: [user_create_id], references: [id])
   sport          Sport       @relation(fields: [sport_name], references: [sport_name])
-  MatchJoin      MatchJoin[]
+  match_join     MatchJoin[]
 
   // index 
-  @@index([start_time, sport_name], name: "match_index")
+  @@index([start_time, sport_name, status], name: "match_index")
 }
 
 model MatchJoin {
