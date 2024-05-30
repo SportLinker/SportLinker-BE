@@ -95,6 +95,9 @@ class MatchService {
                 start_time: true,
                 status: true,
                 match_join: {
+                    where: {
+                        status: 'accepted',
+                    },
                     select: {
                         user_join: {
                             select: {
