@@ -21,9 +21,9 @@ jobs:
               run: |
                   ls -la node_modules
 
-            - name: 🏗️ Build prisma
-              run: |
-                  npx prisma generate
+            # - name: 🏗️ Build prisma
+            #   run: |
+            #       npx prisma generate
 
             - name: 📂 Sync files
               uses: SamKirkland/FTP-Deploy-Action@4.0.0

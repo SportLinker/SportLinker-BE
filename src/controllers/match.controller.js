@@ -24,6 +24,20 @@ class MatchController {
             ),
         }).send(res)
     }
+
+    async getMatchDetail(req, res, next) {
+        new Ok({
+            message: 'Get match detail successfully',
+            metadata: await MatchService.getMatchDetail(req.params.match_id),
+        }).send(res)
+    }
+
+    async deleteMatch(req, res, next) {
+        new Ok({
+            message: 'Delete match successfully',
+            metadata: await MatchService.deleteMatch(req.params.match_id, req.user.id),
+        }).send(res)
+    }
 }
 
 module.exports = new MatchController()

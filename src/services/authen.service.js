@@ -44,6 +44,9 @@ class AuthenService {
             },
         })
         if (!userExist) throw new BadRequestError('Invalid phone or password.')
+        // check active
+        if (userExist.status !== 'active')
+            throw new BadRequestError('User is not active. Please contact admin.')
         // check password
         const validPass = await bcrypt.compare(user.password, userExist.password)
         if (!validPass) throw new BadRequestError('Invalid phone or password.')

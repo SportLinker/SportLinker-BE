@@ -56,8 +56,6 @@ class MatchService {
                 throw new BadRequestError(error)
             })
         if (!newUserJoin) throw new BadRequestError('Create match join fail!')
-        // create match stadium info
-
         // logs
         global.logger.info(`Create new match: ${newMatch.id} by user: ${user_create_id}`)
         return newMatch
@@ -156,6 +154,101 @@ class MatchService {
         }, {})
         // 5. Return result
         return Object.values(result)
+    }
+
+    /**
+     *
+     * @param {*} match_id
+     */
+
+    async getMatchDetail(match_id) {
+        // 1. Get match detail
+        const matchDetail = await prisma.match
+            .findUnique({
+                where: {
+                    match_id: match_id,
+                },
+                select: {
+                    match_id: true,
+                    match_name: true,
+                    place_id: true,
+                    sport_name: true,
+                    total_join: true,
+                    maximum_join: true,
+                    start_time: true,
+                    end_time: true,
+                    status: true,
+                    created_at: true,
+                    user_create: {
+                        select: {
+                            id: true,
+                            name: true,
+                            avatar_url: true,
+                        },
+                    },
+                    match_join: {
+                        where: {
+                            status: 'accepted',
+                        },
+                        select: {
+                            user_join: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    avatar_url: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            })
+            .catch((error) => {
+                throw new BadRequestError(error)
+            })
+        // 2. Get detail place of match
+        const placeDetail = await getPlaceDetail({
+            placeId: matchDetail.place_id,
+        })
+        matchDetail.place_detail = placeDetail
+        // 3. Return result
+        return matchDetail
+    }
+
+    /**
+     *
+     * @param {*} match_id
+     * @param {*} user_id
+     */
+
+    async deleteMatch(match_id, user_id) {
+        // 1. Check user is user create of match
+        const match = await prisma.match
+            .findUnique({
+                where: {
+                    match_id: match_id,
+                },
+            })
+            .catch((error) => {
+                throw new BadRequestError(error)
+            })
+        if (match.user_create_id !== user_id) {
+            throw new BadRequestError('You are not user create of this match!')
+        }
+        // 2. Delete match
+        const deleteMatch = await prisma.match
+            .update({
+                where: {
+                    match_id: match_id,
+                },
+                data: {
+                    status: 'cancelled',
+                },
+            })
+            .catch((error) => {
+                throw new BadRequestError(error)
+            })
+        // 3. Return result
+        return deleteMatch
     }
 }
 
