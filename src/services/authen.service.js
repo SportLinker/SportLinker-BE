@@ -45,10 +45,7 @@ class AuthenService {
         })
         if (!userExist) throw new BadRequestError('Invalid phone or password.')
         // check password
-        const validPass = await bcrypt.compare(
-            user.password,
-            userExist.password
-        )
+        const validPass = await bcrypt.compare(user.password, userExist.password)
         if (!validPass) throw new BadRequestError('Invalid phone or password.')
         // create token
         const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
@@ -69,11 +66,7 @@ class AuthenService {
             role: userExist.role,
             name: userExist.name,
         }
-        const token = await authUtil.createTokenPair(
-            payload,
-            privateKey,
-            publicKey
-        )
+        const token = await authUtil.createTokenPair(payload, privateKey, publicKey)
         console.log('token::', token)
         // save refreshToken , public key to redis
         await redisClient.set(
@@ -124,10 +117,7 @@ class AuthenService {
                 throw new BadRequestError(err.message)
             })
         // create redis favorite list of user
-        await redisClient.set(
-            `favorite:${newUser.id}`,
-            JSON.stringify(user.favorite)
-        )
+        await redisClient.set(`favorite:${newUser.id}`, JSON.stringify(user.favorite))
         // logs
         // creat wallet for this user
         await prisma.wallet.create({
@@ -156,8 +146,12 @@ class AuthenService {
         return 'phone'
     }
 
-    async logout(user) {
-        return 'logout'
+    async logout(userId) {
+        // remove refreshToken from redis
+        await redisClient.del(`keyToken:${userId}`)
+        // logs
+        global.logger.info(`User ${userId} logout successfully`)
+        return 'Logout OK'
     }
 }
 
