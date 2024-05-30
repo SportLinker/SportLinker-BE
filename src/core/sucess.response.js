@@ -4,26 +4,30 @@ const StatusCode = {
     OK: 200,
     CREATED: 201,
     ACCEPTED: 202,
-    NO_CONTENT: 204
+    NO_CONTENT: 204,
 }
 
 const ReasonStatusCode = {
     OK: 'OK',
     CREATED: 'Created',
     ACCEPTED: 'Accepted',
-    NO_CONTENT: 'No Content'
-
+    NO_CONTENT: 'No Content',
 }
 class SuccessResponse {
-    constructor({ message, statusCode = StatusCode.OK, reasonStatusCode = ReasonStatusCode.OK, metadata = {} }) {
-        this.message = !message ? reasonStatusCode : message;
-        this.statusCode = statusCode;
-        this.reasonStatusCode = reasonStatusCode;
-        this.metadata = metadata;
+    constructor({
+        message,
+        code = StatusCode.OK,
+        status = ReasonStatusCode.OK,
+        metadata = {},
+    }) {
+        this.message = !message ? status : message
+        this.code = code
+        this.status = status
+        this.metadata = metadata
     }
 
     send(res, header = {}) {
-        return res.status(this.statusCode).json(this);
+        return res.status(this.code).json(this)
     }
 }
 
@@ -35,37 +39,40 @@ class Ok extends SuccessResponse {
 
 class CREATED extends SuccessResponse {
     constructor({
-        message, statusCode = StatusCode.CREATED,
-        reasonStatusCode = ReasonStatusCode.CREATED,
+        message,
+        code = StatusCode.CREATED,
+        status = ReasonStatusCode.CREATED,
         metadata,
-        options = {}
+        options = {},
     }) {
-        super({ message, statusCode, reasonStatusCode, metadata })
-        this.options = options;
+        super({ message, code, status, metadata })
+        this.options = options
     }
 }
 
 class ACCEPTED extends SuccessResponse {
     constructor({
-        message, statusCode = StatusCode.ACCEPTED,
-        reasonStatusCode = ReasonStatusCode.ACCEPTED,
+        message,
+        code = StatusCode.ACCEPTED,
+        status = ReasonStatusCode.ACCEPTED,
         metadata,
-        options = {}
+        options = {},
     }) {
-        super({ message, statusCode, reasonStatusCode, metadata })
-        this.options = options;
+        super({ message, code, status, metadata })
+        this.options = options
     }
 }
 
 class NO_CONTENT extends SuccessResponse {
     constructor({
-        message, statusCode = StatusCode.NO_CONTENT,
-        reasonStatusCode = ReasonStatusCode.NO_CONTENT,
+        message,
+        code = StatusCode.NO_CONTENT,
+        status = ReasonStatusCode.NO_CONTENT,
         metadata,
-        options = {}
+        options = {},
     }) {
-        super({ message, statusCode, reasonStatusCode, metadata })
-        this.options = options;
+        super({ message, code, status, metadata })
+        this.options = options
     }
 }
 
@@ -73,5 +80,5 @@ module.exports = {
     Ok,
     CREATED,
     ACCEPTED,
-    NO_CONTENT
+    NO_CONTENT,
 }

@@ -24,10 +24,7 @@ class ErrorResponse extends Error {
 }
 
 class ConflictRequestError extends ErrorResponse {
-    constructor(
-        message = ReasonStatusCode.CONFLICT,
-        statusCode = StatusCode.FORBIDDEN
-    ) {
+    constructor(message = ReasonStatusCode.CONFLICT, statusCode = StatusCode.FORBIDDEN) {
         super(message, statusCode)
     }
 }
@@ -51,10 +48,7 @@ class UnauthorizedError extends ErrorResponse {
 }
 
 class ForbiddenError extends ErrorResponse {
-    constructor(
-        message = ReasonStatusCode.FORBIDDEN,
-        statusCode = StatusCode.FORBIDDEN
-    ) {
+    constructor(message = ReasonStatusCode.FORBIDDEN, statusCode = StatusCode.FORBIDDEN) {
         super(message, statusCode)
     }
 }

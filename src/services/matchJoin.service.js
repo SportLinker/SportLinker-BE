@@ -37,19 +37,6 @@ class MatchJoinService {
             .catch((err) => {
                 throw new BadRequestError(err.message)
             })
-        //5. update total join
-        await prisma.match
-            .update({
-                where: { match_id: matchId },
-                data: {
-                    total_join: {
-                        increment: 1,
-                    },
-                },
-            })
-            .catch((err) => {
-                throw new BadRequestError(err.message)
-            })
         // logs
         global.logger.info(`User ${userId} join match ${matchId}`)
         // 6. return succes

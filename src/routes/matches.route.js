@@ -10,8 +10,4 @@ router.use(authentication)
 
 router.post('/', asyncHandler(matchController.createNewMatch))
 
-// router.post('/logout', asyncHandler(AuthenController.logout))
-
-// router.post('/forgot-password', asyncHandler(AuthenController.forgotPassword))
-
 module.exports = router

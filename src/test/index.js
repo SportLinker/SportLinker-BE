@@ -21,7 +21,7 @@ const test = async () => {
     //     latDestination: 21.027763,
     //     longDestination: 105.83416,
     // })
-    getListUser()
+    // getListUser()
 
     // time only include hours, minutes of now
 }
