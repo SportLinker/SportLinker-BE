@@ -1,8 +1,8 @@
-'use strict'
+// 'use strict'
 
-const { CREATED, Ok } = require('../core/sucess.response')
-const MatchService = require('../services/match.service')
+// const { CREATED, Ok } = require('../core/sucess.response')
+// const MatchJoinService = require('../services/matchJoin.service')
 
-class MatchJoinController {}
+// class MatchJoinController {}
 
-module.exports = new MatchJoinController()
+// module.exports = new MatchJoinController()

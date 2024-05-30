@@ -3,9 +3,11 @@ const prisma = require('../configs/prisma.config')
 const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
 
 const getListUser = async () => {
-    const listUser = await prisma.match.findMany()
-    console.log(listUser)
-    return listUser
+    const listUser = await prisma.match.findMany().catch((err) => {
+        global.logger.error(`Error in getListUser: ${err}`)
+        return []
+    })
+    global.logger.info(`List user: ${JSON.stringify(listUser)}`)
 }
 
 const test = async () => {
@@ -19,7 +21,7 @@ const test = async () => {
     //     latDestination: 21.027763,
     //     longDestination: 105.83416,
     // })
-    // getListUser()
+    getListUser()
 
     // time only include hours, minutes of now
 }
