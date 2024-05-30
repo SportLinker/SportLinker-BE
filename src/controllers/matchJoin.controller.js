@@ -3,6 +3,6 @@
 const { CREATED, Ok } = require('../core/sucess.response')
 const MatchService = require('../services/match.service')
 
-class AuthenController {}
+class MatchJoinController {}
 
-module.exports = new AuthenController()
+module.exports = new MatchJoinController()
