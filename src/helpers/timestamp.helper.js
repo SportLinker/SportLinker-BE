@@ -9,9 +9,15 @@ const getUCLHourAndMinute = (time) => {
 }
 
 const getStringHourAndMinut = (time) => {
-    return `${new Date(time).getHours().toString()}:${new Date(time)
-        .getMinutes()
-        .toString()}`
+    let hour = new Date(time).getHours()
+    let minute = new Date(time).getMinutes()
+    if (hour < 10) {
+        hour = `0${hour}`
+    }
+    if (minute < 10) {
+        minute = `0${minute}`
+    }
+    return `${hour}:${minute}`
 }
 
 module.exports = {
