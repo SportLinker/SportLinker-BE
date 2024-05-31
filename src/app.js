@@ -14,8 +14,7 @@ app.use(express.json())
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }))
 // config morgan
-const morganFormat =
-    config.get('NODE_ENV') === 'production' ? 'combined' : 'dev'
+const morganFormat = config.get('NODE_ENV') === 'production' ? 'combined' : 'dev'
 app.use(morgan(morganFormat)) // log requests to the console
 // config cors]
 const corsOptions = {
@@ -35,8 +34,8 @@ global.logger = require('./services/logger.service')
 const RedisConnection = require('./configs/redis.config')
 RedisConnection.connect()
 // connect to database MySQL
-// const MySQLConnection = require('./configs/mysql.config')
-// MySQLConnection.connect()
+const MySQLConnection = require('./configs/mysql.config')
+MySQLConnection.connect()
 // test fnc
 require('./test/index').test()
 //init route
