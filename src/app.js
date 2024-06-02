@@ -36,8 +36,11 @@ RedisConnection.connect()
 // connect to database MySQL
 const MySQLConnection = require('./configs/mysql.config')
 MySQLConnection.connect()
-// test fnc
-require('./test/index').test()
+// test function
+;(async () => {
+    const { test } = require('./test/index')
+    await test()
+})()
 //init route
 app.use('/v1/api', require('./routes/index'))
 

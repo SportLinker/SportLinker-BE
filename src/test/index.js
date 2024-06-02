@@ -4,10 +4,15 @@ const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
 
 const getListUser = async () => {
     const listUser = await prisma.match.findMany().catch((err) => {
-        global.logger.error(`Error in getListUser: ${err}`)
+        console.log(err)
         return []
     })
-    global.logger.info(`List user: ${JSON.stringify(listUser)}`)
+    console.log(listUser)
+}
+
+const getFavorite = async () => {
+    const favorite = await redis.get(`favorite:clwxu3soj000014ox8yfejzg3`)
+    console.log(favorite)
 }
 
 const test = async () => {
@@ -21,7 +26,8 @@ const test = async () => {
     //     latDestination: 21.027763,
     //     longDestination: 105.83416,
     // })
-    getListUser()
+    await getListUser()
+    await getFavorite()
 
     // time only include hours, minutes of now
 }
