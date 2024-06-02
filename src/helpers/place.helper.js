@@ -19,13 +19,13 @@ const getDistance = async ({
     return result
 }
 
-const getPlaceDetail = async ({ placeId }) => {
+const getPlaceDetail = async ({ cid }) => {
     var myHeaders = new Headers()
     myHeaders.append('X-API-KEY', `${global.config.get(`PLACE_X_API_KEY`)}`)
     myHeaders.append('Content-Type', 'application/json')
 
     var raw = JSON.stringify({
-        placeId: placeId,
+        cid: cid,
     })
 
     var requestOptions = {

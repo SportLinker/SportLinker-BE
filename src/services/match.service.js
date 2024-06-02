@@ -36,7 +36,7 @@ class MatchService {
             data: {
                 match_name: match.match_name,
                 user_create_id: user_create_id,
-                place_id: match.place_id,
+                cid: match.cid,
                 sport_name: match.sport_name,
                 maximum_join: match.maximum_join,
                 start_time: match.start_time,
@@ -86,7 +86,7 @@ class MatchService {
             select: {
                 match_id: true,
                 match_name: true,
-                place_id: true,
+                cid: true,
                 sport_name: true,
                 total_join: true,
                 maximum_join: true,
@@ -108,6 +108,8 @@ class MatchService {
                 },
             },
         })
+        // if list match empty return empty list
+        if (listMatchByTimeAndSportName.length === 0) return []
         // Define listMatchByDistanceValid
         let listMatchByDistanceValid = []
         // 3. Filter by distance and time
@@ -119,7 +121,7 @@ class MatchService {
             console.log('match_start_time::', match_start_time)
             // 1. Get detail place of match
             const placeDetail = await getPlaceDetail({
-                placeId: listMatchByTimeAndSportName[i].place_id,
+                cid: listMatchByTimeAndSportName[i].cid,
             })
             // 2. Check distance of user and match
             const distanceMatrix = await getDistance({

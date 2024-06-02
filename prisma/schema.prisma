@@ -96,12 +96,12 @@ model Match {
   match_id       String      @id @default(cuid())
   match_name     String
   user_create_id String
-  place_id       String
+  cid            String
   sport_name     String
   total_join     Int         @default(1)
   maximum_join   Int         @default(10)
-  start_time     DateTime    @db.Timestamp
-  end_time       DateTime    @db.Timestamp
+  start_time     DateTime
+  end_time       DateTime
   created_at     DateTime    @default(now())
   updated_at     DateTime    @updatedAt
   status         MatchStatus @default(upcomming)
