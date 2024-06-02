@@ -9,7 +9,7 @@ router.use(authentication)
 
 router.post('/join', asyncHandler(MatchJoinController.joinMatch))
 // get list user join match by match id
-router.get('/:match_id', asyncHandler(MatchJoinController.getListUserJoinMatch))
+// router.get('/:match_id', asyncHandler(MatchJoinController.getListUserJoinMatchByOwnerId))
 
 // get list user waiting join match
 // reject user join match

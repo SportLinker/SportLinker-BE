@@ -13,7 +13,7 @@ const HEADER = {
 const authentication = asyncHandler(async (req, res, next) => {
     // check if client ID exists
     const clientId = req.headers[HEADER.CLIENT_ID]
-    if (!clientId) throw new ForbiddenError('Middleware Error: Client ID is required')
+    if (!clientId) throw new UnauthorizedError('Middleware Error: Client ID is required')
     // check if access token exists
     let keyUser = await redis.get(`keyToken:${clientId}`)
     console.log(`keyUser:: ${keyUser}`)
