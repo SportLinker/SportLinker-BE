@@ -15,10 +15,10 @@ io.on('connection', (socket) => {
 })
 
 server.listen(global.config.get('APP_PORT'), () => {
+    global.logger.info(`Server is running on ${global.config.get('NODE_ENV')} mode`)
     global.logger.info(
-        `Server is running on ${global.config.get('NODE_ENV')} mode`
-    )
-    global.logger.info(
-        `Server is running on port ${global.config.get('APP_PORT')}`
+        `Server is running on ${global.config.get('APP_HOST')}:${global.config.get(
+            'APP_PORT'
+        )}`
     )
 })
