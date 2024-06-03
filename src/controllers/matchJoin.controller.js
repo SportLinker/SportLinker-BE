@@ -21,6 +21,16 @@ class MatchJoinController {
             ),
         }).send(res)
     }
+
+    async getListUserJoinMatchByOwnerId(req, res, next) {
+        new Ok({
+            message: 'Get list user join match by match id successfully.',
+            metadata: await MatchJoinService.getListUserJoinMatchByOwnerId(
+                req.params.match_id,
+                req.user.id
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new MatchJoinController()

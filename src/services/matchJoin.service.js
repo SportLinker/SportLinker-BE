@@ -101,6 +101,41 @@ class MatchJoinService {
         // 4. return success
         return `Update status user_join in match ${isMatchExist.match_name} successfully`
     }
+
+    async getListUserJoinMatchByOwnerId(matchId, userId) {
+        // 1. check match exist
+        const isMatchExist = await prisma.match.findUnique({
+            where: { match_id: matchId },
+        })
+        if (!isMatchExist) {
+            throw new BadRequestError('Match not found')
+        }
+        // 2. check is owner of match
+        if (isMatchExist.user_create_id !== userId) {
+            throw new BadRequestError('You are not owner of this match')
+        }
+        // 3. get list user join match by match id
+        const listUserJoin = await prisma.matchJoin.findMany({
+            where: {
+                match_id: matchId,
+            },
+            select: {
+                user_join: {
+                    select: {
+                        id: true,
+                        avatar_url: true,
+                        name: true,
+                    },
+                },
+                status: true,
+                time_join_at: true,
+            },
+        })
+        // logs
+        global.logger.info(`Get list user join match by match id ${matchId}`)
+        // 4. return success
+        return listUserJoin
+    }
 }
 
 module.exports = new MatchJoinService()
