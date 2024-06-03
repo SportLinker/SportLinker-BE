@@ -10,6 +10,8 @@ router.get('/', asyncHandler(matchController.getListMatch))
 
 router.use(authentication)
 
+router.put('/:match_id', asyncHandler(matchController.updateMatch))
+
 router.post('/', asyncHandler(matchController.createNewMatch))
 
 router.delete('/:match_id', asyncHandler(matchController.deleteMatch))

@@ -1,6 +1,6 @@
 'use strict'
 
-const { CREATED, Ok } = require('../core/sucess.response')
+const { CREATED, Ok, NO_CONTENT } = require('../core/sucess.response')
 const MatchService = require('../services/match.service')
 
 class MatchController {
@@ -36,6 +36,17 @@ class MatchController {
         new Ok({
             message: 'Delete match successfully',
             metadata: await MatchService.deleteMatch(req.params.match_id, req.user.id),
+        }).send(res)
+    }
+
+    async updateMatch(req, res, next) {
+        new NO_CONTENT({
+            message: 'Update match successfully',
+            metadata: await MatchService.updateMatch(
+                req.params.match_id,
+                req.user.id,
+                req.body
+            ),
         }).send(res)
     }
 }

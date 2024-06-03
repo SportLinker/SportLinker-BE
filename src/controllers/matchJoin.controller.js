@@ -10,6 +10,17 @@ class MatchJoinController {
             metadata: await MatchJoinService.joinMatch(req.body.match_id, req.user.id),
         }).send(res)
     }
+
+    async updateUserJoinMatchByMatchId(req, res, next) {
+        new Ok({
+            message: 'Update user join match by match id successfully.',
+            metadata: await MatchJoinService.updateUserJoinMatchByMatchId(
+                req.params.match_id,
+                req.body,
+                req.user.id
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new MatchJoinController()

@@ -11,9 +11,7 @@ router.post('/join', asyncHandler(MatchJoinController.joinMatch))
 // get list user join match by match id
 // router.get('/:match_id', asyncHandler(MatchJoinController.getListUserJoinMatchByOwnerId))
 
-// get list user waiting join match
-// reject user join match
-// accept user join match
-// delete user join match
+// update status user_join in match
+router.patch('/:match_id', asyncHandler(MatchJoinController.updateUserJoinMatchByMatchId))
 
 module.exports = router

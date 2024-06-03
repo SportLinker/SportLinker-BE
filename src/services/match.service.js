@@ -276,6 +276,44 @@ class MatchService {
         // 3. Return result
         return deleteMatch
     }
+
+    /**
+     *
+     * @param {*} match_id
+     * @param {*} user_id
+     * @param {*} data
+     */
+
+    async updateMatch(match_id, user_id, data) {
+        // 1. Check user is user create of match
+        const match = await prisma.match
+            .findUnique({
+                where: {
+                    match_id: match_id,
+                },
+            })
+            .catch((error) => {
+                throw new BadRequestError(error)
+            })
+        if (match.user_create_id !== user_id) {
+            throw new BadRequestError('You are not user create of this match!')
+        }
+        // 2. Update match
+        const updateMatch = await prisma.match
+            .update({
+                where: {
+                    match_id: match_id,
+                },
+                data: {
+                    ...data,
+                },
+            })
+            .catch((error) => {
+                throw new BadRequestError(error)
+            })
+        // 3. Return result
+        return updateMatch
+    }
 }
 
 module.exports = new MatchService()

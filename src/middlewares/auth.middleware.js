@@ -16,7 +16,6 @@ const authentication = asyncHandler(async (req, res, next) => {
     if (!clientId) throw new UnauthorizedError('Middleware Error: Client ID is required')
     // check if access token exists
     let keyUser = await redis.get(`keyToken:${clientId}`)
-    console.log(`keyUser:: ${keyUser}`)
     if (!keyUser) throw new UnauthorizedError('Middleware Error: Client ID is invalid')
     // parse key to object
     keyUser = JSON.parse(keyUser)
