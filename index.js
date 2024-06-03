@@ -11,7 +11,21 @@ const io = require('socket.io')(server, {
 global.io = io
 
 io.on('connection', (socket) => {
-    console.log('Socket connected')
+    console.log('New client connected')
+
+    socket.on('join_room', (room) => {
+        socket.join(room)
+        console.log(`User joined room: ${room}`)
+    })
+
+    socket.on('send_message', (data) => {
+        console.log(data)
+        io.in(data.room).emit('receive_message', data)
+    })
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected')
+    })
 })
 
 server.listen(global.config.get('APP_PORT'), () => {

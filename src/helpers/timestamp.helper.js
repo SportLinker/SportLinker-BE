@@ -8,6 +8,14 @@ const getUCLHourAndMinute = (time) => {
     return new Date(time).getUTCHours() + new Date(time).getUTCMinutes()
 }
 
+const getStringByDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+    })
+}
+
 const getStringHourAndMinut = (time) => {
     let hour = new Date(time).getHours()
     let minute = new Date(time).getMinutes()
@@ -24,4 +32,5 @@ module.exports = {
     getTimeByFormat,
     getUCLHourAndMinute,
     getStringHourAndMinut,
+    getStringByDate,
 }

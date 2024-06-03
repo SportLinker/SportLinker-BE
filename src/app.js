@@ -30,14 +30,14 @@ app.use(cors(corsOptions))
 // init global variable
 global.config = config
 global.logger = require('./services/logger.service')
-// connect to database Redis
-const RedisConnection = require('./configs/redis.config')
-RedisConnection.connect()
-// connect to database MySQL
-const MySQLConnection = require('./configs/mysql.config')
-MySQLConnection.connect()
 // test function
 ;(async () => {
+    // connect to database Redis
+    const RedisConnection = require('./configs/redis.config')
+    await RedisConnection.connect()
+    // connect to database MySQL
+    // const MySQLConnection = require('./configs/mysql.config')
+    // await MySQLConnection.connect()
     const { test } = require('./test/index')
     await test()
 })()

@@ -5,6 +5,7 @@ const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
 const {
     getUCLHourAndMinute,
     getStringHourAndMinut,
+    getStringByDate,
 } = require('../helpers/timestamp.helper')
 
 class MatchService {
@@ -68,16 +69,20 @@ class MatchService {
      * @param {*} distance string (meters)
      * @param {*} start_time float (hour of day)
      * @param {*} end_time float (hour of day)
-     * @param {*} sport_name
+     * @param {*} sport_name array (sport name)
      */
     async getListMatch(lat, long, distance, start_time, end_time, sport_name) {
+        //
+        sport_name = sport_name.split(',')
         // 1. Get list match by sport name, now time and filter by time
         let listMatchByTimeAndSportName = await prisma.match.findMany({
             where: {
                 start_time: {
                     gte: new Date(),
                 },
-                sport_name: sport_name,
+                sport_name: {
+                    in: sport_name,
+                },
                 status: 'upcomming',
             },
             orderBy: {
@@ -142,20 +147,39 @@ class MatchService {
                 listMatchByDistanceValid.push(listMatchByTimeAndSportName[i])
             }
         }
-        // 4. Group by start_time
-        const result = listMatchByDistanceValid.reduce((acc, match) => {
-            const start_time = getStringHourAndMinut(match.start_time)
-            if (!acc[start_time]) {
-                acc[start_time] = {
-                    start_time: start_time,
-                    matches: [],
+        // 4. Group by day
+        let result = listMatchByDistanceValid.reduce((acc, match) => {
+            const date = getStringByDate(match.start_time)
+            if (!acc[date]) {
+                acc[date] = {
+                    date: date,
+                    match_group_by_date: [],
                 }
             }
-            acc[start_time].matches.push(match)
+            acc[date].match_group_by_date.push(match)
             return acc
         }, {})
+        result = Object.values(result)
+        // loop to group by start_time
+        for (let i = 0; i < result.length; i++) {
+            const match_group_by_time = result[i].match_group_by_date.reduce(
+                (acc, match) => {
+                    const time = getStringHourAndMinut(match.start_time)
+                    if (!acc[time]) {
+                        acc[time] = {
+                            time: time,
+                            matches: [],
+                        }
+                    }
+                    acc[time].matches.push(match)
+                    return acc
+                },
+                {}
+            )
+            result[i].match_group_by_date = Object.values(match_group_by_time)
+        }
         // 5. Return result
-        return Object.values(result)
+        return result
     }
 
     /**

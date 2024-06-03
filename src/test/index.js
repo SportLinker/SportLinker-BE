@@ -1,9 +1,11 @@
 const redis = require('../configs/redis.config').client
 const prisma = require('../configs/prisma.config')
 const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
+const cloudinary = require('../configs/cloudinary.config')
+// const twilio = require('../configs/twillio.config')
 
 const getListUser = async () => {
-    const listUser = await prisma.match.findMany().catch((err) => {
+    const listUser = await prisma.user.findMany().catch((err) => {
         console.log(err)
         return []
     })
@@ -26,8 +28,9 @@ const test = async () => {
     //     latDestination: 21.027763,
     //     longDestination: 105.83416,
     // })
-    await getListUser()
-    await getFavorite()
+    // log date format Tuseday, June 04
+    // await getListUser()
+    // await getFavorite()
 
     // time only include hours, minutes of now
 }
