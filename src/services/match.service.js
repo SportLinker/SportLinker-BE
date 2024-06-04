@@ -57,6 +57,13 @@ class MatchService {
                 throw new BadRequestError(error)
             })
         if (!newUserJoin) throw new BadRequestError('Create match join fail!')
+        // create match option
+        await prisma.matchOption.create({
+            data: {
+                match_id: newMatch.match_id,
+                budget: match.option.budget,
+            },
+        })
         // logs
         global.logger.info(`Create new match: ${newMatch.id} by user: ${user_create_id}`)
         return newMatch
