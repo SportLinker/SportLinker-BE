@@ -1,48 +1,43 @@
 'use strict'
 
-const UserService = require("../services/user.service")
+const UserService = require('../services/user.service')
+const { Ok, CREATED } = require('../core/sucess.response')
 
 class UserController {
-    getListUser = async (req, res) => {
-        try {
-
-            return res
-                .status(200)
-                .json({
-                    status: 200,
-                    data: await UserService.getListUser()
-                })
-
-        } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    status: 500,
-                    message: error.message
-                })
-        }
+    async getAllUser(req, res, next) {
+        new CREATED({
+            message: 'Get all user successfully',
+            metadata: await UserService.getAllUser(
+                req.query.page_size,
+                req.query.page_number
+            ),
+        }).send(res)
     }
 
-    createUser = async (req, res) => {
-        try {
-            const data = await UserService.createUser(req.body);
+    async createUser(req, res, next) {
+        new CREATED({
+            message: 'Create user successfully',
+            metadata: await UserService.createUser(req.body, req.user.id),
+        }).send(res)
+    }
 
-            return res
-                .status(200)
-                .json({
-                    status: 200,
-                    data: data
-                })
+    async updateUser(req, res, next) {
+        new Ok({
+            message: 'Update user successfully',
+            metadata: await UserService.updateUser(
+                req.params.user_id,
+                req.body,
+                req.user.id
+            ),
+        }).send(res)
+    }
 
-        } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    status: 500,
-                    message: error.message
-                })
-        }
+    async deleteUser(req, res, next) {
+        new Ok({
+            message: 'Delete user successfully',
+            metadata: await UserService.deleteUser(req.params.user_id, req.user.id),
+        }).send(res)
     }
 }
 
-module.exports = new UserController();
+module.exports = new UserController()
