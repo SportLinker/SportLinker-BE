@@ -32,6 +32,24 @@ class UserService {
     }
 
     async createUser(data, admin_id) {
+        // check user is exist
+        if (data.email) {
+            const isExistMail = await prisma.user.findUnique({
+                where: {
+                    email: data.email,
+                },
+            })
+            if (isExistMail) throw new BadRequestError('User is already exist')
+        }
+        // check phone is exist
+        if (data.phone) {
+            const isExistPhone = await prisma.user.findUnique({
+                where: {
+                    phone: data.phone,
+                },
+            })
+            if (isExistPhone) throw new BadRequestError('Phone is already exist')
+        }
         const user = await prisma.user.create({
             data,
         })
