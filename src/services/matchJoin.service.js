@@ -2,7 +2,7 @@
 
 const prisma = require('../configs/prisma.config')
 const { BadRequestError } = require('../core/error.response')
-const NotificationSerivce = require('./notification.serivce')
+const NotificationSerivce = require('./notification.service')
 
 class MatchJoinService {
     async joinMatch(matchId, userId) {
