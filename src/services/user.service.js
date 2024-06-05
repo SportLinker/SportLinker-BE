@@ -1,8 +1,7 @@
 'use strict'
-
 const prisma = require('../configs/prisma.config')
 const { BadRequestError } = require('../core/error.response')
-const brycpt = require('bcrypt')
+const bcrypt = require('bcrypt');
 
 class UserService {
     async getAllUser(pageSize, pageNumber) {
@@ -33,48 +32,76 @@ class UserService {
     }
 
     async createUser(data, admin_id) {
-        // check user is exist
+        // Check if the 'name' field is provided in the data
+        if (!data.name) {
+            throw new BadRequestError('Name is required');
+        }
+    
+        // Check if the user with the provided email already exists
         if (data.email) {
             const isExistMail = await prisma.user.findUnique({
                 where: {
                     email: data.email,
                 },
-            })
-            if (isExistMail) throw new BadRequestError('User is already exist')
+            });
+            if (isExistMail) {
+                throw new BadRequestError('User with this email already exists');
+            }
         }
-        // check phone is exist
+    
+        // Check if the user with the provided phone number already exists
         if (data.phone) {
             const isExistPhone = await prisma.user.findUnique({
                 where: {
                     phone: data.phone,
                 },
-            })
-            if (isExistPhone) throw new BadRequestError('Phone is already exist')
+            });
+            if (isExistPhone) {
+                throw new BadRequestError('User with this phone number already exists');
+            }
         }
-        // hash password
-        data.password = await brycpt.hash(data.password, 10)
-
+    
+        // Hash the password
+        data.password = await bcrypt.hash(data.password, 10);
+    
+        // Create the user with the provided data
         const user = await prisma.user.create({
             data,
-        })
-        global.logger.info(
-            `Create user successfully by admin ${admin_id} with id: ${user.id}`
-        )
-        return user
+        });
+    
+        global.logger.info(`User created successfully by admin ${admin_id} with ID: ${user.id}`);
+        
+        return user;
     }
+    
 
     async updateUser(user_id, data, admin_id) {
+        const validFields = {
+            name: data.name, // Update the user's name
+            email: data.email, // Update the user's email
+            role: data.role,
+            gender:data.gender,
+            password:data.password, // Update the user's role
+            date_of_birth: data.date_of_birth, // Update the user's date of birth
+            status:data.status,
+            // Add other valid fields for updating the user
+        };
+    
         const user = await prisma.user.update({
             where: {
                 id: user_id,
             },
-            data,
-        })
+            data: validFields, // Only pass valid fields to the update function
+        });
+    
         global.logger.info(
             `Update user successfully by admin ${admin_id} with id: ${user.id}`
-        )
-        return user
+        );
+    
+        return user;
     }
+    
+    
 
     async deleteUser(user_id, admin_id) {
         // check user is admin
