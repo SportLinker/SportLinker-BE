@@ -75,6 +75,14 @@ class MatchService {
             // set cache stadium info
             await redis.set(`stadium:${match.cid}`, JSON.stringify(placeDetail))
         }
+        // create message for match
+        await prisma.groupMessage.create({
+            data: {
+                group_message_id: newMatch.match_id,
+                group_message_name: newMatch.match_name,
+                type: 'match',
+            },
+        })
         // logs
         global.logger.info(`Create new match: ${newMatch.id} by user: ${user_create_id}`)
         return newMatch
@@ -90,48 +98,89 @@ class MatchService {
      * @param {*} sport_name array (sport name)
      */
     async getListMatch(lat, long, distance, start_time, end_time, sport_name, user_id) {
-        //
-        sport_name = sport_name.split(',')
-        // 1. Get list match by sport name, now time and filter by time
-        let listMatchByTimeAndSportName = await prisma.match.findMany({
-            where: {
-                start_time: {
-                    gte: new Date(),
-                },
-                sport_name: {
-                    in: sport_name,
-                },
-                status: 'upcomming',
-            },
-            orderBy: {
-                start_time: 'asc',
-            },
-            select: {
-                match_id: true,
-                match_name: true,
-                cid: true,
-                sport_name: true,
-                total_join: true,
-                maximum_join: true,
-                start_time: true,
-                status: true,
-                user_create_id: true,
-                match_join: {
-                    where: {
-                        status: 'accepted',
+        let listMatchByTimeAndSportName
+        // check sport_name is empty
+        if (!sport_name) {
+            listMatchByTimeAndSportName = await prisma.match.findMany({
+                where: {
+                    start_time: {
+                        gte: new Date(),
                     },
-                    select: {
-                        user_join: {
-                            select: {
-                                id: true,
-                                name: true,
-                                avatar_url: true,
+                    status: 'upcomming',
+                },
+                orderBy: {
+                    start_time: 'asc',
+                },
+                select: {
+                    match_id: true,
+                    match_name: true,
+                    cid: true,
+                    sport_name: true,
+                    total_join: true,
+                    maximum_join: true,
+                    start_time: true,
+                    status: true,
+                    user_create_id: true,
+                    match_join: {
+                        where: {
+                            status: 'accepted',
+                        },
+                        select: {
+                            user_join: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    avatar_url: true,
+                                },
                             },
                         },
                     },
                 },
-            },
-        })
+            })
+        } else {
+            sport_name = sport_name.split(',')
+            // 1. Get list match by sport name, now time and filter by time
+            listMatchByTimeAndSportName = await prisma.match.findMany({
+                where: {
+                    start_time: {
+                        gte: new Date(),
+                    },
+                    sport_name: {
+                        in: sport_name,
+                    },
+                    status: 'upcomming',
+                },
+                orderBy: {
+                    start_time: 'asc',
+                },
+                select: {
+                    match_id: true,
+                    match_name: true,
+                    cid: true,
+                    sport_name: true,
+                    total_join: true,
+                    maximum_join: true,
+                    start_time: true,
+                    status: true,
+                    user_create_id: true,
+                    match_join: {
+                        where: {
+                            status: 'accepted',
+                        },
+                        select: {
+                            user_join: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    avatar_url: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            })
+        }
+
         // if list match empty return empty list
         if (listMatchByTimeAndSportName.length === 0) return []
         let list_match_by_distance_and_time = []

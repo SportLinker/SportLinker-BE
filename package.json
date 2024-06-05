@@ -8,13 +8,13 @@
     "start": "cross-env NODE_ENV=production npx prisma:generate && npx prisma push && node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "prisma:generate": "npx prisma generate",
-    "prisma:push": "npx prisma db push",
-    "postinstall": "npm run prisma:generate && npm run prisma:push"
+    "prisma:push": "npx prisma db push"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@payos/node": "^1.0.6",
     "@prisma/client": "^5.14.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.2.0",
