@@ -234,7 +234,7 @@ class MatchService {
                 select: {
                     match_id: true,
                     match_name: true,
-                    place_id: true,
+                    cid: true,
                     sport_name: true,
                     total_join: true,
                     maximum_join: true,
@@ -263,15 +263,26 @@ class MatchService {
                             },
                         },
                     },
+                    option: {
+                        select: {
+                            budget: true,
+                        },
+                    },
                 },
             })
             .catch((error) => {
                 throw new BadRequestError(error)
             })
         // 2. Get detail place of match
-        const placeDetail = await getPlaceDetail({
-            placeId: matchDetail.place_id,
-        })
+        let placeDetail = await redis.get(`stadium:${matchDetail.cid}`)
+        placeDetail = JSON.parse(placeDetail)
+        if (!placeDetail) {
+            placeDetail = await getPlaceDetail({
+                cid: matchDetail.cid,
+            })
+            await redis.set(`stadium:${matchDetail.cid}`, JSON.stringify(placeDetail))
+        }
+
         matchDetail.place_detail = placeDetail
         // 3. Return result
         return matchDetail
