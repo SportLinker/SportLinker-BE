@@ -113,7 +113,7 @@ model Match {
   user_create    User         @relation(fields: [user_create_id], references: [id])
   sport          Sport        @relation(fields: [sport_name], references: [sport_name])
   match_join     MatchJoin[]
-  match_option   MatchOption?
+  option         MatchOption?
 
   // index 
   @@index([start_time, sport_name, status], name: "match_index")

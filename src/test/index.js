@@ -19,20 +19,12 @@ const getFavorite = async () => {
 
 const test = async () => {
     global.logger.info('Test log info is running')
-    // await getPlaceDetail({
-    //     placeId: `ChIJa-nS17FrCzERjDFvhpcd85o`,
+    // const placeDetail = await getPlaceDetail({
+    //     cid: '12022315892551549787',
     // })
-    // await getDistance({
-    //     latOrigin: 21.028511,
-    //     longOrigin: 105.804817,
-    //     latDestination: 21.027763,
-    //     longDestination: 105.83416,
-    // })
-    // log date format Tuseday, June 04
-    // await getListUser()
-    // await getFavorite()
-
-    // time only include hours, minutes of now
+    // console.log(placeDetail)
+    // //save to redis
+    // await redis.set(`stadium:12022315892551549787`, JSON.stringify(placeDetail))
 }
 
 module.exports = {

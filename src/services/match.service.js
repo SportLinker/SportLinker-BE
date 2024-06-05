@@ -1,6 +1,7 @@
 'use strict'
 const prisma = require('../configs/prisma.config')
 const { BadRequestError } = require('../core/error.response')
+const redis = require('../configs/redis.config').client
 const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
 const {
     getUCLHourAndMinute,
@@ -64,6 +65,16 @@ class MatchService {
                 budget: match.option.budget,
             },
         })
+        // Check cache stadium info is exist
+        const stadiumInfo = await redis.get(`stadium:${match.cid}`)
+        if (!stadiumInfo) {
+            // get detail place of match
+            const placeDetail = await getPlaceDetail({
+                cid: match.cid,
+            })
+            // set cache stadium info
+            await redis.set(`stadium:${match.cid}`, JSON.stringify(placeDetail))
+        }
         // logs
         global.logger.info(`Create new match: ${newMatch.id} by user: ${user_create_id}`)
         return newMatch
@@ -78,7 +89,7 @@ class MatchService {
      * @param {*} end_time float (hour of day)
      * @param {*} sport_name array (sport name)
      */
-    async getListMatch(lat, long, distance, start_time, end_time, sport_name) {
+    async getListMatch(lat, long, distance, start_time, end_time, sport_name, user_id) {
         //
         sport_name = sport_name.split(',')
         // 1. Get list match by sport name, now time and filter by time
@@ -104,6 +115,7 @@ class MatchService {
                 maximum_join: true,
                 start_time: true,
                 status: true,
+                user_create_id: true,
                 match_join: {
                     where: {
                         status: 'accepted',
@@ -122,28 +134,46 @@ class MatchService {
         })
         // if list match empty return empty list
         if (listMatchByTimeAndSportName.length === 0) return []
-        // Define listMatchByDistanceValid
-        let listMatchByDistanceValid = []
+        let list_match_by_distance_and_time = []
         // 3. Filter by distance and time
         for (let i = 0; i < listMatchByTimeAndSportName.length; i++) {
             // get start time of match
             let match_start_time =
                 new Date(listMatchByTimeAndSportName[i].start_time).getHours() +
                 new Date(listMatchByTimeAndSportName[i].start_time).getMinutes() / 60
-            console.log('match_start_time::', match_start_time)
             // 1. Get detail place of match
-            const placeDetail = await getPlaceDetail({
-                cid: listMatchByTimeAndSportName[i].cid,
-            })
+            let placeDetail = await redis.get(
+                `stadium:${listMatchByTimeAndSportName[i].cid}`
+            )
+            placeDetail = JSON.parse(placeDetail)
+            if (!placeDetail) {
+                placeDetail = await getPlaceDetail({
+                    cid: listMatchByTimeAndSportName[i].cid,
+                })
+                await redis.set(
+                    `stadium:${listMatchByTimeAndSportName[i].cid}`,
+                    JSON.stringify(placeDetail)
+                )
+            }
+            // wait distance matrix to 30s
+            await new Promise((resolve) => setTimeout(resolve, 150))
+
             // 2. Check distance of user and match
-            const distanceMatrix = await getDistance({
+            let distanceMatrix = await getDistance({
                 latOrigin: lat,
                 longOrigin: long,
                 latDestination: placeDetail.latitude,
                 longDestination: placeDetail.longitude,
             })
-            // 3. If valid distance and time valid push detail place to listMatch
-            // check distance and time
+            distanceMatrix = distanceMatrix.rows[0].elements[0].distance
+            console.log(`Distance: ${distanceMatrix.value}`)
+            // 3. Check is owner of match
+            if (listMatchByTimeAndSportName[i].user_create_id === user_id) {
+                listMatchByTimeAndSportName[i].is_owner = true
+            } else {
+                listMatchByTimeAndSportName[i].is_owner = false
+            }
+            // 4. If valid distance and time valid push detail place to listMatch
             if (
                 distanceMatrix.value <= distance &&
                 start_time <= match_start_time &&
@@ -151,11 +181,11 @@ class MatchService {
             ) {
                 listMatchByTimeAndSportName[i].place_detail = placeDetail
                 listMatchByTimeAndSportName[i].distance = distanceMatrix
-                listMatchByDistanceValid.push(listMatchByTimeAndSportName[i])
+                list_match_by_distance_and_time.push(listMatchByTimeAndSportName[i])
             }
         }
         // 4. Group by day
-        let result = listMatchByDistanceValid.reduce((acc, match) => {
+        let result = list_match_by_distance_and_time.reduce((acc, match) => {
             const date = getStringByDate(match.start_time)
             if (!acc[date]) {
                 acc[date] = {

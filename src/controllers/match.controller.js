@@ -20,7 +20,8 @@ class MatchController {
                 req.query.distance,
                 req.query.start_time,
                 req.query.end_time,
-                req.query.sport_name
+                req.query.sport_name,
+                req.user.id
             ),
         }).send(res)
     }

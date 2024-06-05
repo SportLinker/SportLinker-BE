@@ -3,22 +3,13 @@ const { createClient } = require('redis')
 class RedisConnection {
     constructor() {
         if (!RedisConnection.instance) {
-            if (global.config.get(`NODE_ENV`) === 'development') {
-                this.client = createClient({
-                    password: global.config.get(`REDIS_PASSWORD`),
-                    socket: {
-                        host: global.config.get(`REDIS_HOST`),
-                        port: global.config.get(`REDIS_PORT`),
-                    },
-                })
-            } else {
-                this.client = createClient({
-                    socket: {
-                        path: global.config.get(`REDIS_PATH`),
-                    },
-                })
-            }
-
+            this.client = createClient({
+                password: global.config.get(`REDIS_PASSWORD`),
+                socket: {
+                    host: global.config.get(`REDIS_HOST`),
+                    port: global.config.get(`REDIS_PORT`),
+                },
+            })
             RedisConnection.instance = this
         }
         return RedisConnection.instance

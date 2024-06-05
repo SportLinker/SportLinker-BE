@@ -12,11 +12,10 @@ const getDistance = async ({
         `&destinations=${latDestination},${longDestination}` +
         `&vehicle=car` +
         `&api_key=${global.config.get(`DISTANCEMATRIX_API_KEY`)}`
-    const response = await fetch(distanceMatrixAPI)
-    const data = await response.json()
-    const result = data.rows[0].elements[0].distance
-    console.log('result::', result)
-    return result
+
+    let response = await fetch(distanceMatrixAPI)
+    response = await response.json()
+    return response
 }
 
 const getPlaceDetail = async ({ cid }) => {
