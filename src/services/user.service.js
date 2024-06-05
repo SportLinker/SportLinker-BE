@@ -55,7 +55,17 @@ class UserService {
     }
 
     async deleteUser(user_id, admin_id) {
-        const user = await prisma.user.update({
+        // check user is admin
+        const user = await prisma.user.findUnique({
+            where: {
+                id: user_id,
+            },
+        })
+        if (user.role === 'admin') {
+            throw new BadRequestError('Cannot delete admin user')
+        }
+        // delete user
+        await prisma.user.update({
             where: {
                 id: user_id,
             },
