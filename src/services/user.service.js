@@ -2,6 +2,7 @@
 
 const prisma = require('../configs/prisma.config')
 const { BadRequestError } = require('../core/error.response')
+const brycpt = require('bcrypt')
 
 class UserService {
     async getAllUser(pageSize, pageNumber) {
@@ -50,6 +51,9 @@ class UserService {
             })
             if (isExistPhone) throw new BadRequestError('Phone is already exist')
         }
+        // hash password
+        data.password = await brycpt.hash(data.password, 10)
+
         const user = await prisma.user.create({
             data,
         })
