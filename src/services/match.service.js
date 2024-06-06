@@ -280,7 +280,7 @@ class MatchService {
      * @param {*} match_id
      */
 
-    async getMatchDetail(match_id) {
+    async getMatchDetail(match_id, user_id) {
         // 1. Get match detail
         const matchDetail = await prisma.match
             .findUnique({
@@ -338,8 +338,18 @@ class MatchService {
             })
             await redis.set(`stadium:${matchDetail.cid}`, JSON.stringify(placeDetail))
         }
-
         matchDetail.place_detail = placeDetail
+        // 3. Check is owner of match
+        if (matchDetail.user_create.id === user_id) {
+            matchDetail.is_owner = true
+        } else {
+            matchDetail.is_owner = false
+        }
+        // 4. Check is apptent to match
+        const is_attendend = matchDetail.match_join.some(
+            (match) => match.user_join.id === user_id
+        )
+        matchDetail.is_attendend = is_attendend
         // 3. Return result
         return matchDetail
     }

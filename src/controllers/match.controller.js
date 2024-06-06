@@ -29,7 +29,7 @@ class MatchController {
     async getMatchDetail(req, res, next) {
         new Ok({
             message: 'Get match detail successfully',
-            metadata: await MatchService.getMatchDetail(req.params.match_id),
+            metadata: await MatchService.getMatchDetail(req.params.match_id, req.user.id),
         }).send(res)
     }
 
