@@ -93,6 +93,7 @@ model Wallet {
 // Sport
 model Sport {
   sport_name String  @id @unique
+  value      String?
   icon       String?
   Match      Match[]
 }
