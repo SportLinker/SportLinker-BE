@@ -33,11 +33,25 @@ class MatchJoinService {
                 data: {
                     match_id: matchId,
                     user_join_id: userId,
+                    status: 'accepted',
                 },
             })
             .catch((err) => {
                 throw new BadRequestError(err.message)
             })
+        // get detail user join
+        const userJoin = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                name: true,
+            },
+        })
+        // send notification to owner of match
+        await NotificationSerivce.createNotification({
+            sender_id: userId,
+            receiver_id: isMatchExist.user_create_id,
+            content: `User ${userJoin.name} join match ${isMatchExist.match_name}`,
+        })
         // logs
         global.logger.info(`User ${userId} join match ${matchId}`)
         // 6. return succes
