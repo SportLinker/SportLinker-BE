@@ -83,6 +83,13 @@ class MatchService {
                 type: 'match',
             },
         })
+        // create group message join for owner
+        await prisma.groupMessageJoin.create({
+            data: {
+                group_message_id: newMatch.match_id,
+                user_join_id: user_create_id,
+            },
+        })
         // logs
         global.logger.info(`Create new match: ${newMatch.id} by user: ${user_create_id}`)
         return newMatch
