@@ -8,10 +8,10 @@ class MatchJoinService {
     async joinMatch(matchId, userId) {
         //1. check match exist
         const isMatchExist = await prisma.match.findUnique({
-            where: { match_id: matchId, status: 'upcomming' },
+            where: { match_id: matchId },
         })
-        if (!isMatchExist) {
-            throw new BadRequestError('Match not found or already started')
+        if (isMatchExist.status !== 'upcomming') {
+            throw new BadRequestError('Match is not upcomming')
         }
         // 2. check match is full
         if (isMatchExist.total_join + 1 > isMatchExist.max_join) {
@@ -39,6 +39,15 @@ class MatchJoinService {
             .catch((err) => {
                 throw new BadRequestError(err.message)
             })
+        // 5. update total join in match
+        await prisma.match.update({
+            where: { match_id: matchId },
+            data: {
+                total_join: {
+                    increment: 1,
+                },
+            },
+        })
         // get detail user join
         const userJoin = await prisma.user.findUnique({
             where: { id: userId },

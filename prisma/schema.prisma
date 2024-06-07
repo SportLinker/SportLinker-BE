@@ -111,7 +111,6 @@ model Match {
   end_time       DateTime
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
-  description    String?
   status         MatchStatus  @default(upcomming)
   // Relation
   user_create    User         @relation(fields: [user_create_id], references: [id])
