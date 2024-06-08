@@ -493,6 +493,21 @@ class MatchService {
                 },
             },
         })
+        // get detail place of match
+        for (let i = 0; i < allMatchByAdmin.length; i++) {
+            let placeDetail = await redis.get(`stadium:${allMatchByAdmin[i].cid}`)
+            placeDetail = JSON.parse(placeDetail)
+            if (!placeDetail) {
+                placeDetail = await getPlaceDetail({
+                    cid: allMatchByAdmin[i].cid,
+                })
+                await redis.set(
+                    `stadium:${allMatchByAdmin[i].cid}`,
+                    JSON.stringify(placeDetail)
+                )
+            }
+            allMatchByAdmin[i].place_detail = placeDetail
+        }
         // count total match
         const totalMatch = await prisma.match.count({
             where: {
