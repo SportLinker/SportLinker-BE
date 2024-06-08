@@ -441,6 +441,8 @@ class MatchService {
         // 3. Return result
         return updateMatch
     }
+<<<<<<< Updated upstream
+=======
 
     /**
      *
@@ -451,11 +453,14 @@ class MatchService {
      */
 
     async getAllMatchByAdmin(page_number, page_size, month, year) {
-        // parse all param to int
-        page_number = parseInt(page_number)
-        page_size = parseInt(page_size)
-        month = parseInt(month)
-        year = parseInt(year)
+        // parse all param to int if they are valid
+        page_number = Number.isInteger(parseInt(page_number)) ? parseInt(page_number) : 1
+        page_size = Number.isInteger(parseInt(page_size)) ? parseInt(page_size) : 10
+        month = Number.isInteger(parseInt(month)) ? parseInt(month) : 1
+        year = Number.isInteger(parseInt(year))
+            ? parseInt(year)
+            : new Date().getFullYear()
+    
         // 1. Get all match by admin
         const allMatchByAdmin = await prisma.match.findMany({
             where: {
@@ -484,11 +489,6 @@ class MatchService {
                         id: true,
                         name: true,
                         avatar_url: true,
-                    },
-                },
-                option: {
-                    select: {
-                        budget: true,
                     },
                 },
             },
@@ -524,6 +524,8 @@ class MatchService {
             total_page: total_page,
         }
     }
+    
+>>>>>>> Stashed changes
 }
 
 module.exports = new MatchService()
