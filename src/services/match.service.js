@@ -441,8 +441,6 @@ class MatchService {
         // 3. Return result
         return updateMatch
     }
-<<<<<<< Updated upstream
-=======
 
     /**
      *
@@ -524,8 +522,6 @@ class MatchService {
             total_page: total_page,
         }
     }
-    
->>>>>>> Stashed changes
 }
 
 module.exports = new MatchService()
