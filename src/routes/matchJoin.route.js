@@ -13,5 +13,9 @@ router.get('/:match_id', asyncHandler(MatchJoinController.getListUserJoinMatchBy
 
 // update status user_join in match
 router.patch('/:match_id', asyncHandler(MatchJoinController.updateUserJoinMatchByMatchId))
-
+// delete user join match or leave match
+router.delete(
+    '/:match_id',
+    asyncHandler(MatchJoinController.deleteUserJoinMatchByMatchId)
+)
 module.exports = router

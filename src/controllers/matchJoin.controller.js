@@ -31,6 +31,17 @@ class MatchJoinController {
             ),
         }).send(res)
     }
+
+    async deleteUserJoinMatchByMatchId(req, res, next) {
+        new Ok({
+            message: 'Delete user join match by match id successfully.',
+            metadata: await MatchJoinService.deleteUserJoinMatchByMatchId(
+                req.body.user_id,
+                req.params.match_id,
+                req.user.id
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new MatchJoinController()

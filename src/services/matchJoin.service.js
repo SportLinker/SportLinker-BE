@@ -159,6 +159,64 @@ class MatchJoinService {
         // 4. return success
         return listUserJoin
     }
+
+    async deleteUserJoinMatchByMatchId(userJoinId, matchId, userId) {
+        // 1. check match exist
+        const isMatchExist = await prisma.match.findUnique({
+            where: { match_id: matchId },
+        })
+        // check  match is upcomming
+        if (isMatchExist.status !== 'upcomming') {
+            throw new BadRequestError('Match is not upcomming')
+        }
+        /**
+         * onwer of match can delete user join match
+         * user join can leave match
+         */
+        // get detail user join
+        const userJoin = await prisma.user.findUnique({
+            where: { id: userJoinId },
+            select: {
+                name: true,
+            },
+        })
+        // 2. check is owner of match
+        if (isMatchExist.user_create_id === userId) {
+            await prisma.matchJoin.delete({
+                where: {
+                    user_join_id: userJoinId,
+                    match_id: matchId,
+                },
+            })
+            // send notification to user
+            await NotificationSerivce.createNotification({
+                content: `Owner of match ${isMatchExist.match_name} delete you from match`,
+                receiver_id: userJoinId,
+                sender_id: userId,
+            })
+
+            return `Delete user join match successfully`
+        } else {
+            // check user join is user login
+            if (userJoinId !== userId) {
+                throw new BadRequestError('You are not user join match')
+            } else {
+                await prisma.matchJoin.delete({
+                    where: {
+                        user_join_id: userJoinId,
+                        match_id: matchId,
+                    },
+                })
+                // send notification to owner of match
+                await NotificationSerivce.createNotification({
+                    content: `User ${userJoin.name} leave match ${isMatchExist.match_name}`,
+                    receiver_id: isMatchExist.user_create_id,
+                    sender_id: userJoinId,
+                })
+                return `Leave match successfully`
+            }
+        }
+    }
 }
 
 module.exports = new MatchJoinService()
