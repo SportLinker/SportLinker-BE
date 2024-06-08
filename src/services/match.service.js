@@ -441,6 +441,69 @@ class MatchService {
         // 3. Return result
         return updateMatch
     }
+
+    /**
+     *
+     * @param {*} page_number
+     * @param {*} page_size
+     * @param {*} month
+     * @param {*} year
+     */
+
+    async getAllMatchByAdmin(page_number, page_size, month, year) {
+        // 1. Get all match by admin
+        const allMatchByAdmin = await prisma.match.findMany({
+            where: {
+                start_time: {
+                    gte: new Date(`${year}-${month}-01`),
+                    lt: new Date(`${year}-${month}-31`),
+                },
+            },
+            skip: (page_number - 1) * page_size,
+            take: page_size,
+            orderBy: {
+                start_time: 'asc',
+            },
+            select: {
+                match_id: true,
+                match_name: true,
+                cid: true,
+                sport_name: true,
+                total_join: true,
+                maximum_join: true,
+                start_time: true,
+                end_time: true,
+                status: true,
+                user_create: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
+                option: {
+                    select: {
+                        budget: true,
+                    },
+                },
+            },
+        })
+        // count total match
+        const totalMatch = await prisma.match.count({
+            where: {
+                start_time: {
+                    gte: new Date(`${year}-${month}-01`),
+                    lt: new Date(`${year}-${month}-31`),
+                },
+            },
+        })
+        // check total page
+        const total_page = Math.ceil(totalMatch / page_size)
+        return {
+            matches: allMatchByAdmin,
+            total_page: total_page,
+        }
+    }
 }
 
 module.exports = new MatchService()

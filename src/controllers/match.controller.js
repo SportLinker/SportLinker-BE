@@ -50,6 +50,18 @@ class MatchController {
             ),
         }).send(res)
     }
+
+    async getAllMatchByAdmin(req, res, next) {
+        new Ok({
+            message: 'Get all match by admin successfully',
+            metadata: await MatchService.getAllMatchByAdmin(
+                req.query.page_number,
+                req.query.page_size,
+                req.query.month,
+                req.query.year
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new MatchController()

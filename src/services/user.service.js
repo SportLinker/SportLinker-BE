@@ -25,9 +25,11 @@ class UserService {
         })
         // count total user
         const total_user = await prisma.user.count()
+        // check total page
+        const total_page = Math.ceil(total_user / pageSize)
         return {
             list_user,
-            total_user,
+            total_page,
         }
     }
 

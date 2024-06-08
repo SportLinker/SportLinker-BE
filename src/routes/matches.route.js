@@ -16,4 +16,6 @@ router.post('/', asyncHandler(matchController.createNewMatch))
 
 router.delete('/:match_id', asyncHandler(matchController.deleteMatch))
 
+router.get('/admin/getAllMatch', asyncHandler(matchController.getAllMatchByAdmin))
+
 module.exports = router
