@@ -4,7 +4,7 @@ const { asyncHandler } = require('../helpers/asyncHandler.helper')
 const matchController = require('../controllers/match.controller')
 const { authentication } = require('../middlewares/auth.middleware')
 
-router.use(authentication)
+// router.use(authentication)
 
 router.get('/:match_id', asyncHandler(matchController.getMatchDetail))
 

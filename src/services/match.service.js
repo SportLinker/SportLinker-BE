@@ -451,6 +451,11 @@ class MatchService {
      */
 
     async getAllMatchByAdmin(page_number, page_size, month, year) {
+        // parse all param to int
+        page_number = parseInt(page_number)
+        page_size = parseInt(page_size)
+        month = parseInt(month)
+        year = parseInt(year)
         // 1. Get all match by admin
         const allMatchByAdmin = await prisma.match.findMany({
             where: {
