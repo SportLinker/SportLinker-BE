@@ -75,6 +75,21 @@ class MatchService {
             // set cache stadium info
             await redis.set(`stadium:${match.cid}`, JSON.stringify(placeDetail))
         }
+        // create message for match
+        await prisma.groupMessage.create({
+            data: {
+                group_message_id: newMatch.match_id,
+                group_message_name: newMatch.match_name,
+                type: 'match',
+            },
+        })
+        // create group message join for owner
+        await prisma.groupMessageJoin.create({
+            data: {
+                group_message_id: newMatch.match_id,
+                user_join_id: user_create_id,
+            },
+        })
         // logs
         global.logger.info(`Create new match: ${newMatch.id} by user: ${user_create_id}`)
         return newMatch
@@ -90,48 +105,89 @@ class MatchService {
      * @param {*} sport_name array (sport name)
      */
     async getListMatch(lat, long, distance, start_time, end_time, sport_name, user_id) {
-        //
-        sport_name = sport_name.split(',')
-        // 1. Get list match by sport name, now time and filter by time
-        let listMatchByTimeAndSportName = await prisma.match.findMany({
-            where: {
-                start_time: {
-                    gte: new Date(),
-                },
-                sport_name: {
-                    in: sport_name,
-                },
-                status: 'upcomming',
-            },
-            orderBy: {
-                start_time: 'asc',
-            },
-            select: {
-                match_id: true,
-                match_name: true,
-                cid: true,
-                sport_name: true,
-                total_join: true,
-                maximum_join: true,
-                start_time: true,
-                status: true,
-                user_create_id: true,
-                match_join: {
-                    where: {
-                        status: 'accepted',
+        let listMatchByTimeAndSportName
+        // check sport_name is empty
+        if (!sport_name) {
+            listMatchByTimeAndSportName = await prisma.match.findMany({
+                where: {
+                    start_time: {
+                        gte: new Date(),
                     },
-                    select: {
-                        user_join: {
-                            select: {
-                                id: true,
-                                name: true,
-                                avatar_url: true,
+                    status: 'upcomming',
+                },
+                orderBy: {
+                    start_time: 'asc',
+                },
+                select: {
+                    match_id: true,
+                    match_name: true,
+                    cid: true,
+                    sport_name: true,
+                    total_join: true,
+                    maximum_join: true,
+                    start_time: true,
+                    status: true,
+                    user_create_id: true,
+                    match_join: {
+                        where: {
+                            status: 'accepted',
+                        },
+                        select: {
+                            user_join: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    avatar_url: true,
+                                },
                             },
                         },
                     },
                 },
-            },
-        })
+            })
+        } else {
+            sport_name = sport_name.split(',')
+            // 1. Get list match by sport name, now time and filter by time
+            listMatchByTimeAndSportName = await prisma.match.findMany({
+                where: {
+                    start_time: {
+                        gte: new Date(),
+                    },
+                    sport_name: {
+                        in: sport_name,
+                    },
+                    status: 'upcomming',
+                },
+                orderBy: {
+                    start_time: 'asc',
+                },
+                select: {
+                    match_id: true,
+                    match_name: true,
+                    cid: true,
+                    sport_name: true,
+                    total_join: true,
+                    maximum_join: true,
+                    start_time: true,
+                    status: true,
+                    user_create_id: true,
+                    match_join: {
+                        where: {
+                            status: 'accepted',
+                        },
+                        select: {
+                            user_join: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    avatar_url: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            })
+        }
+
         // if list match empty return empty list
         if (listMatchByTimeAndSportName.length === 0) return []
         let list_match_by_distance_and_time = []
@@ -224,7 +280,7 @@ class MatchService {
      * @param {*} match_id
      */
 
-    async getMatchDetail(match_id) {
+    async getMatchDetail(match_id, user_id) {
         // 1. Get match detail
         const matchDetail = await prisma.match
             .findUnique({
@@ -282,8 +338,18 @@ class MatchService {
             })
             await redis.set(`stadium:${matchDetail.cid}`, JSON.stringify(placeDetail))
         }
-
         matchDetail.place_detail = placeDetail
+        // 3. Check is owner of match
+        if (matchDetail.user_create.id === user_id) {
+            matchDetail.is_owner = true
+        } else {
+            matchDetail.is_owner = false
+        }
+        // 4. Check is apptent to match
+        const is_attendend = matchDetail.match_join.some(
+            (match) => match.user_join.id === user_id
+        )
+        matchDetail.is_attendend = is_attendend
         // 3. Return result
         return matchDetail
     }
@@ -374,6 +440,89 @@ class MatchService {
             })
         // 3. Return result
         return updateMatch
+    }
+
+    /**
+     *
+     * @param {*} page_number
+     * @param {*} page_size
+     * @param {*} month
+     * @param {*} year
+     */
+
+    async getAllMatchByAdmin(page_number, page_size, month, year) {
+        // parse all param to int
+        page_number = parseInt(page_number)
+        page_size = parseInt(page_size)
+        month = parseInt(month)
+        year = parseInt(year)
+        // 1. Get all match by admin
+        const allMatchByAdmin = await prisma.match.findMany({
+            where: {
+                start_time: {
+                    gte: new Date(`${year}-${month}-01`),
+                    lt: new Date(`${year}-${month}-31`),
+                },
+            },
+            skip: (page_number - 1) * page_size,
+            take: page_size,
+            orderBy: {
+                start_time: 'asc',
+            },
+            select: {
+                match_id: true,
+                match_name: true,
+                cid: true,
+                sport_name: true,
+                total_join: true,
+                maximum_join: true,
+                start_time: true,
+                end_time: true,
+                status: true,
+                user_create: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
+                option: {
+                    select: {
+                        budget: true,
+                    },
+                },
+            },
+        })
+        // get detail place of match
+        for (let i = 0; i < allMatchByAdmin.length; i++) {
+            let placeDetail = await redis.get(`stadium:${allMatchByAdmin[i].cid}`)
+            placeDetail = JSON.parse(placeDetail)
+            if (!placeDetail) {
+                placeDetail = await getPlaceDetail({
+                    cid: allMatchByAdmin[i].cid,
+                })
+                await redis.set(
+                    `stadium:${allMatchByAdmin[i].cid}`,
+                    JSON.stringify(placeDetail)
+                )
+            }
+            allMatchByAdmin[i].place_detail = placeDetail
+        }
+        // count total match
+        const totalMatch = await prisma.match.count({
+            where: {
+                start_time: {
+                    gte: new Date(`${year}-${month}-01`),
+                    lt: new Date(`${year}-${month}-31`),
+                },
+            },
+        })
+        // check total page
+        const total_page = Math.ceil(totalMatch / page_size)
+        return {
+            matches: allMatchByAdmin,
+            total_page: total_page,
+        }
     }
 }
 

@@ -5,7 +5,7 @@ const { Ok, CREATED } = require('../core/sucess.response')
 
 class UserController {
     async getAllUser(req, res, next) {
-        new CREATED({
+        new Ok({
             message: 'Get all user successfully',
             metadata: await UserService.getAllUser(
                 req.query.page_size,

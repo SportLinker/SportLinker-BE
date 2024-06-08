@@ -8,10 +8,10 @@ class MatchJoinService {
     async joinMatch(matchId, userId) {
         //1. check match exist
         const isMatchExist = await prisma.match.findUnique({
-            where: { match_id: matchId, status: 'upcomming' },
+            where: { match_id: matchId },
         })
-        if (!isMatchExist) {
-            throw new BadRequestError('Match not found or already started')
+        if (isMatchExist.status !== 'upcomming') {
+            throw new BadRequestError('Match is not upcomming')
         }
         // 2. check match is full
         if (isMatchExist.total_join + 1 > isMatchExist.max_join) {
@@ -33,11 +33,34 @@ class MatchJoinService {
                 data: {
                     match_id: matchId,
                     user_join_id: userId,
+                    status: 'accepted',
                 },
             })
             .catch((err) => {
                 throw new BadRequestError(err.message)
             })
+        // 5. update total join in match
+        await prisma.match.update({
+            where: { match_id: matchId },
+            data: {
+                total_join: {
+                    increment: 1,
+                },
+            },
+        })
+        // get detail user join
+        const userJoin = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                name: true,
+            },
+        })
+        // send notification to owner of match
+        await NotificationSerivce.createNotification({
+            sender_id: userId,
+            receiver_id: isMatchExist.user_create_id,
+            content: `User ${userJoin.name} join match ${isMatchExist.match_name}`,
+        })
         // logs
         global.logger.info(`User ${userId} join match ${matchId}`)
         // 6. return succes
@@ -135,6 +158,64 @@ class MatchJoinService {
         global.logger.info(`Get list user join match by match id ${matchId}`)
         // 4. return success
         return listUserJoin
+    }
+
+    async deleteUserJoinMatchByMatchId(userJoinId, matchId, userId) {
+        // 1. check match exist
+        const isMatchExist = await prisma.match.findUnique({
+            where: { match_id: matchId },
+        })
+        // check  match is upcomming
+        if (isMatchExist.status !== 'upcomming') {
+            throw new BadRequestError('Match is not upcomming')
+        }
+        /**
+         * onwer of match can delete user join match
+         * user join can leave match
+         */
+        // get detail user join
+        const userJoin = await prisma.user.findUnique({
+            where: { id: userJoinId },
+            select: {
+                name: true,
+            },
+        })
+        // 2. check is owner of match
+        if (isMatchExist.user_create_id === userId) {
+            await prisma.matchJoin.delete({
+                where: {
+                    user_join_id: userJoinId,
+                    match_id: matchId,
+                },
+            })
+            // send notification to user
+            await NotificationSerivce.createNotification({
+                content: `Owner of match ${isMatchExist.match_name} delete you from match`,
+                receiver_id: userJoinId,
+                sender_id: userId,
+            })
+
+            return `Delete user join match successfully`
+        } else {
+            // check user join is user login
+            if (userJoinId !== userId) {
+                throw new BadRequestError('You are not user join match')
+            } else {
+                await prisma.matchJoin.delete({
+                    where: {
+                        user_join_id: userJoinId,
+                        match_id: matchId,
+                    },
+                })
+                // send notification to owner of match
+                await NotificationSerivce.createNotification({
+                    content: `User ${userJoin.name} leave match ${isMatchExist.match_name}`,
+                    receiver_id: isMatchExist.user_create_id,
+                    sender_id: userJoinId,
+                })
+                return `Leave match successfully`
+            }
+        }
     }
 }
 

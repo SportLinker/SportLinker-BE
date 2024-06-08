@@ -29,7 +29,7 @@ class MatchController {
     async getMatchDetail(req, res, next) {
         new Ok({
             message: 'Get match detail successfully',
-            metadata: await MatchService.getMatchDetail(req.params.match_id),
+            metadata: await MatchService.getMatchDetail(req.params.match_id, req.user.id),
         }).send(res)
     }
 
@@ -47,6 +47,18 @@ class MatchController {
                 req.params.match_id,
                 req.user.id,
                 req.body
+            ),
+        }).send(res)
+    }
+
+    async getAllMatchByAdmin(req, res, next) {
+        new Ok({
+            message: 'Get all match by admin successfully',
+            metadata: await MatchService.getAllMatchByAdmin(
+                req.query.page_number,
+                req.query.page_size,
+                req.query.month,
+                req.query.year
             ),
         }).send(res)
     }

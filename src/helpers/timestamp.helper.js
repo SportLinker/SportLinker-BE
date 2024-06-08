@@ -9,7 +9,8 @@ const getUCLHourAndMinute = (time) => {
 }
 
 const getStringByDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
+    // vietnamese date format (ex: Thứ hai, 20 tháng 9, 2021)
+    return new Date(date).toLocaleDateString('vi-VN', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
