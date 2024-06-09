@@ -161,31 +161,37 @@ class MatchJoinService {
     }
 
     async deleteUserJoinMatchByMatchId(userJoinId, matchId, userId) {
-        // 1. check match exist
+        // 1. check match exist is upcomming
         const isMatchExist = await prisma.match.findUnique({
             where: { match_id: matchId },
         })
-        // check  match is upcomming
+
         if (isMatchExist.status !== 'upcomming') {
             throw new BadRequestError('Match is not upcomming')
         }
-        /**
-         * onwer of match can delete user join match
-         * user join can leave match
-         */
-        // get detail user join
+        // 2. check user join is exist
+        const matchJoin = await prisma.matchJoin.findFirst({
+            where: {
+                match_id: matchId,
+                user_join_id: userJoinId,
+            },
+        })
+
+        if (!matchJoin) {
+            throw new BadRequestError('You are not join match')
+        }
+        // 3. get detail user join
         const userJoin = await prisma.user.findUnique({
             where: { id: userJoinId },
             select: {
                 name: true,
             },
         })
-        // 2. check is owner of match
+        // 4. Check is onwer or user join match
         if (isMatchExist.user_create_id === userId) {
             await prisma.matchJoin.delete({
                 where: {
-                    user_join_id: userJoinId,
-                    match_id: matchId,
+                    id: matchJoin.id,
                 },
             })
             // send notification to user
@@ -195,16 +201,14 @@ class MatchJoinService {
                 sender_id: userId,
             })
 
-            return `Delete user join match successfully`
+            return `Remove user join match successfully`
         } else {
-            // check user join is user login
             if (userJoinId !== userId) {
                 throw new BadRequestError('You are not user join match')
             } else {
                 await prisma.matchJoin.delete({
                     where: {
-                        user_join_id: userJoinId,
-                        match_id: matchId,
+                        id: matchJoin.id,
                     },
                 })
                 // send notification to owner of match

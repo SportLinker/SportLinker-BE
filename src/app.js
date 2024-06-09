@@ -26,7 +26,7 @@ const corsOptions = {
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 }
-app.use(cors(corsOptions))
+app.use(cors())
 // init global variable
 global.config = config
 global.logger = require('./services/logger.service')
