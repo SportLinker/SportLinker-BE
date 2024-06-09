@@ -195,6 +195,7 @@ class MatchJoinService {
      *       4.1.1 send notification to user
      *   4.2 if user join match leave match
      *       4.2.1 send notification to owner of match
+     * 5. delete user out of group message join
      * @returns
      */
     async deleteUserJoinMatchByMatchId(userJoinId, matchId, userId) {
@@ -240,6 +241,20 @@ class MatchJoinService {
                     },
                 },
             })
+            // delete user out of group message join
+            const groupMessageJoin = await prisma.groupMessageJoin.findFirst({
+                where: {
+                    group_message_id: matchId,
+                    user_join_id: userJoinId,
+                },
+            })
+            if (groupMessageJoin) {
+                await prisma.groupMessageJoin.delete({
+                    where: {
+                        id: groupMessageJoin.id,
+                    },
+                })
+            }
             // send notification to user
             await NotificationSerivce.createNotification({
                 content: `Owner of match ${isMatchExist.match_name} delete you from match`,
@@ -267,6 +282,20 @@ class MatchJoinService {
                         },
                     },
                 })
+                // delete user out of group message join
+                const groupMessageJoin = await prisma.groupMessageJoin.findFirst({
+                    where: {
+                        group_message_id: matchId,
+                        user_join_id: userJoinId,
+                    },
+                })
+                if (groupMessageJoin) {
+                    await prisma.groupMessageJoin.delete({
+                        where: {
+                            id: groupMessageJoin.id,
+                        },
+                    })
+                }
                 // send notification to owner of match
                 await NotificationSerivce.createNotification({
                     content: `User ${userJoin.name} leave match ${isMatchExist.match_name}`,
