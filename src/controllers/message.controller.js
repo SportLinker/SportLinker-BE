@@ -13,6 +13,17 @@ class MessageController {
             ),
         }).send(res)
     }
+
+    async createMessage(req, res, next) {
+        new CREATED({
+            message: 'Create message successfully',
+            metadata: await MessageService.createMessage(
+                req.params.group_message_id,
+                req.user.id,
+                req.body.content
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new MessageController()

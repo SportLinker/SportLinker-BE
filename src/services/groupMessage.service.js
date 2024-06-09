@@ -42,9 +42,25 @@ class GroupMessageService {
                 },
             })
             if (lastMessage) {
-                groupMessage[i].last_message = lastMessage
+                groupMessage[i].last_message = lastMessage.content
+                // get notification message to check is seen
+                const notification_message = await prisma.notificationMessage.findFirst({
+                    where: {
+                        message_id: lastMessage.message_id,
+                        user_id: userId,
+                    },
+                    select: {
+                        is_seen: true,
+                    },
+                })
+                if (notification_message) {
+                    groupMessage[i].is_seen = notification_message.is_seen
+                } else {
+                    groupMessage[i].is_seen = false
+                }
             } else {
                 groupMessage[i].last_message = `Hãy bắt đầu cuộc trò chuyện`
+                groupMessage[i].is_seen = false
             }
         }
         return groupMessage

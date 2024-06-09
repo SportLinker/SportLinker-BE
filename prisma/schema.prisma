@@ -20,30 +20,30 @@ datasource db {
 
 // User
 model User {
-  id                    String             @id @default(cuid())
-  phone                 String?            @unique
-  email                 String?            @unique
+  id                    String                @id @default(cuid())
+  phone                 String?               @unique
+  email                 String?               @unique
   name                  String
   password              String
   bio                   String?
   avatar_url            String?
   gender                UserGender
   date_of_birth         DateTime?
-  role                  UserRole           @default(player)
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime?          @updatedAt
+  role                  UserRole              @default(player)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime?             @updatedAt
   last_active_time      DateTime?
-  status                UserStatus         @default(active)
+  status                UserStatus            @default(active)
   // Relation
   AuthenOTPs            AuthenOTP[]
   Wallet                Wallet?
   Match                 Match[]
   MatchJoin             MatchJoin[]
-  receivedNotifications Notification[]     @relation("ReceivedNotifications")
-  sentNotifications     Notification[]     @relation("SentNotifications")
-  messageTo             Message[]          @relation("MessageTo")
-  messageFrom           Message[]          @relation("MessageFrom")
+  receivedNotifications Notification[]        @relation("ReceivedNotifications")
+  sentNotifications     Notification[]        @relation("SentNotifications")
+  Message               Message[]
   GroupMessageJoin      GroupMessageJoin[]
+  NotificationMessage   NotificationMessage[]
 }
 
 enum UserStatus {
@@ -169,14 +169,15 @@ model Notification {
 
 // Message Chat
 model Message {
-  message_id   String   @id @default(cuid())
-  message_to   String
-  message_from String
-  content      String
-  created_at   DateTime @default(now())
+  message_id          String                @id @default(cuid())
+  message_to          String
+  message_from        String
+  content             String
+  created_at          DateTime              @default(now())
   // Relation
-  user_to      User     @relation("MessageTo", fields: [message_to], references: [id])
-  user_from    User     @relation("MessageFrom", fields: [message_from], references: [id])
+  user_from           User                  @relation(fields: [message_from], references: [id])
+  group_message_to    GroupMessage          @relation(fields: [message_to], references: [group_message_id])
+  NotificationMessage NotificationMessage[]
 }
 
 model GroupMessage {
@@ -189,6 +190,7 @@ model GroupMessage {
   // Relation
   type                   GroupMessageType
   GroupMessageJoin       GroupMessageJoin[]
+  Message                Message[]
 }
 
 enum GroupMessageType {
@@ -205,4 +207,15 @@ model GroupMessageJoin {
   // Relation
   group_message    GroupMessage @relation(fields: [group_message_id], references: [group_message_id])
   user_join        User         @relation(fields: [user_join_id], references: [id])
+}
+
+model NotificationMessage {
+  id         String   @id @default(cuid())
+  user_id    String
+  message_id String
+  is_seen    Boolean  @default(false)
+  created_at DateTime @default(now())
+  // Relation
+  user       User     @relation(fields: [user_id], references: [id])
+  message    Message  @relation(fields: [message_id], references: [message_id])
 }
