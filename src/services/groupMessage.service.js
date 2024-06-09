@@ -22,6 +22,14 @@ class GroupMessageService {
                     in: id,
                 },
             },
+            orderBy: [
+                {
+                    last_active_time: 'desc',
+                },
+                {
+                    type: 'asc',
+                },
+            ],
         })
         return groupMessage
     }

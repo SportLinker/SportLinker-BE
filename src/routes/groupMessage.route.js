@@ -8,4 +8,6 @@ router.use(authentication)
 
 router.get('/', asyncHandler(groupMessageController.getListGroupMessageByUser))
 
+router.post('/', asyncHandler(groupMessageController.createGroupMessage))
+
 module.exports = router

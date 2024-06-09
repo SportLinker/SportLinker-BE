@@ -10,6 +10,13 @@ class groupMessageController {
             metadata: await GroupMessageService.getListGroupMessageByUser(req.user.id),
         }).send(res)
     }
+
+    async createGroupMessage(req, res, next) {
+        new CREATED({
+            message: 'Match created successfully',
+            metadata: await GroupMessageService.createGroupMessage(req.body, req.user.id),
+        }).send(res)
+    }
 }
 
 module.exports = new groupMessageController()

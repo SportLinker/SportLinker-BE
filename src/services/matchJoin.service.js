@@ -194,6 +194,15 @@ class MatchJoinService {
                     id: matchJoin.id,
                 },
             })
+            // set total_join - 1
+            await prisma.match.update({
+                where: { match_id: matchId },
+                data: {
+                    total_join: {
+                        decrement: 1,
+                    },
+                },
+            })
             // send notification to user
             await NotificationSerivce.createNotification({
                 content: `Owner of match ${isMatchExist.match_name} delete you from match`,
@@ -206,9 +215,19 @@ class MatchJoinService {
             if (userJoinId !== userId) {
                 throw new BadRequestError('You are not user join match')
             } else {
+                // delete user join match
                 await prisma.matchJoin.delete({
                     where: {
                         id: matchJoin.id,
+                    },
+                })
+                // set total_join - 1
+                await prisma.match.update({
+                    where: { match_id: matchId },
+                    data: {
+                        total_join: {
+                            decrement: 1,
+                        },
                     },
                 })
                 // send notification to owner of match
