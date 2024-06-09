@@ -19,14 +19,10 @@ app.use(morgan(morganFormat)) // log requests to the console
 // config cors]
 const corsOptions = {
     // allow multiple domains
-    origin: [
-        'https://sport-linker-landing-page.vercel.app',
-        '192.168.15.122:8081',
-        'http://localhost:5173',
-    ],
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 }
-app.use(cors())
+app.use(cors(corsOptions))
 // init global variable
 global.config = config
 global.logger = require('./services/logger.service')

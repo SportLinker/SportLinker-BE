@@ -31,6 +31,22 @@ class GroupMessageService {
                 },
             ],
         })
+        // Get last message of group message
+        for (let i = 0; i < groupMessage.length; i++) {
+            const lastMessage = await prisma.message.findFirst({
+                where: {
+                    message_to: groupMessage[i].group_message_id,
+                },
+                orderBy: {
+                    created_at: 'desc',
+                },
+            })
+            if (lastMessage) {
+                groupMessage[i].last_message = lastMessage
+            } else {
+                groupMessage[i].last_message = `Hãy bắt đầu cuộc trò chuyện`
+            }
+        }
         return groupMessage
     }
 }
