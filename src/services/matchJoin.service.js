@@ -5,6 +5,20 @@ const { BadRequestError } = require('../core/error.response')
 const NotificationSerivce = require('./notification.service')
 
 class MatchJoinService {
+    /**
+     *
+     * @param {*} matchId
+     * @param {*} userId
+     * @logic
+     * 1. Check match is upcomming
+     * 2. Check match is full
+     * 3. Check user is include in match
+     * 4. Join match
+     * 5. Update total join in match
+     * 6. Add user to group message join
+     * 7. Send notification to owner of match
+     * @returns
+     */
     async joinMatch(matchId, userId) {
         //1. check match exist
         const isMatchExist = await prisma.match.findUnique({
@@ -48,6 +62,13 @@ class MatchJoinService {
                 },
             },
         })
+        // 6. add user to group message join
+        await prisma.groupMessageJoin.create({
+            data: {
+                group_message_id: isMatchExist.match_id,
+                user_join_id: userId,
+            },
+        })
         // get detail user join
         const userJoin = await prisma.user.findUnique({
             where: { id: userId },
@@ -55,7 +76,7 @@ class MatchJoinService {
                 name: true,
             },
         })
-        // send notification to owner of match
+        // 7. send notification to owner of match
         await NotificationSerivce.createNotification({
             sender_id: userId,
             receiver_id: isMatchExist.user_create_id,
@@ -63,7 +84,6 @@ class MatchJoinService {
         })
         // logs
         global.logger.info(`User ${userId} join match ${matchId}`)
-        // 6. return succes
         return `User join match  successfully. Please wait for the owner to accept you.`
     }
 
@@ -71,6 +91,7 @@ class MatchJoinService {
      * @param {string} matchId match_id
      * @param {string} body include status and user_join_id
      * @param {string} user_create_id   owner of match
+     *
      */
 
     async updateUserJoinMatchByMatchId(matchId, body, user_create_id) {
@@ -160,6 +181,22 @@ class MatchJoinService {
         return listUserJoin
     }
 
+    /**
+     *
+     * @param {*} userJoinId
+     * @param {*} matchId
+     * @param {*} userId
+     * @logic
+     * 1. Check match is upcomming
+     * 2. Check user join is exist
+     * 3. Get detail user join
+     * 4. Check is onwer or user join match
+     *   4.1 if owner of match delete user join match
+     *       4.1.1 send notification to user
+     *   4.2 if user join match leave match
+     *       4.2.1 send notification to owner of match
+     * @returns
+     */
     async deleteUserJoinMatchByMatchId(userJoinId, matchId, userId) {
         // 1. check match exist is upcomming
         const isMatchExist = await prisma.match.findUnique({
@@ -180,7 +217,7 @@ class MatchJoinService {
         if (!matchJoin) {
             throw new BadRequestError('You are not join match')
         }
-        // 3. get detail user join
+        // get detail user join
         const userJoin = await prisma.user.findUnique({
             where: { id: userJoinId },
             select: {
