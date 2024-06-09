@@ -38,6 +38,8 @@ global.logger = require('./services/logger.service')
     // connect to database MySQL
     // const MySQLConnection = require('./configs/mysql.config')
     // await MySQLConnection.connect()
+    const prisma = require('./configs/prisma.config')
+    await prisma.connect()
     const { test } = require('./test/index')
     await test()
 })()

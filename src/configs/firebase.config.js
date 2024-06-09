@@ -16,4 +16,4 @@ class Firebase {
     }
 }
 
-module.exports = new Firebase().auth
+module.exports = new Firebase()

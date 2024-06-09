@@ -1,5 +1,6 @@
 'use strict'
-const prisma = require('../configs/prisma.config')
+
+const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const bcrypt = require('bcrypt')
 
@@ -65,7 +66,7 @@ class UserService {
 
         // Hash the password
         if (data.password) {
-            data.password = await bcrypt.hash(data.password, 10);
+            data.password = await bcrypt.hash(data.password, 10)
         }
         // Create the user with the provided data
         const user = await prisma.user.create({
@@ -83,15 +84,15 @@ class UserService {
         const validFields = {
             name: data.name, // Update the user's name
             email: data.email, // Update the user's email
-            role: data.role,// Update the user's role
-            gender:data.gender,// Update the user's gender
-            password:data.password, // Update the user's password
+            role: data.role, // Update the user's role
+            gender: data.gender, // Update the user's gender
+            password: data.password, // Update the user's password
             date_of_birth: data.date_of_birth, // Update the user's date of birth
             status: data.status,
             // Add other valid fields for updating the user
-        };
+        }
         if (data.password) {
-            validFields.password = await bcrypt.hash(data.password, 10);
+            validFields.password = await bcrypt.hash(data.password, 10)
         }
         const user = await prisma.user.update({
             where: {

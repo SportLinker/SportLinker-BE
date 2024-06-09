@@ -185,6 +185,7 @@ model GroupMessage {
   group_message_thumnail String?
   created_at             DateTime           @default(now())
   expired_at             DateTime?
+  last_active_time       DateTime?          @default(now())
   // Relation
   type                   GroupMessageType
   GroupMessageJoin       GroupMessageJoin[]

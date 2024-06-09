@@ -16,4 +16,4 @@ class PayOS {
     }
 }
 
-module.exports = new PayOS().payment
+module.exports = new PayOS()

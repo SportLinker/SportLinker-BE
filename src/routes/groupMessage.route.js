@@ -1,16 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const { asyncHandler } = require('../helpers/asyncHandler.helper')
+const { authentication } = require('../middlewares/auth.middleware')
+const groupMessageController = require('../controllers/groupMessage.controller')
 
-router.post(
-    '/',
-    asyncHandler(async (req, res) => {
-        const { message } = req.body
-        global.io.emit('groupMessage', message)
-        res.json({
-            message: 'success',
-        })
-    })
-)
+router.use(authentication)
+
+router.get('/', asyncHandler(groupMessageController.getListGroupMessageByUser))
 
 module.exports = router
