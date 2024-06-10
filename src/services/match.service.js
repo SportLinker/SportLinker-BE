@@ -81,6 +81,7 @@ class MatchService {
             data: {
                 group_message_id: newMatch.match_id,
                 group_message_name: newMatch.match_name,
+                group_message_thumnail: `https://res.cloudinary.com/dcbsbl9zg/image/upload/v1718024452/SportLinker/Avatar/Default/group-chat.jpg`,
                 type: 'match',
             },
         })
