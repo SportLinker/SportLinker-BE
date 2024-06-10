@@ -5,6 +5,16 @@ const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 
 class GroupMessageService {
+    /**
+     *
+     * @param {*} userId
+     * @logic
+     * 1. Get group message join by user
+     * 2. Get group message by group message join
+     * 3. Get last message of group message
+     * 4. Get notification message to check is seen
+     * @returns
+     */
     async getListGroupMessageByUser(userId) {
         // Get group message join by user
         const groupMessageJoinByUser = await prisma.groupMessageJoin.findMany({

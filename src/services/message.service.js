@@ -95,6 +95,14 @@ class MessageService {
                 },
             },
         })
+        // update is_seen true for user
+        await prisma.notificationMessage.create({
+            data: {
+                message_id: message.message_id,
+                user_id: userId,
+                is_seen: true,
+            },
+        })
         for (let i = 0; i < userJoinGroupMessage.length; i++) {
             await prisma.notificationMessage.create({
                 data: {
