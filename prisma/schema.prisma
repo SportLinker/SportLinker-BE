@@ -44,6 +44,7 @@ model User {
   Message               Message[]
   GroupMessageJoin      GroupMessageJoin[]
   NotificationMessage   NotificationMessage[]
+  Stadium               Stadium[]
 }
 
 enum UserStatus {
@@ -92,10 +93,11 @@ model Wallet {
 
 // Sport
 model Sport {
-  sport_name String  @id @unique
-  value      String?
-  icon       String?
-  Match      Match[]
+  sport_name  String        @id @unique
+  value       String?
+  icon        String?
+  Match       Match[]
+  StadiumYard StadiumYard[]
 }
 
 // Match
@@ -135,10 +137,11 @@ model MatchJoin {
 }
 
 model MatchOption {
-  match_id String @unique
+  match_id String  @unique
   budget   Float?
+  note     String?
   // Relation
-  match    Match  @relation(fields: [match_id], references: [match_id])
+  match    Match   @relation(fields: [match_id], references: [match_id])
 }
 
 enum MatchStatus {
@@ -218,4 +221,32 @@ model NotificationMessage {
   // Relation
   user       User     @relation(fields: [user_id], references: [id])
   message    Message  @relation(fields: [message_id], references: [message_id])
+}
+
+model Stadium {
+  id              String        @id @default(cuid())
+  stadium_owner   String
+  stadium_name    String
+  stadium_lat     String
+  stadium_long    String
+  stadium_address String
+  // Relation
+  onwer           User          @relation(fields: [stadium_owner], references: [id])
+  StadiumYard     StadiumYard[]
+}
+
+model StadiumYard {
+  id               String  @id @default(cuid())
+  stadium_id       String
+  yard_name        String
+  yard_sport       String
+  yard_description String
+  yard_number      Int     @unique
+  //Relation
+  stadium          Stadium @relation(fields: [stadium_id], references: [id])
+  sport            Sport   @relation(fields: [yard_sport], references: [sport_name])
+}
+
+model BookingYard {
+  id String @id @default(cuid())
 }

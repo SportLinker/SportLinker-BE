@@ -12,6 +12,18 @@ class PaymentService {
             bank: this.bankPayment,
         },
     }
+
+    async createPayment(type, amount) {
+        return paymentStrategies[type](amount)
+    }
+
+    /**
+     *
+     */
+
+    /**
+     *
+     */
 }
 
 module.exports = new PaymentService()
