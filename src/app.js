@@ -37,6 +37,9 @@ global.logger = require('./services/logger.service')
     // test function
     const { test } = require('./test/index')
     await test()
+    // run schedule
+    const runSchedule = require('./services/schedule.service')
+    runSchedule()
 })()
 //init route
 app.use('/v1/api', require('./routes/index'))

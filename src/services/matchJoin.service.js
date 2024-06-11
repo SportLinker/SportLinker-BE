@@ -62,13 +62,18 @@ class MatchJoinService {
                 },
             },
         })
+        console.log(matchId)
         // 6. add user to group message join
-        await prisma.groupMessageJoin.create({
-            data: {
-                group_message_id: isMatchExist.match_id,
-                user_join_id: userId,
-            },
-        })
+        await prisma.groupMessageJoin
+            .create({
+                data: {
+                    group_message_id: matchId,
+                    user_join_id: userId,
+                },
+            })
+            .catch((err) => {
+                console.log(`err`, err)
+            })
         // get detail user join
         const userJoin = await prisma.user.findUnique({
             where: { id: userId },

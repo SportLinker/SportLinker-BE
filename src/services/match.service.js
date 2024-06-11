@@ -109,6 +109,7 @@ class MatchService {
     async getListMatch(lat, long, distance, start_time, end_time, sport_name, user_id) {
         let listMatchByTimeAndSportName
         // check sport_name is empty
+        console.log(sport_name)
         if (!sport_name) {
             listMatchByTimeAndSportName = await prisma.match.findMany({
                 where: {

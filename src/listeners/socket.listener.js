@@ -4,15 +4,16 @@ const io = global.io
 const GroupMessageService = require('../services/groupMessage.service')
 
 const socketListener = () => {
+    global.onLineUser = new Map()
     io.on('connection', (socket) => {
-        console.log('A new user connected')
+        console.log('A user connected')
 
-        io.on('receive-list-message', (user_id) => {
-            const list_message_of_user =
-                GroupMessageService.getListGroupMessageByUser(user_id)
-
-            io.emit('get-list-message', list_message_of_user)
+        socket.on('online', (user_id) => {
+            global.onLineUser.set(user_id, socket.id)
+            console.log(global.onLineUser)
         })
+
+        // socket.
     })
 }
 
