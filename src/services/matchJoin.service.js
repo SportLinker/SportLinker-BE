@@ -84,7 +84,7 @@ class MatchJoinService {
         })
         // logs
         global.logger.info(`User ${userId} join match ${matchId}`)
-        return `User join match  successfully. Please wait for the owner to accept you.`
+        return `Join match  successfully`
     }
 
     /**
