@@ -21,6 +21,7 @@ class MessageService {
                 message_to: groupMessageId,
             },
             select: {
+                message_id: true,
                 content: true,
                 created_at: true,
                 user_from: {
@@ -35,6 +36,7 @@ class MessageService {
                 created_at: 'desc',
             },
         })
+        console.log(listMessage)
         // check message of user
         for (let i = 0; i < listMessage.length; i++) {
             if (listMessage[i].user_from.id === userId) {
@@ -43,18 +45,28 @@ class MessageService {
                 listMessage[i].is_me = false
             }
         }
-        // update notification message is seen
-        await prisma.notificationMessage.updateMany({
+        // Get list message not seen of user in this group chat
+        const list_message_not_seen_of_user = await prisma.notificationMessage.findMany({
             where: {
                 message_id: {
                     in: listMessage.map((message) => message.message_id),
                 },
                 user_id: userId,
-            },
-            data: {
-                is_seen: true,
+                is_seen: false,
             },
         })
+        // loop update to seen
+        for (let i = 0; i < list_message_not_seen_of_user.length; i++) {
+            await prisma.notificationMessage.update({
+                where: {
+                    id: list_message_not_seen_of_user[i].id,
+                },
+                data: {
+                    is_seen: true,
+                },
+            })
+        }
+
         return listMessage
     }
 
