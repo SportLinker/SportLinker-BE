@@ -45,6 +45,7 @@ model User {
   GroupMessageJoin      GroupMessageJoin[]
   NotificationMessage   NotificationMessage[]
   Stadium               Stadium[]
+  VoucherUser           VoucherUser[]
 }
 
 enum UserStatus {
@@ -93,11 +94,11 @@ model Wallet {
 
 // Sport
 model Sport {
-  sport_name  String        @id @unique
+  sport_name  String  @id @unique
   value       String?
   icon        String?
   Match       Match[]
-  StadiumYard StadiumYard[]
+  StadiumYard Yard[]
 }
 
 // Match
@@ -224,29 +225,70 @@ model NotificationMessage {
 }
 
 model Stadium {
-  id              String        @id @default(cuid())
-  stadium_owner   String
-  stadium_name    String
-  stadium_lat     String
-  stadium_long    String
-  stadium_address String
+  id                  String        @id @default(cuid())
+  stadium_owner_id    String
+  stadium_name        String
+  stadium_lat         String
+  stadium_long        String
+  stadium_address     String
+  stadium_thumnail    String?
+  stadium_time        String?
+  stadium_rating      Float         @default(0)
+  stadium_description String
+  stadium_status      StadiumStatus @default(approved)
   // Relation
-  onwer           User          @relation(fields: [stadium_owner], references: [id])
-  StadiumYard     StadiumYard[]
+  onwer               User          @relation(fields: [stadium_owner_id], references: [id])
+  yards               Yard[]
 }
 
-model StadiumYard {
-  id               String  @id @default(cuid())
+model Yard {
+  yard_id          String  @id @default(cuid())
   stadium_id       String
-  yard_name        String
+  yard_name        String // sân số 1 
   yard_sport       String
-  yard_description String
-  yard_number      Int     @unique
+  yard_description String // sân 5 
+  price_per_hour   Float
   //Relation
   stadium          Stadium @relation(fields: [stadium_id], references: [id])
   sport            Sport   @relation(fields: [yard_sport], references: [sport_name])
 }
 
+enum StadiumStatus {
+  pending
+  approved
+  rejected
+  banned
+  deleted
+  mantainance
+}
+
+enum YardStatus {
+  booked
+  avaiable
+  mantainance
+}
+
 model BookingYard {
   id String @id @default(cuid())
+}
+
+model Voucher {
+  id           String        @id @default(cuid())
+  voucher_code String        @unique
+  value        Float
+  expired_at   DateTime
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  VoucherUser  VoucherUser[]
+}
+
+model VoucherUser {
+  id         String   @id @default(cuid())
+  user_id    String
+  voucher_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  // Relation
+  user       User     @relation(fields: [user_id], references: [id])
+  voucher    Voucher  @relation(fields: [voucher_id], references: [id])
 }
