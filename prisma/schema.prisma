@@ -274,21 +274,27 @@ model BookingYard {
 
 model Voucher {
   id           String        @id @default(cuid())
+  voucher_name String
   voucher_code String        @unique
   value        Float
-  expired_at   DateTime
   created_at   DateTime      @default(now())
-  updated_at   DateTime      @updatedAt
+  expired_at   DateTime
   VoucherUser  VoucherUser[]
 }
 
 model VoucherUser {
-  id         String   @id @default(cuid())
+  id         String        @id @default(cuid())
   user_id    String
   voucher_id String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime      @default(now())
+  status     VoucherStatus @default(active)
   // Relation
-  user       User     @relation(fields: [user_id], references: [id])
-  voucher    Voucher  @relation(fields: [voucher_id], references: [id])
+  user       User          @relation(fields: [user_id], references: [id])
+  voucher    Voucher       @relation(fields: [voucher_id], references: [id])
+}
+
+enum VoucherStatus {
+  active
+  expired
+  used
 }
