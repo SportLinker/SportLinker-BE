@@ -61,23 +61,16 @@ class StadiumService {
     }
 
     async getListStadiumByOwner(userId, lat = null, long = null) {
-        return prisma.stadium.findMany({
+        const list_stadium = await prisma.stadium.findMany({
             where: {
                 stadium_owner_id: userId,
             },
         })
+        return list_stadium
     }
 
     async getListStadiumByPlayer(userId, lat = null, long = null) {
-        return prisma.stadium.findMany({
-            orderBy: {
-                stadium_status: 'asc',
-            },
-        })
-    }
-
-    async getListStadiumByAdmin(userId, lat, long) {
-        const list_stadium = prisma.stadium.findMany({
+        const list_stadium = await prisma.stadium.findMany({
             where: {
                 stadium_status: 'approved',
             },
@@ -93,6 +86,33 @@ class StadiumService {
             list_stadium[i].distance = distance.rows[0].elements[0].distance.value
         }
         list_stadium.sort((a, b) => a.distance - b.distance)
+        return list_stadium
+    }
+
+    async getListStadiumByAdmin(userId, lat, long) {
+        const list_stadium = await prisma.stadium.findMany({
+            select: {
+                stadium_name: true,
+                stadium_address: true,
+                stadium_thumnail: true,
+                stadium_time: true,
+                stadium_description: true,
+                stadium_status: true,
+                created_at: true,
+                stadium_owner: {
+                    select: {
+                        user_id: true,
+                        user_name: true,
+                        user_email: true,
+                        user_phone: true,
+                    },
+                },
+            },
+            orderBy: {
+                stadium_status: 'desc',
+                created_at: 'desc',
+            },
+        })
         return list_stadium
     }
 }
