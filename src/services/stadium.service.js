@@ -166,7 +166,7 @@ class StadiumService {
                 },
             },
             where: {
-                stadium_id: stadiumId,
+                id: stadiumId,
             },
         })
         return stadium
@@ -188,7 +188,7 @@ class StadiumService {
         // 1. Find stadium by id
         const stadium = await prisma.stadium.findFirst({
             where: {
-                stadium_id: stadiumId,
+                id: stadiumId,
             },
         })
         if (!stadium) {
@@ -239,7 +239,7 @@ class StadiumService {
         // 3. delete stadium
         const stadium = await prisma.stadium.delete({
             where: {
-                stadium_id: stadiumId,
+                id: stadiumId,
             },
         })
 
