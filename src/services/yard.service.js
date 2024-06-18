@@ -6,15 +6,18 @@ const { BadRequestError } = require('../core/error.response')
 class YardService {
     async createYard(data, stadium_id) {
         // 1. create a new yard
-        return await prisma.yard.create({
+        const newYard = await prisma.yard.create({
             data: {
-                stadium_id: stadium_id,
                 yard_name: data.yard_name,
-                yard_description: data.yard_description,
                 yard_sport: data.yard_sport,
+                yard_description: data.yard_description,
                 price_per_hour: data.price_per_hour,
+                yard_image: data.yard_image,
+                stadium_id: stadium_id,
             },
         })
+        // 2. Send notification to the stadium owner
+        return newYard
     }
 
     async getYards(stadium_id) {
