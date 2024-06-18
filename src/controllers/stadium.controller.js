@@ -11,15 +11,24 @@ class StadiumController {
         }).send(res)
     }
 
-    async getStadiums(req, res, next) {
+    async getStadiumByPlayer(req, res, next) {
         new OK({
-            message: 'Stadiums fetched successfully.',
-            metadata: await StadiumService.getStadiums(
-                req.user.id,
-                req.user.role,
-                req.query.lat,
-                req.query.long
-            ),
+            message: 'Get stadium by player sucessfully',
+            metadata: await StadiumService.getStadiums(req.query.lat, req.query.long),
+        }).send(res)
+    }
+
+    async getStadiumByOnwer(req, res, next) {
+        new OK({
+            message: 'Get stadium by onwer sucessfully',
+            metadata: await StadiumService.getStadiumByOnwer(req.user.id),
+        }).send(res)
+    }
+
+    async getStadiumByAdmin(req, res, next) {
+        new OK({
+            message: 'Get stadium by onwer sucessfully',
+            metadata: await StadiumService.getStadiumByAdmin(),
         }).send(res)
     }
 }

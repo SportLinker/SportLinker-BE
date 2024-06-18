@@ -10,7 +10,11 @@ router.use(authentication)
 
 router.post('/', asyncHandler(StadiumController.createStadium))
 
-router.get('/', asyncHandler(StadiumController.getStadiums))
+router.get('/', asyncHandler(StadiumController.getStadiumByPlayer))
+
+router.get('/getByOnwer', asyncHandler(StadiumController.getStadiumByOnwer))
+
+router.get('/getByAdmin', asyncHandler(StadiumController.getStadiumByAdmin))
 
 // router.get('/:id', asyncHandler(StadiumController.getStadiumById))
 

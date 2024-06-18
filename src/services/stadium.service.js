@@ -50,26 +50,7 @@ class StadiumService {
         return stadium
     }
 
-    StadiumStrategies = {
-        stadium: this.getListStadiumByOwner,
-        player: this.getListStadiumByPlayer,
-        admin: this.getListStadiumByAdmin,
-    }
-
-    async getStadiums(userId, role, lat, long) {
-        return this.StadiumStrategies[role](userId, lat, long)
-    }
-
-    async getListStadiumByOwner(userId, lat = null, long = null) {
-        const list_stadium = await prisma.stadium.findMany({
-            where: {
-                stadium_owner_id: userId,
-            },
-        })
-        return list_stadium
-    }
-
-    async getListStadiumByPlayer(userId, lat = null, long = null) {
+    async getStadiumByPlayer(lat, long) {
         const list_stadium = await prisma.stadium.findMany({
             where: {
                 stadium_status: 'approved',
@@ -89,7 +70,17 @@ class StadiumService {
         return list_stadium
     }
 
-    async getListStadiumByAdmin(userId, lat, long) {
+    async getStadiumByOnwer(userId) {
+        const list_stadium = await prisma.stadium.findMany({
+            where: {
+                stadium_owner_id: userId,
+            },
+        })
+
+        return list_stadium
+    }
+
+    async getStadiumByAdmin() {
         const list_stadium = await prisma.stadium.findMany({
             select: {
                 stadium_name: true,
