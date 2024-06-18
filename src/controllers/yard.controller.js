@@ -17,6 +17,13 @@ class YardController {
             metadata: await YardService.getYards(req.params.stadium_id),
         }).send(res)
     }
+
+    async updateYard(req, res, next) {
+        new Ok({
+            message: 'Yard updated successfully.',
+            metadata: await YardService.updateYard(req.params.yard_id, req.body),
+        }).send(res)
+    }
 }
 
 module.exports = new YardController()

@@ -27,6 +27,20 @@ class YardService {
             },
         })
     }
+
+    async updateYard(yard_id, data) {
+        return await prisma.yard.update({
+            where: {
+                yard_id: yard_id,
+            },
+            data: {
+                yard_name: data.yard_name,
+                yard_sport: data.yard_sport,
+                yard_description: data.yard_description,
+                price_per_hour: data.price_per_hour,
+            },
+        })
+    }
 }
 
 module.exports = new YardService()

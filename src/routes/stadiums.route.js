@@ -16,9 +16,11 @@ router.get('/getByOnwer', asyncHandler(StadiumController.getStadiumByOnwer))
 
 router.get('/getByAdmin', asyncHandler(StadiumController.getStadiumByAdmin))
 
-// router.get('/:id', asyncHandler(StadiumController.getStadiumById))
+router.get('/:stadium_id', asyncHandler(StadiumController.getStadiumById))
 
-// router.put('/:id', asyncHandler(StadiumController.updateStadium))
+router.put('/:stadium_id', asyncHandler(StadiumController.updateStadium))
+
+router.delete('/:stadium_id', asyncHandler(StadiumController.deleteStadium))
 
 // router.delete('/:id', asyncHandler(StadiumController.deleteStadium))
 

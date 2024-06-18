@@ -9,4 +9,6 @@ router.post('/:stadium_id', asyncHandler(YardController.createYard))
 
 router.get('/:stadium_id', asyncHandler(YardController.getYards))
 
+router.put('/:yard_id', asyncHandler(YardController.updateYard))
+
 module.exports = router

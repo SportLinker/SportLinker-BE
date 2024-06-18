@@ -46,6 +46,7 @@ model User {
   NotificationMessage   NotificationMessage[]
   Stadium               Stadium[]
   VoucherUser           VoucherUser[]
+  Transaction           Transaction[]
 }
 
 enum UserStatus {
@@ -84,7 +85,6 @@ enum OTPType {
 
 // Wallet
 model Wallet {
-  wakket_id  String   @id @default(cuid())
   user_id    String   @unique
   balance    Int      @default(0)
   created_at DateTime @default(now())
@@ -300,4 +300,41 @@ enum VoucherStatus {
   active
   expired
   used
+}
+
+// Transaction
+
+model Transaction {
+  id               String            @id @default(cuid())
+  user_id          String
+  transaction_code String?           @unique
+  amount           Float
+  bank_account     String?
+  bank_name        String?
+  bank_short_name  String?
+  rejected_reason  String?
+  type             TransactionType
+  method           TransactionMethod
+  status           TransactionStatus @default(pending)
+  created_at       DateTime          @default(now())
+  expired_at       DateTime?
+  // Relation
+  user             User              @relation(fields: [user_id], references: [id])
+}
+
+enum TransactionType {
+  deposit
+  withdraw
+}
+
+enum TransactionMethod {
+  momo
+  bank
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  rejected
+  cancelled
 }

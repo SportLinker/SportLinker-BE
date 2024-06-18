@@ -23,7 +23,7 @@ class Prisma {
                 global.logger.info('Connected to database')
             })
             .catch((error) => {
-                global.logger.error(error)
+                global.logger.error(`Err connecting MySQL`, error.message)
             })
     }
 }
