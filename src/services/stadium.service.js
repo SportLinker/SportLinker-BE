@@ -152,6 +152,7 @@ class StadiumService {
                 stadium_thumnail: true,
                 stadium_time: true,
                 stadium_status: true,
+                stadium_rating: true,
                 created_at: true,
                 yards: {
                     select: {
