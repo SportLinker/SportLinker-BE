@@ -12,7 +12,6 @@ class YardService {
                 yard_sport: data.yard_sport,
                 yard_description: data.yard_description,
                 price_per_hour: data.price_per_hour,
-                yard_image: data.yard_image,
                 stadium_id: stadium_id,
             },
         })
