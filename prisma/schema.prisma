@@ -228,8 +228,8 @@ model Stadium {
   id                  String        @id @default(cuid())
   stadium_owner_id    String
   stadium_name        String
-  stadium_lat         String
-  stadium_long        String
+  stadium_lat         Float
+  stadium_long        Float
   stadium_address     String
   stadium_thumnail    String?
   stadium_time        String?
