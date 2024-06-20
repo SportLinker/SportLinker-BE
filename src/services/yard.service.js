@@ -34,10 +34,15 @@ class YardService {
                 yard_id: yard_id,
             },
             data: {
-                yard_name: data.yard_name,
-                yard_sport: data.yard_sport,
-                yard_description: data.yard_description,
-                price_per_hour: data.price_per_hour,
+                ...data,
+            },
+        })
+    }
+
+    async deleteYard(yard_id) {
+        return await prisma.yard.delete({
+            where: {
+                yard_id: yard_id,
             },
         })
     }

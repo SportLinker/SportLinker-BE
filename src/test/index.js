@@ -1,5 +1,5 @@
 const redis = require('../configs/redis.config').client
-const prisma = require('../configs/prisma.config')
+const prisma = require('../configs/prisma.config').client
 const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
 const cloudinary = require('../configs/cloudinary.config')
 // const twilio = require('../configs/twillio.config')

@@ -3,6 +3,8 @@
 const { BadRequestError } = require('../core/error.response')
 const prisma = require('../configs/prisma.config').client
 const payos = require('../configs/payos.config').payment
+const { bankQRLink } = require('../helpers/payment.helper')
+const NotificationService = require('./notification.service')
 
 class PaymentService {
     // init strategies for create payment
@@ -38,97 +40,141 @@ class PaymentService {
     async depositBank(userId, body) {
         // create code for deposit bank include random 8 char
         const code = Math.random().toString(36).substring(2, 8).toUpperCase()
-        // create transaction
-        const transaction = await prisma.transaction.create({
-            data: {
-                user_id: userId,
-                amount: body.amount,
-                status: 'pending',
-                type: 'deposit',
-                method: 'bank',
+        // check if code is exist
+        const isExist = await prisma.transaction.findFirst({
+            where: {
+                transaction_code: code,
             },
         })
-        // expire time after five minutes return number
-        // create payment for bank
-        const result = await payos.createPaymentLink({
-            amount: body.amount,
-            orderCode: Math.floor(Math.random() * 1000) + 1,
-            description: code,
-            cancelUrl: `${global.config.get(`PAYMENT_RETURN_URL`)}/${
-                transaction.id
-            }?status=cancelled`,
-            returnUrl: `${global.config.get(`PAYMENT_RETURN_URL`)}/${
-                transaction.id
-            }?status=completed`,
-            expiredAt: Math.floor(Date.now() / 1000) + 300,
-            signature: transaction.id,
-            items: [],
+        if (isExist) {
+            return this.depositBank(userId, body)
+        }
+        // create transaction
+        const transaction = await prisma.transaction
+            .create({
+                data: {
+                    user_id: userId,
+                    transaction_code: code,
+                    amount: body.amount,
+                    status: 'pending',
+                    type: 'deposit',
+                    method: 'bank',
+                    expired_at: new Date(new Date().getTime() + 5 * 60000),
+                },
+            })
+            .catch((err) => {
+                console.log(err)
+                global.logger.error(`Create transaction error: ${err.message}`)
+            })
+        // create payment qr code for bank
+        const qrLink = bankQRLink(body.amount, code)
+
+        return {
+            transaction_code: code,
+            qr_link: qrLink,
+            expired_at: transaction.expired_at,
+        }
+    }
+
+    async handleSuccessDepositPaymentBank(transaction_code) {
+        // find transaction by code
+        const transaction = await prisma.transaction.findFirst({
+            where: {
+                transaction_code: transaction_code,
+            },
         })
-        // update transaction code
+        // update transaction status
+        if (!transaction) {
+            global.logger.error(`Transaction not found: ${transaction_code}`)
+            return
+        }
+        if (transaction.status !== 'pending') {
+            global.logger.error(
+                `Transaction have been completed or expired: ${transaction_code}`
+            )
+            return
+        }
+        // update transaction status
+        await prisma.transaction
+            .update({
+                where: {
+                    id: transaction.id,
+                },
+                data: {
+                    status: 'completed',
+                },
+            })
+            .catch((err) => {
+                global.logger.error(`Update transaction status error: ${err.message}`)
+            })
+        // update user balance
+        await prisma.wallet
+            .update({
+                where: {
+                    user_id: transaction.user_id,
+                },
+                data: {
+                    balance: {
+                        increment: transaction.amount,
+                    },
+                },
+            })
+            .catch((err) => {
+                global.logger.error(`Update user balance error: ${err.message}`)
+            })
+        // send notification to user
+        await NotificationService.createNotification({
+            receiver_id: transaction.user_id,
+            sender_id: transaction.user_id,
+            content: `Deposit ${transaction.amount} completed`,
+        })
+
+        global.logger.info(
+            `Deposit ${transaction.amount} to ${transaction.user_id} completed`
+        )
+
+        return transaction
+    }
+
+    async handleCancelDepositPaymentBank(transaction_code) {
+        // find transaction by code
+        const transaction = await prisma.transaction.findFirst({
+            where: {
+                transaction_code: transaction_code,
+            },
+        })
+        // update transaction status
+        if (!transaction) {
+            throw new BadRequestError('Transaction not found')
+        }
+        if (transaction.status !== 'pending') {
+            throw new BadRequestError('Transaction have been completed or expired')
+        }
+        // update transaction status
         await prisma.transaction.update({
             where: {
                 id: transaction.id,
             },
             data: {
-                transaction_code: result.description,
-            },
-        })
-        return result
-    }
-
-    getPaymentStrategies = {
-        complete: this.completePayment,
-        cancelled: this.cancelPayment,
-    }
-
-    async getPayment(transactionId, status) {
-        return this.getPaymentStrategies[status](transactionId)
-    }
-
-    async completePayment(transactionId) {
-        // find transaction
-        const transaction = await prisma.transaction.findUnique({
-            where: {
-                id: transactionId,
-            },
-        })
-        // update transaction status
-        await prisma.transaction.update({
-            where: {
-                id: transactionId,
-            },
-            data: {
-                status: 'completed',
-            },
-        })
-        // update user balance
-        await prisma.wallet.update({
-            where: {
-                user_id: transaction.user_id,
-            },
-            data: {
-                balance: {
-                    increment: transaction.amount,
-                },
+                status: 'cancelled',
             },
         })
         // send notification to user
-        await prisma.notification.create({
-            data: {
-                receiver_id: transaction.user_id,
-                sender_id: `clwxu3soj000014ox8yfejzg3`,
-                content: `Add money to wallet successfully with ${transaction.amount} VND`,
-            },
+        await NotificationService.createNotification({
+            user_id: transaction.user_id,
+            title: 'Deposit cancelled',
+            content: `Processing payment with ${transaction.amount} cancelled`,
         })
         return transaction
     }
 
-    async cancelPayment(transactionId) {
-        return await prisma.transaction.findUnique({
+    async getPaymentsDetail(transaction_code) {
+        const transaction = prisma.transaction.findFirst({
             where: {
-                id: transactionId,
+                transaction_code: transaction_code,
             },
         })
+        return transaction
     }
 }
 

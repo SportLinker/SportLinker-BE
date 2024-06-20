@@ -22,6 +22,12 @@ class VoucherController {
             metadata: await VoucherService.getAllVoucherUser(req.user.id),
         }).send(res)
     }
+
+    async deleteVoucher(req, res) {
+        new Ok({
+            metadata: await VoucherService.deleteVoucher(req.params.voucher_id),
+        }).send(res)
+    }
 }
 
 module.exports = new VoucherController()

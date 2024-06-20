@@ -224,6 +224,7 @@ model NotificationMessage {
   message    Message  @relation(fields: [message_id], references: [message_id])
 }
 
+// Stadium
 model Stadium {
   id                  String        @id @default(cuid())
   stadium_owner_id    String
@@ -243,17 +244,18 @@ model Stadium {
 }
 
 model Yard {
-  yard_id          String     @id @default(cuid())
+  yard_id          String        @id @default(cuid())
   stadium_id       String
   yard_name        String // sân số 1 
   yard_sport       String
   yard_description String // sân 5 
   price_per_hour   Float
-  yard_status      YardStatus @default(avaiable)
-  created_at       DateTime   @default(now())
+  yard_status      YardStatus    @default(avaiable)
+  created_at       DateTime      @default(now())
   //Relation
-  stadium          Stadium    @relation(fields: [stadium_id], references: [id])
-  sport            Sport      @relation(fields: [yard_sport], references: [sport_name])
+  stadium          Stadium       @relation(fields: [stadium_id], references: [id])
+  sport            Sport         @relation(fields: [yard_sport], references: [sport_name])
+  BookingYard      BookingYard[]
 }
 
 enum StadiumStatus {
@@ -272,7 +274,23 @@ enum YardStatus {
 }
 
 model BookingYard {
-  id String @id @default(cuid())
+  id         String        @id @default(cuid())
+  yard_id    String
+  user_id    String
+  time_start DateTime
+  time_end   DateTime
+  status     BookingStatus @default(pending)
+  created_at DateTime      @default(now())
+  // Relation
+  yard       Yard          @relation(fields: [yard_id], references: [yard_id])
+}
+
+enum BookingStatus {
+  pending
+  accepted
+  rejected
+  cancelled
+  completed
 }
 
 model Voucher {

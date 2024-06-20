@@ -13,8 +13,6 @@ const createTokenPair = async (payload, privateKey, publicKey) => {
             algorithm: 'RS256',
             expiresIn: '7 days',
         })
-        console.log('Generated accessToken::', accessToken)
-        console.log('Generated refreshToken::', refreshToken)
         //
         await JWT.verify(accessToken, publicKey, (err, decode) => {
             if (err) {

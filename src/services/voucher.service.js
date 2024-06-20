@@ -92,6 +92,36 @@ class VoucherService {
 
         return voucher
     }
+
+    /**
+     * @function deleteVoucher
+     * @param {*} voucher_id
+     * @logic
+     * 1. delete voucher
+     */
+
+    async deleteVoucher(voucher_id) {
+        const voucher_by_user = await prisma.voucherUser.findMany({
+            where: {
+                voucher_id: voucher_id,
+            },
+        })
+        // delete voucher by user
+        for (let i = 0; i < voucher_by_user.length; i++) {
+            await prisma.voucherUser.delete({
+                where: {
+                    id: voucher_by_user[i].id,
+                },
+            })
+        }
+        // delete voucher
+        await prisma.voucher.delete({
+            where: {
+                id: voucher_id,
+            },
+        })
+        return 'Voucher deleted'
+    }
 }
 
 module.exports = new VoucherService()

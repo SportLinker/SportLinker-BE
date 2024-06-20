@@ -10,7 +10,10 @@ const io = require('socket.io')(server, {
 
 global.io = io
 
-require('./src/listeners/socket.listener')()
+// listen socket
+require('./src/listeners/socket.listener').socketListener()
+// listen bot discord
+require('./src/listeners/discord.listener').discordListener()
 
 server.listen(global.config.get('APP_PORT'), () => {
     global.logger.info(`Server is running on ${global.config.get('NODE_ENV')} mode`)

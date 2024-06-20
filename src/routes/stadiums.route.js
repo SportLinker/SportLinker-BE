@@ -12,7 +12,7 @@ router.post('/', asyncHandler(StadiumController.createStadium))
 
 router.get('/', asyncHandler(StadiumController.getStadiumByPlayer))
 
-router.get('/getByOnwer', asyncHandler(StadiumController.getStadiumByOnwer))
+router.get('/getByOwner', asyncHandler(StadiumController.getStadiumByOnwer))
 
 router.get('/getByAdmin', asyncHandler(StadiumController.getStadiumByAdmin))
 

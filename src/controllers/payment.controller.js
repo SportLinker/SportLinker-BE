@@ -16,13 +16,10 @@ class PaymentController {
         }).send(res)
     }
 
-    async getPayment(req, res, next) {
+    async getPaymentsDetail(req, res, next) {
         new Ok({
             message: 'Get payment successfully',
-            metadata: await PaymentService.getPayment(
-                req.params.transaction_id,
-                req.query.status
-            ),
+            metadata: await PaymentService.getPaymentsDetail(req.params.transaction_code),
         }).send(res)
     }
 }

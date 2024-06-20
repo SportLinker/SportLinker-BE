@@ -3,6 +3,7 @@
 const { BadRequestError } = require('../core/error.response')
 const prisma = require('../configs/prisma.config').client
 const { getDistance } = require('../helpers/place.helper')
+const NotificationService = require('./notification.service')
 
 class StadiumService {
     /**
@@ -75,7 +76,7 @@ class StadiumService {
                 latDestination: list_stadium[i].stadium_lat,
                 longDestination: list_stadium[i].stadium_long,
             })
-            list_stadium[i].distance = distance.rows[0].elements[0].distance.value
+            list_stadium[i].distance = distance.rows[0].elements[0].distance
         }
         list_stadium.sort((a, b) => a.distance - b.distance)
         return list_stadium
@@ -165,6 +166,13 @@ class StadiumService {
                         created_at: true,
                     },
                 },
+                onwer: {
+                    select: {
+                        avatar_url: true,
+                        id: true,
+                        name: true,
+                    },
+                },
             },
             where: {
                 id: stadiumId,
@@ -202,7 +210,7 @@ class StadiumService {
         // 3. Update stadium
         const updatedStadium = await prisma.stadium.update({
             where: {
-                stadium_id: stadiumId,
+                id: stadiumId,
             },
             data: {
                 ...data,
@@ -242,6 +250,18 @@ class StadiumService {
             where: {
                 id: stadiumId,
             },
+        })
+        // send notification to admin and owner
+        await NotificationService.createNotification({
+            sender_id: stadium.stadium_owner_id,
+            receiver_id: `${global.config.get(`ADMIN_ID`)}`,
+            content: `Stadium ${stadium.stadium_name} has been deleted.`,
+        })
+        // send notification to owner
+        await NotificationService.createNotification({
+            sender_id: `${global.config.get(`ADMIN_ID`)}`,
+            receiver_id: stadium.stadium_owner_id,
+            content: `Your stadium ${stadium.stadium_name} has been deleted.`,
         })
 
         return stadium

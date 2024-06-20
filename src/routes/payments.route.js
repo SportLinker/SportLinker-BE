@@ -4,10 +4,10 @@ const { asyncHandler } = require('../helpers/asyncHandler.helper')
 const PaymentController = require('../controllers/payment.controller')
 const { authentication } = require('../middlewares/auth.middleware')
 
-router.get('/:transaction_id', asyncHandler(PaymentController.getPayment))
-
 router.use(authentication)
 
 router.post('/', asyncHandler(PaymentController.createPayment))
+
+router.get('/:transaction_code', asyncHandler(PaymentController.getPaymentsDetail))
 
 module.exports = router

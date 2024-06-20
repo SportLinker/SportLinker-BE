@@ -66,8 +66,56 @@ class MessageService {
                 },
             })
         }
-
-        return listMessage
+        // get detail group message
+        const groupMessage = await prisma.groupMessage.findUnique({
+            where: {
+                group_message_id: groupMessageId,
+            },
+            select: {
+                group_message_id: true,
+                group_message_name: true,
+                group_message_thumnail: true,
+                type: true,
+            },
+        })
+        // check if group message is type 1 (1: private chat, 2: group chat)
+        if (groupMessage.type === 'single') {
+            // get user in group message
+            const userInGroupMessage = await prisma.groupMessageJoin.findMany({
+                where: {
+                    group_message_id: groupMessageId,
+                    user_join_id: {
+                        not: userId,
+                    },
+                },
+                select: {
+                    user_join_id: true,
+                    user: {
+                        select: {
+                            avatar_url: true,
+                            name: true,
+                            id: true,
+                        },
+                    },
+                },
+            })
+            // check user in group message
+            if (userInGroupMessage.length === 0) {
+                throw new BadRequestError('User not in group message')
+            }
+            groupMessage.group_message_id = userInGroupMessage[0].user_join_id
+            groupMessage.group_message_name = userInGroupMessage[0].user.name
+            groupMessage.group_message_thumnail = userInGroupMessage[0].user.avatar_url
+            return {
+                group_message_detail: groupMessage,
+                messages: listMessage,
+            }
+        }
+        // return group message detail and list message
+        return {
+            group_message_detail: groupMessage,
+            messages: listMessage,
+        }
     }
 
     /**

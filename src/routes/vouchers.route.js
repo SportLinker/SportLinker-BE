@@ -9,6 +9,8 @@ router.get('/', asyncHandler(VoucherController.getAllVoucher))
 
 router.post('/', asyncHandler(VoucherController.createVoucher))
 
+router.delete('/:voucher_id', asyncHandler(VoucherController.deleteVoucher))
+
 router.get('/user', asyncHandler(VoucherController.getAllVoucherUser))
 
 module.exports = router

@@ -80,31 +80,21 @@ class UserService {
         return user
     }
 
-    async updateUser(user_id, data, admin_id) {
-        const validFields = {
-            name: data.name, // Update the user's name
-            email: data.email, // Update the user's email
-            role: data.role, // Update the user's role
-            gender: data.gender, // Update the user's gender
-            password: data.password, // Update the user's password
-            date_of_birth: data.date_of_birth, // Update the user's date of birth
-            status: data.status,
-            // Add other valid fields for updating the user
+    async updateUser(user_id, data, user_authen) {
+        if (user_id !== user_authen.id) {
+            if (user_authen.role !== 'admin') {
+                throw new BadRequestError('Cannot update other user')
+            }
         }
-        if (data.password) {
-            validFields.password = await bcrypt.hash(data.password, 10)
-        }
+        // update
         const user = await prisma.user.update({
             where: {
                 id: user_id,
             },
-            data: validFields, // Only pass valid fields to the update function
+            data: {
+                ...data,
+            },
         })
-
-        global.logger.info(
-            `Update user successfully by admin ${admin_id} with id: ${user.id}`
-        )
-
         return user
     }
 

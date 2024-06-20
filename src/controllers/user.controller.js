@@ -27,7 +27,7 @@ class UserController {
             metadata: await UserService.updateUser(
                 req.params.user_id,
                 req.body,
-                req.user.id
+                req.user
             ),
         }).send(res)
     }

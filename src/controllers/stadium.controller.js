@@ -14,7 +14,10 @@ class StadiumController {
     async getStadiumByPlayer(req, res, next) {
         new Ok({
             message: 'Get stadium by player sucessfully',
-            metadata: await StadiumService.getStadiums(req.query.lat, req.query.long),
+            metadata: await StadiumService.getStadiumByPlayer(
+                req.query.lat,
+                req.query.long
+            ),
         }).send(res)
     }
 
