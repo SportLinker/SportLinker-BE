@@ -1,5 +1,5 @@
 'use strict'
-const prisma = require('../configs/prisma.config')
+const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const redisClient = require('../configs/redis.config').client
 const bcrypt = require('bcrypt')
@@ -14,7 +14,6 @@ class AuthenService {
 
     registerStrategies = {
         phone: this.registerWithPhone,
-        google: this.registerWithGoogle,
     }
 
     forgotPasswordStrategies = {
@@ -33,7 +32,7 @@ class AuthenService {
 
     async loginWithGoogle(user) {
         // Your Google login logic here
-        return 'google'
+        // passport
     }
 
     async loginWithPhone(user) {
@@ -88,11 +87,6 @@ class AuthenService {
         return await this.registerStrategies[typeRegister](user)
     }
 
-    async registerWithGoogle(user) {
-        // Your Google register logic here
-        return 'google'
-    }
-
     async registerWithPhone(user) {
         // check phone exist
         const phoneExist = await prisma.user.findUnique({
@@ -113,7 +107,6 @@ class AuthenService {
                     gender: user.gender,
                     role: user.role,
                     date_of_birth: user.date_of_birth,
-                    role: user.role,
                 },
             })
             .catch((err) => {

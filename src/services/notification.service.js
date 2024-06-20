@@ -1,6 +1,6 @@
 'use strict'
 
-const prisma = require('../configs/prisma.config')
+const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 
 class NotificationSerivce {

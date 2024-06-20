@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const { asyncHandler } = require('../helpers/asyncHandler.helper')
-const PaymentController = require('../controllers/payment.controller')
 const { authentication } = require('../middlewares/auth.middleware')
-
-router.get('/:transaction_id', asyncHandler(PaymentController.getPayment))
+const groupMessageController = require('../controllers/groupMessage.controller')
 
 router.use(authentication)
 
-router.post('/', asyncHandler(PaymentController.createPayment))
+router.get('/', asyncHandler(groupMessageController.getListGroupMessageByUser))
+
+router.post('/', asyncHandler(groupMessageController.createGroupMessage))
 
 module.exports = router

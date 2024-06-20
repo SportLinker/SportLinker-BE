@@ -19,12 +19,6 @@ const getFavorite = async () => {
 
 const test = async () => {
     global.logger.info('Test log info is running')
-    // const placeDetail = await getPlaceDetail({
-    //     cid: '12022315892551549787',
-    // })
-    // console.log(placeDetail)
-    // //save to redis
-    // await redis.set(`stadium:12022315892551549787`, JSON.stringify(placeDetail))
 }
 
 module.exports = {

@@ -14,4 +14,4 @@ class Cloudinary {
     }
 }
 
-module.exports = new Cloudinary().cloudinary
+module.exports = new Cloudinary()

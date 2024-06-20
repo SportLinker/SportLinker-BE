@@ -1,10 +1,24 @@
 'use strict'
 
-const prisma = require('../configs/prisma.config')
+const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const NotificationSerivce = require('./notification.service')
 
 class MatchJoinService {
+    /**
+     *
+     * @param {*} matchId
+     * @param {*} userId
+     * @logic
+     * 1. Check match is upcomming
+     * 2. Check match is full
+     * 3. Check user is include in match
+     * 4. Join match
+     * 5. Update total join in match
+     * 6. Add user to group message join
+     * 7. Send notification to owner of match
+     * @returns
+     */
     async joinMatch(matchId, userId) {
         //1. check match exist
         const isMatchExist = await prisma.match.findUnique({
@@ -48,6 +62,18 @@ class MatchJoinService {
                 },
             },
         })
+        console.log(matchId)
+        // 6. add user to group message join
+        await prisma.groupMessageJoin
+            .create({
+                data: {
+                    group_message_id: matchId,
+                    user_join_id: userId,
+                },
+            })
+            .catch((err) => {
+                console.log(`err`, err)
+            })
         // get detail user join
         const userJoin = await prisma.user.findUnique({
             where: { id: userId },
@@ -55,7 +81,7 @@ class MatchJoinService {
                 name: true,
             },
         })
-        // send notification to owner of match
+        // 7. send notification to owner of match
         await NotificationSerivce.createNotification({
             sender_id: userId,
             receiver_id: isMatchExist.user_create_id,
@@ -63,14 +89,14 @@ class MatchJoinService {
         })
         // logs
         global.logger.info(`User ${userId} join match ${matchId}`)
-        // 6. return succes
-        return `User join match  successfully. Please wait for the owner to accept you.`
+        return `Join match  successfully`
     }
 
     /**
      * @param {string} matchId match_id
      * @param {string} body include status and user_join_id
      * @param {string} user_create_id   owner of match
+     *
      */
 
     async updateUserJoinMatchByMatchId(matchId, body, user_create_id) {
@@ -160,19 +186,43 @@ class MatchJoinService {
         return listUserJoin
     }
 
+    /**
+     *
+     * @param {*} userJoinId
+     * @param {*} matchId
+     * @param {*} userId
+     * @logic
+     * 1. Check match is upcomming
+     * 2. Check user join is exist
+     * 3. Get detail user join
+     * 4. Check is onwer or user join match
+     *   4.1 if owner of match delete user join match
+     *       4.1.1 send notification to user
+     *   4.2 if user join match leave match
+     *       4.2.1 send notification to owner of match
+     * 5. delete user out of group message join
+     * @returns
+     */
     async deleteUserJoinMatchByMatchId(userJoinId, matchId, userId) {
-        // 1. check match exist
+        // 1. check match exist is upcomming
         const isMatchExist = await prisma.match.findUnique({
             where: { match_id: matchId },
         })
-        // check  match is upcomming
+
         if (isMatchExist.status !== 'upcomming') {
             throw new BadRequestError('Match is not upcomming')
         }
-        /**
-         * onwer of match can delete user join match
-         * user join can leave match
-         */
+        // 2. check user join is exist
+        const matchJoin = await prisma.matchJoin.findFirst({
+            where: {
+                match_id: matchId,
+                user_join_id: userJoinId,
+            },
+        })
+
+        if (!matchJoin) {
+            throw new BadRequestError('You are not join match')
+        }
         // get detail user join
         const userJoin = await prisma.user.findUnique({
             where: { id: userJoinId },
@@ -180,14 +230,36 @@ class MatchJoinService {
                 name: true,
             },
         })
-        // 2. check is owner of match
+        // 4. Check is onwer or user join match
         if (isMatchExist.user_create_id === userId) {
             await prisma.matchJoin.delete({
                 where: {
-                    user_join_id: userJoinId,
-                    match_id: matchId,
+                    id: matchJoin.id,
                 },
             })
+            // set total_join - 1
+            await prisma.match.update({
+                where: { match_id: matchId },
+                data: {
+                    total_join: {
+                        decrement: 1,
+                    },
+                },
+            })
+            // delete user out of group message join
+            const groupMessageJoin = await prisma.groupMessageJoin.findFirst({
+                where: {
+                    group_message_id: matchId,
+                    user_join_id: userJoinId,
+                },
+            })
+            if (groupMessageJoin) {
+                await prisma.groupMessageJoin.delete({
+                    where: {
+                        id: groupMessageJoin.id,
+                    },
+                })
+            }
             // send notification to user
             await NotificationSerivce.createNotification({
                 content: `Owner of match ${isMatchExist.match_name} delete you from match`,
@@ -195,18 +267,40 @@ class MatchJoinService {
                 sender_id: userId,
             })
 
-            return `Delete user join match successfully`
+            return `Remove user join match successfully`
         } else {
-            // check user join is user login
             if (userJoinId !== userId) {
                 throw new BadRequestError('You are not user join match')
             } else {
+                // delete user join match
                 await prisma.matchJoin.delete({
                     where: {
-                        user_join_id: userJoinId,
-                        match_id: matchId,
+                        id: matchJoin.id,
                     },
                 })
+                // set total_join - 1
+                await prisma.match.update({
+                    where: { match_id: matchId },
+                    data: {
+                        total_join: {
+                            decrement: 1,
+                        },
+                    },
+                })
+                // delete user out of group message join
+                const groupMessageJoin = await prisma.groupMessageJoin.findFirst({
+                    where: {
+                        group_message_id: matchId,
+                        user_join_id: userJoinId,
+                    },
+                })
+                if (groupMessageJoin) {
+                    await prisma.groupMessageJoin.delete({
+                        where: {
+                            id: groupMessageJoin.id,
+                        },
+                    })
+                }
                 // send notification to owner of match
                 await NotificationSerivce.createNotification({
                     content: `User ${userJoin.name} leave match ${isMatchExist.match_name}`,

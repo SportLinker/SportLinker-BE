@@ -1,5 +1,6 @@
 'use strict'
-const prisma = require('../configs/prisma.config')
+
+const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const redis = require('../configs/redis.config').client
 const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
@@ -80,6 +81,7 @@ class MatchService {
             data: {
                 group_message_id: newMatch.match_id,
                 group_message_name: newMatch.match_name,
+                group_message_thumnail: `https://res.cloudinary.com/dcbsbl9zg/image/upload/v1718024452/SportLinker/Avatar/Default/group-chat.jpg`,
                 type: 'match',
             },
         })
@@ -107,6 +109,7 @@ class MatchService {
     async getListMatch(lat, long, distance, start_time, end_time, sport_name, user_id) {
         let listMatchByTimeAndSportName
         // check sport_name is empty
+        console.log(sport_name)
         if (!sport_name) {
             listMatchByTimeAndSportName = await prisma.match.findMany({
                 where: {
@@ -276,7 +279,7 @@ class MatchService {
     }
 
     /**
-     *
+     *@function: Get Match Detail
      * @param {*} match_id
      */
 

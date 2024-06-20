@@ -19,11 +19,7 @@ app.use(morgan(morganFormat)) // log requests to the console
 // config cors]
 const corsOptions = {
     // allow multiple domains
-    origin: [
-        'https://sport-linker-landing-page.vercel.app',
-        '192.168.15.122:8081',
-        'http://localhost:5173',
-    ],
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 }
 app.use(cors(corsOptions))
@@ -36,10 +32,14 @@ global.logger = require('./services/logger.service')
     const RedisConnection = require('./configs/redis.config')
     await RedisConnection.connect()
     // connect to database MySQL
-    // const MySQLConnection = require('./configs/mysql.config')
-    // await MySQLConnection.connect()
+    const prisma = require('./configs/prisma.config')
+    await prisma.connect()
+    // test function
     const { test } = require('./test/index')
     await test()
+    // run schedule
+    const runSchedule = require('./services/schedule.service')
+    runSchedule()
 })()
 //init route
 app.use('/v1/api', require('./routes/index'))

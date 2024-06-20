@@ -20,30 +20,33 @@ datasource db {
 
 // User
 model User {
-  id                    String             @id @default(cuid())
-  phone                 String?            @unique
-  email                 String?            @unique
+  id                    String                @id @default(cuid())
+  phone                 String?               @unique
+  email                 String?               @unique
   name                  String
   password              String
   bio                   String?
   avatar_url            String?
   gender                UserGender
   date_of_birth         DateTime?
-  role                  UserRole           @default(player)
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime?          @updatedAt
+  role                  UserRole              @default(player)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime?             @updatedAt
   last_active_time      DateTime?
-  status                UserStatus         @default(active)
+  status                UserStatus            @default(active)
   // Relation
   AuthenOTPs            AuthenOTP[]
   Wallet                Wallet?
   Match                 Match[]
   MatchJoin             MatchJoin[]
-  receivedNotifications Notification[]     @relation("ReceivedNotifications")
-  sentNotifications     Notification[]     @relation("SentNotifications")
-  messageTo             Message[]          @relation("MessageTo")
-  messageFrom           Message[]          @relation("MessageFrom")
+  receivedNotifications Notification[]        @relation("ReceivedNotifications")
+  sentNotifications     Notification[]        @relation("SentNotifications")
+  Message               Message[]
   GroupMessageJoin      GroupMessageJoin[]
+  NotificationMessage   NotificationMessage[]
+  Stadium               Stadium[]
+  VoucherUser           VoucherUser[]
+  Transaction           Transaction[]
 }
 
 enum UserStatus {
@@ -82,7 +85,6 @@ enum OTPType {
 
 // Wallet
 model Wallet {
-  wakket_id  String   @id @default(cuid())
   user_id    String   @unique
   balance    Int      @default(0)
   created_at DateTime @default(now())
@@ -92,10 +94,11 @@ model Wallet {
 
 // Sport
 model Sport {
-  sport_name String  @id @unique
-  value      String?
-  icon       String?
-  Match      Match[]
+  sport_name  String  @id @unique
+  value       String?
+  icon        String?
+  Match       Match[]
+  StadiumYard Yard[]
 }
 
 // Match
@@ -135,10 +138,11 @@ model MatchJoin {
 }
 
 model MatchOption {
-  match_id String @unique
+  match_id String  @unique
   budget   Float?
+  note     String?
   // Relation
-  match    Match  @relation(fields: [match_id], references: [match_id])
+  match    Match   @relation(fields: [match_id], references: [match_id])
 }
 
 enum MatchStatus {
@@ -169,14 +173,15 @@ model Notification {
 
 // Message Chat
 model Message {
-  message_id   String   @id @default(cuid())
-  message_to   String
-  message_from String
-  content      String
-  created_at   DateTime @default(now())
+  message_id          String                @id @default(cuid())
+  message_to          String
+  message_from        String
+  content             String
+  created_at          DateTime              @default(now())
   // Relation
-  user_to      User     @relation("MessageTo", fields: [message_to], references: [id])
-  user_from    User     @relation("MessageFrom", fields: [message_from], references: [id])
+  user_from           User                  @relation(fields: [message_from], references: [id])
+  group_message_to    GroupMessage          @relation(fields: [message_to], references: [group_message_id])
+  NotificationMessage NotificationMessage[]
 }
 
 model GroupMessage {
@@ -185,9 +190,11 @@ model GroupMessage {
   group_message_thumnail String?
   created_at             DateTime           @default(now())
   expired_at             DateTime?
+  last_active_time       DateTime?          @default(now())
   // Relation
   type                   GroupMessageType
   GroupMessageJoin       GroupMessageJoin[]
+  Message                Message[]
 }
 
 enum GroupMessageType {
@@ -204,4 +211,130 @@ model GroupMessageJoin {
   // Relation
   group_message    GroupMessage @relation(fields: [group_message_id], references: [group_message_id])
   user_join        User         @relation(fields: [user_join_id], references: [id])
+}
+
+model NotificationMessage {
+  id         String   @id @default(cuid())
+  user_id    String
+  message_id String
+  is_seen    Boolean  @default(false)
+  created_at DateTime @default(now())
+  // Relation
+  user       User     @relation(fields: [user_id], references: [id])
+  message    Message  @relation(fields: [message_id], references: [message_id])
+}
+
+model Stadium {
+  id                  String        @id @default(cuid())
+  stadium_owner_id    String
+  stadium_name        String
+  stadium_lat         Float
+  stadium_long        Float
+  stadium_address     String
+  stadium_thumnail    String?
+  stadium_time        String?
+  stadium_rating      Float         @default(0)
+  stadium_description String
+  stadium_status      StadiumStatus @default(approved)
+  created_at          DateTime      @default(now())
+  // Relation
+  onwer               User          @relation(fields: [stadium_owner_id], references: [id])
+  yards               Yard[]
+}
+
+model Yard {
+  yard_id          String     @id @default(cuid())
+  stadium_id       String
+  yard_name        String // sân số 1 
+  yard_sport       String
+  yard_description String // sân 5 
+  price_per_hour   Float
+  yard_status      YardStatus @default(avaiable)
+  created_at       DateTime   @default(now())
+  //Relation
+  stadium          Stadium    @relation(fields: [stadium_id], references: [id])
+  sport            Sport      @relation(fields: [yard_sport], references: [sport_name])
+}
+
+enum StadiumStatus {
+  pending
+  approved
+  rejected
+  banned
+  deleted
+  mantainance
+}
+
+enum YardStatus {
+  booked
+  avaiable
+  mantainance
+}
+
+model BookingYard {
+  id String @id @default(cuid())
+}
+
+model Voucher {
+  id           String        @id @default(cuid())
+  voucher_name String
+  voucher_code String        @unique
+  value        Float
+  created_at   DateTime      @default(now())
+  expired_at   DateTime
+  VoucherUser  VoucherUser[]
+}
+
+model VoucherUser {
+  id         String        @id @default(cuid())
+  user_id    String
+  voucher_id String
+  created_at DateTime      @default(now())
+  status     VoucherStatus @default(active)
+  // Relation
+  user       User          @relation(fields: [user_id], references: [id])
+  voucher    Voucher       @relation(fields: [voucher_id], references: [id])
+}
+
+enum VoucherStatus {
+  active
+  expired
+  used
+}
+
+// Transaction
+
+model Transaction {
+  id               String            @id @default(cuid())
+  user_id          String
+  transaction_code String?           @unique
+  amount           Float
+  bank_account     String?
+  bank_name        String?
+  bank_short_name  String?
+  rejected_reason  String?
+  type             TransactionType
+  method           TransactionMethod
+  status           TransactionStatus @default(pending)
+  created_at       DateTime          @default(now())
+  expired_at       DateTime?
+  // Relation
+  user             User              @relation(fields: [user_id], references: [id])
+}
+
+enum TransactionType {
+  deposit
+  withdraw
+}
+
+enum TransactionMethod {
+  momo
+  bank
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  rejected
+  cancelled
 }
