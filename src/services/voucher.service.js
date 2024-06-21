@@ -39,7 +39,7 @@ class VoucherService {
             })
             // create voucher for all user
             for (let i = 0; i < list_player.length; i++) {
-                await prisma.user_voucher.create({
+                await prisma.voucherUser.create({
                     data: {
                         user_id: list_player[i].id,
                         voucher_id: voucher.id,
@@ -49,7 +49,7 @@ class VoucherService {
             return voucher
         }
         // 3. create voucher for specific user
-        await prisma.user_voucher.create({
+        await prisma.voucherUser.create({
             data: {
                 user_id: to,
                 voucher_id: voucher.id,
