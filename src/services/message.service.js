@@ -175,16 +175,20 @@ class MessageService {
     }
 
     async createMessageBySocket(message_id, message_from, content, created_at) {
-        const user_from = await prisma.user.findUnique({
-            select: {
-                avatar_url: true,
-                name: true,
-                id: true,
-            },
-            where: {
-                id: message_from,
-            },
-        })
+        const user_from = await prisma.user
+            .findUnique({
+                select: {
+                    avatar_url: true,
+                    name: true,
+                    id: true,
+                },
+                where: {
+                    id: message_from,
+                },
+            })
+            .catch((err) => {
+                console.log(err)
+            })
         return {
             message_id: message_id,
             content: content,

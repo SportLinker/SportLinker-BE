@@ -51,6 +51,7 @@ const runSchedule = () => {
                         lt: new Date(),
                     },
                     status: 'pending',
+                    type: 'deposit',
                 },
             })
             .catch((err) => {

@@ -28,6 +28,7 @@ const socketListener = () => {
         })
 
         socket.on('send-message', async (data) => {
+            console.log(`send-message: ${JSON.stringify(data)}`)
             const { message_id, message_to, message_from, content, created_at } =
                 data.message.payload
             // get list user id in group not include user send message
@@ -37,7 +38,6 @@ const socketListener = () => {
                 content,
                 created_at
             )
-            console.log(`detail_message: ${JSON.stringify(detail_message)}`)
             // send message to room
             io.to(message_to).emit('receive-message', detail_message)
         })
