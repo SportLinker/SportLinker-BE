@@ -36,7 +36,6 @@ class MessageService {
                 created_at: 'desc',
             },
         })
-        console.log(listMessage)
         // check message of user
         for (let i = 0; i < listMessage.length; i++) {
             if (listMessage[i].user_from.id === userId) {
@@ -173,6 +172,26 @@ class MessageService {
         }
 
         return message
+    }
+
+    async createMessageBySocket(message_id, message_from, content, created_at) {
+        const user_from = await prisma.user.findUnique({
+            select: {
+                avatar_url: true,
+                name: true,
+                id: true,
+            },
+            where: {
+                id: message_from,
+            },
+        })
+        return {
+            message_id: message_id,
+            content: content,
+            created_at: created_at,
+            user_from: user_from,
+            is_me: false,
+        }
     }
 }
 

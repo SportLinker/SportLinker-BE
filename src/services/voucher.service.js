@@ -84,9 +84,18 @@ class VoucherService {
 
     async getAllVoucherUser(user_id) {
         const voucher = await prisma.voucherUser.findMany({
+            select: {
+                voucher: {
+                    select: {
+                        voucher_code: true,
+                        voucher_name: true,
+                        expired_at: true,
+                    },
+                },
+                status: true,
+            },
             where: {
                 user_id: user_id,
-                status: 'active',
             },
         })
 
