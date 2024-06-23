@@ -195,7 +195,7 @@ class MatchJoinService {
      * 1. Check match is upcomming
      * 2. Check user join is exist
      * 3. Get detail user join
-     * 4. Check is onwer or user join match
+     * 4. Check is owner or user join match
      *   4.1 if owner of match delete user join match
      *       4.1.1 send notification to user
      *   4.2 if user join match leave match
@@ -230,7 +230,7 @@ class MatchJoinService {
                 name: true,
             },
         })
-        // 4. Check is onwer or user join match
+        // 4. Check is owner or user join match
         if (isMatchExist.user_create_id === userId) {
             await prisma.matchJoin.delete({
                 where: {

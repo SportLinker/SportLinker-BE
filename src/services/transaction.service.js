@@ -5,7 +5,10 @@ const prisma = require('../configs/prisma.config').client
 const NotificationService = require('./notification.service')
 
 class TransactionService {
-    async getAllTransaction() {
+    async getAllTransaction(pageSize, pageNumber) {
+        // parse page size and page number
+        pageSize = parseInt(pageSize)
+        pageNumber = parseInt(pageNumber)
         const transactions = await prisma.transaction.findMany({
             select: {
                 id: true,
@@ -39,8 +42,14 @@ class TransactionService {
                     created_at: 'desc',
                 },
             ],
+            skip: pageSize * (pageNumber - 1),
+            take: pageSize,
         })
-        return transactions
+        const total_page = Math.ceil((await prisma.transaction.count()) / pageSize)
+        return {
+            total_page: total_page,
+            transactions: transactions,
+        }
     }
 
     async updateTransaction(transaction_id, data) {

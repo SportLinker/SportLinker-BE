@@ -38,6 +38,20 @@ class UserController {
             metadata: await UserService.deleteUser(req.params.user_id, req.user.id),
         }).send(res)
     }
+
+    async getUserById(req, res, next) {
+        new Ok({
+            message: 'Get user by id successfully',
+            metadata: await UserService.getUserById(req.params.user_id),
+        }).send(res)
+    }
+
+    async getProfile(req, res, next) {
+        new Ok({
+            message: 'Get profile successfully',
+            metadata: await UserService.getProfile(req.user.id),
+        }).send(res)
+    }
 }
 
 module.exports = new UserController()

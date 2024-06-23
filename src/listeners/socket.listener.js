@@ -13,6 +13,7 @@ const socketListener = () => {
         global.logger.info(`A user connected with socket id: ${socket.id}`)
 
         socket.on('online-user', async (userId) => {
+            console.log(`online-user: ${userId}`)
             // set online user
             global.onLineUser.set(userId, socket.id)
             console.log(global.onLineUser)
@@ -26,6 +27,13 @@ const socketListener = () => {
                 socket.join(groupMessage.group_message_id)
             })
         })
+
+        /**
+         * @param {*} data
+         * @variable
+         * 1 message_to === group_message_id
+         * 2 message_from === user_id
+         */
 
         socket.on('send-message', async (data) => {
             console.log(`send-message: ${JSON.stringify(data)}`)

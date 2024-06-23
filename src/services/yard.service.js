@@ -2,6 +2,7 @@
 
 const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
+const { getStringHourAndMinut, getTimeByFormat } = require('../helpers/timestamp.helper')
 
 class YardService {
     async createYard(data, stadium_id) {
@@ -19,13 +20,148 @@ class YardService {
         return newYard
     }
 
-    async getYards(stadium_id) {
+    /**
+     * @function getListYardByUser
+     * @param {*} stadium_id
+     * @returns yards and their bookings is accepted
+     */
+
+    async getListYardByUser(stadium_id) {
         // 1. Find all yards by stadium id
-        return await prisma.yard.findMany({
+        const yards = await prisma.yard.findMany({
+            select: {
+                yard_id: true,
+                yard_name: true,
+                yard_sport: true,
+                yard_description: true,
+                price_per_hour: true,
+                created_at: true,
+                yard_status: true,
+                BookingYard: {
+                    select: {
+                        time_start: true,
+                        time_end: true,
+                    },
+                    where: {
+                        status: 'accepted',
+                        time_start: {
+                            gte: new Date(),
+                        },
+                    },
+                },
+            },
             where: {
                 stadium_id: stadium_id,
             },
         })
+        // combine booking by time
+        for (let i = 0; i < yards.length; i++) {
+            const books = yards[i].BookingYard.reduce((acc, cur) => {
+                const date = getTimeByFormat('yyyy-MM-DD', cur.time_start)
+                cur.time_start = getStringHourAndMinut(cur.time_start)
+                cur.time_end = getStringHourAndMinut(cur.time_end)
+                if (!acc[date]) {
+                    acc[date] = {
+                        date: date,
+                        matches: [],
+                    }
+                }
+
+                acc[date].matches.push(cur)
+
+                return acc
+            }, [])
+            yards[i].BookingYard = Object.values(books)
+        }
+
+        return yards
+    }
+
+    /**
+     * @function getListYardByOwner
+     * @param {*} yard_id
+     * @param {*} data
+     * @returns
+     */
+
+    async getListYardByOwner(stadium_id) {
+        // 1. Find all yards by stadium id
+        const yards = await prisma.yard.findMany({
+            where: {
+                stadium_id: stadium_id,
+            },
+            orderBy: {
+                created_at: 'asc',
+            },
+        })
+        return yards
+    }
+
+    /**
+     * @function getYardById
+     * @param {*} yard_id
+     * @param {*} data
+     * @returns
+     */
+
+    async getYardById(yard_id) {
+        const yard = await prisma.yard.findUnique({
+            select: {
+                yard_id: true,
+                yard_name: true,
+                yard_description: true,
+                price_per_hour: true,
+                created_at: true,
+                yard_sport: true,
+                yard_status: true,
+                BookingYard: {
+                    select: {
+                        id: true,
+                        time_start: true,
+                        time_end: true,
+                        status: true,
+                        created_at: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                avatar_url: true,
+                            },
+                        },
+                    },
+                    orderBy: [
+                        {
+                            time_start: 'asc',
+                        },
+                        {
+                            status: 'asc',
+                        },
+                    ],
+                },
+            },
+            where: {
+                yard_id: yard_id,
+            },
+        })
+
+        const books = yard.BookingYard.reduce((acc, cur) => {
+            const date = getTimeByFormat('yyyy-MM-DD', cur.time_start)
+            cur.time_start = getStringHourAndMinut(cur.time_start)
+            cur.time_end = getStringHourAndMinut(cur.time_end)
+            if (!acc[date]) {
+                acc[date] = {
+                    date: date,
+                    matches: [],
+                }
+            }
+
+            acc[date].matches.push(cur)
+
+            return acc
+        }, [])
+        yard.BookingYard = Object.values(books)
+
+        return yard
     }
 
     async updateYard(yard_id, data) {

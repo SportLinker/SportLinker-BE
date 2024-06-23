@@ -11,10 +11,24 @@ class YardController {
         }).send(res)
     }
 
-    async getYards(req, res, next) {
+    async getListYardByUser(req, res, next) {
         new Ok({
             message: 'Yards fetched successfully.',
-            metadata: await YardService.getYards(req.params.stadium_id),
+            metadata: await YardService.getListYardByUser(req.params.stadium_id),
+        }).send(res)
+    }
+
+    async getListYardByOwner(req, res, next) {
+        new Ok({
+            message: 'Yards fetched successfully.',
+            metadata: await YardService.getListYardByOwner(req.params.stadium_id),
+        }).send(res)
+    }
+
+    async getYardById(req, res, next) {
+        new Ok({
+            message: 'Yard fetched successfully.',
+            metadata: await YardService.getYardById(req.params.yard_id),
         }).send(res)
     }
 

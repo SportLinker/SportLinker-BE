@@ -65,13 +65,22 @@ class VoucherService {
      * 2. return all voucher
      */
 
-    async getAllVoucher() {
-        const voucher = await prisma.voucher.findMany({
+    async getAllVoucher(pageNumber, pageSize) {
+        // parse page size and page number
+        pageSize = parseInt(pageSize)
+        pageNumber = parseInt(pageNumber)
+        const vouchers = await prisma.voucher.findMany({
             orderBy: {
                 created_at: 'desc',
             },
+            skip: pageSize * (pageNumber - 1),
+            take: pageSize,
         })
-        return voucher
+        const total_page = Math.ceil((await prisma.voucher.count()) / pageSize)
+        return {
+            total_page: total_page,
+            vouchers: vouchers,
+        }
     }
 
     /**

@@ -215,7 +215,7 @@ class MatchService {
                 )
             }
             // wait distance matrix to 30s
-            await new Promise((resolve) => setTimeout(resolve, 125))
+            await new Promise((resolve) => setTimeout(resolve, 150))
 
             // 2. Check distance of user and match
             let distanceMatrix = await getDistance({

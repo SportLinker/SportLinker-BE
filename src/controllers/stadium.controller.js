@@ -21,16 +21,16 @@ class StadiumController {
         }).send(res)
     }
 
-    async getStadiumByOnwer(req, res, next) {
+    async getStadiumByOwner(req, res, next) {
         new Ok({
-            message: 'Get stadium by onwer sucessfully',
-            metadata: await StadiumService.getStadiumByOnwer(req.user.id),
+            message: 'Get stadium by owner sucessfully',
+            metadata: await StadiumService.getStadiumByOwner(req.user.id),
         }).send(res)
     }
 
     async getStadiumByAdmin(req, res, next) {
         new Ok({
-            message: 'Get stadium by onwer sucessfully',
+            message: 'Get stadium by owner sucessfully',
             metadata: await StadiumService.getStadiumByAdmin(),
         }).send(res)
     }

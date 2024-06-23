@@ -10,22 +10,30 @@ class Prisma {
                         url: global.config.get('MYSQL_URL'),
                     },
                 },
+                log: [
+                    'warn',
+                    'error',
+                    {
+                        level: 'info',
+                        emit: 'event',
+                    },
+                ],
             })
             Prisma.instance = this
         }
         return Prisma.instance
     }
 
-    async connect() {
-        await this.client
-            .$connect()
-            .then(() => {
-                global.logger.info('Connected to database')
-            })
-            .catch((error) => {
-                global.logger.error(`Err connecting MySQL`, error.message)
-            })
-    }
+    // async connect() {
+    //     await this.client
+    //         .$connect()
+    //         .then(() => {
+    //             global.logger.info('Connected to database')
+    //         })
+    //         .catch((error) => {
+    //             global.logger.error(`Err connecting MySQL`, error.message)
+    //         })
+    // }
 }
 
 module.exports = new Prisma()

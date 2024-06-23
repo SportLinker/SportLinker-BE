@@ -20,7 +20,7 @@ app.use(morgan(morganFormat)) // log requests to the console
 const corsOptions = {
     // allow multiple domains
     origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 }
 app.use(cors(corsOptions))
 // init global variable
@@ -32,8 +32,8 @@ global.logger = require('./services/logger.service')
     const RedisConnection = require('./configs/redis.config')
     await RedisConnection.connect()
     // connect to database MySQL
-    const prisma = require('./configs/prisma.config')
-    await prisma.connect()
+    // const prisma = require('./configs/prisma.config')
+    // await prisma.connect()
     // test function
     const { test } = require('./test/index')
     await test()

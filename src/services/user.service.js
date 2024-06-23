@@ -3,6 +3,7 @@
 const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const bcrypt = require('bcrypt')
+const redis = require('../configs/redis.config').client
 
 class UserService {
     async getAllUser(pageSize, pageNumber) {
@@ -120,6 +121,55 @@ class UserService {
         global.logger.info(
             `Delete user successfully by admin ${admin_id} with id: ${user.id}`
         )
+        return user
+    }
+
+    async getUserById(user_id) {
+        const user = await prisma.user.findUnique({
+            select: {
+                id: true,
+                name: true,
+                phone: true,
+                email: true,
+                date_of_birth: true,
+                role: true,
+                status: true,
+            },
+            where: {
+                id: user_id,
+            },
+        })
+        // get favorite of user
+        const favorite = await redis.get(`favorite:${user_id}`)
+        user.favorite = favorite ? JSON.parse(favorite) : []
+
+        return user
+    }
+
+    async getProfile(user_id) {
+        const user = await prisma.user.findUnique({
+            select: {
+                id: true,
+                name: true,
+                phone: true,
+                email: true,
+                date_of_birth: true,
+                role: true,
+                status: true,
+                Wallet: {
+                    select: {
+                        balance: true,
+                    },
+                },
+            },
+            where: {
+                id: user_id,
+            },
+        })
+        // get favorite of user
+        const favorite = await redis.get(`favorite:${user_id}`)
+        user.favorite = favorite ? JSON.parse(favorite) : []
+
         return user
     }
 }

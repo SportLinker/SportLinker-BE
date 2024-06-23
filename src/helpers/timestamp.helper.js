@@ -1,7 +1,7 @@
 const moment = require('moment')
 
-const getTimeByFormat = (format) => {
-    return moment().format(format)
+const getTimeByFormat = (format, time) => {
+    return moment(time).format(format)
 }
 
 const getUCLHourAndMinute = (time) => {
@@ -29,9 +29,23 @@ const getStringHourAndMinut = (time) => {
     return `${hour}:${minute}`
 }
 
+const getStringDay = (time) => {
+    let day = new Date(time).getDate()
+    let month = new Date(time).getMonth() + 1
+    let year = new Date(time).getFullYear()
+    if (day < 10) {
+        day = `0${day}`
+    }
+    if (month < 10) {
+        month = `0${month}`
+    }
+    return `${year}-${month}-${day}`
+}
+
 module.exports = {
     getTimeByFormat,
     getUCLHourAndMinute,
     getStringHourAndMinut,
     getStringByDate,
+    getStringDay,
 }

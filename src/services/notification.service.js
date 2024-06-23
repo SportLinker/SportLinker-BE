@@ -13,6 +13,28 @@ class NotificationSerivce {
             },
         })
     }
+
+    async getListNotificationByUser(user_id) {
+        const notifications = await prisma.notification.findMany({
+            where: {
+                receiver_id: user_id,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        })
+        // update status of notification to read
+        await prisma.notification.updateMany({
+            where: {
+                receiver_id: user_id,
+            },
+            data: {
+                is_read: true,
+            },
+        })
+
+        return notifications
+    }
 }
 
 module.exports = new NotificationSerivce()

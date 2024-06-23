@@ -13,7 +13,10 @@ class VoucherController {
 
     async getAllVoucher(req, res) {
         new Ok({
-            metadata: await VoucherService.getAllVoucher(),
+            metadata: await VoucherService.getAllVoucher(
+                req.query.page_number,
+                req.query.page_size
+            ),
         }).send(res)
     }
 

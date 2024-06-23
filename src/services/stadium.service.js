@@ -64,12 +64,33 @@ class StadiumService {
 
     async getStadiumByPlayer(lat, long) {
         const list_stadium = await prisma.stadium.findMany({
+            select: {
+                id: true,
+                stadium_name: true,
+                stadium_address: true,
+                stadium_long: true,
+                stadium_lat: true,
+                stadium_thumnail: true,
+                stadium_rating: true,
+                stadium_time: true,
+                stadium_description: true,
+                stadium_status: true,
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
+            },
             where: {
                 stadium_status: 'approved',
             },
         })
         // get distance and sort by distance
         for (let i = 0; i < list_stadium.length; i++) {
+            // wait 150ms
+            await new Promise((resolve) => setTimeout(resolve, 150))
             const distance = await getDistance({
                 latOrigin: lat,
                 longOrigin: long,
@@ -78,19 +99,19 @@ class StadiumService {
             })
             list_stadium[i].distance = distance.rows[0].elements[0].distance
         }
-        list_stadium.sort((a, b) => a.distance - b.distance)
+        list_stadium.sort((a, b) => a.distance.value - b.distance.value)
         return list_stadium
     }
 
     /**
-     * @function getStadiumByOnwer
+     * @function getStadiumByOwner
      * @param {*} userId
      * @logic
      * 1. Find stadium by owner
      * 2. Return list stadium
      */
 
-    async getStadiumByOnwer(userId) {
+    async getStadiumByOwner(userId) {
         const list_stadium = await prisma.stadium.findMany({
             where: {
                 stadium_owner_id: userId,
@@ -166,7 +187,7 @@ class StadiumService {
                         created_at: true,
                     },
                 },
-                onwer: {
+                owner: {
                     select: {
                         avatar_url: true,
                         id: true,

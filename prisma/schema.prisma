@@ -47,6 +47,7 @@ model User {
   Stadium               Stadium[]
   VoucherUser           VoucherUser[]
   Transaction           Transaction[]
+  BookingYard           BookingYard[]
 }
 
 enum UserStatus {
@@ -239,7 +240,7 @@ model Stadium {
   stadium_status      StadiumStatus @default(approved)
   created_at          DateTime      @default(now())
   // Relation
-  onwer               User          @relation(fields: [stadium_owner_id], references: [id])
+  owner               User          @relation(fields: [stadium_owner_id], references: [id])
   yards               Yard[]
 }
 
@@ -283,6 +284,7 @@ model BookingYard {
   created_at DateTime      @default(now())
   // Relation
   yard       Yard          @relation(fields: [yard_id], references: [yard_id])
+  user       User          @relation(fields: [user_id], references: [id])
 }
 
 enum BookingStatus {

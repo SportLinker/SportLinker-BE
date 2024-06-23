@@ -7,7 +7,10 @@ class TransactionController {
     async getAllTransaction(req, res, next) {
         new Ok({
             message: 'Get all transaction success',
-            metadata: await TransactionService.getAllTransaction(),
+            metadata: await TransactionService.getAllTransaction(
+                req.query.page_size,
+                req.query.page_number
+            ),
         }).send(res)
     }
 

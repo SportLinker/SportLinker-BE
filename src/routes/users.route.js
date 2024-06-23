@@ -14,4 +14,8 @@ router.put('/:user_id', asyncHandler(UserController.updateUser))
 
 router.delete('/:user_id', asyncHandler(UserController.deleteUser))
 
+router.get('/getProfile', asyncHandler(UserController.getProfile))
+
+router.get('/:user_id', asyncHandler(UserController.getUserById))
+
 module.exports = router
