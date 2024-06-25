@@ -3,11 +3,11 @@
 const express = require('express')
 const router = express.Router()
 const { asyncHandler } = require('../helpers/asyncHandler.helper')
-const NotificationController = require('../controllers/notification.controller')
+const BookingController = require('../controllers/booking.controller')
 const { authentication } = require('../middlewares/auth.middleware')
 
 router.use(authentication)
 
-router.get('/', asyncHandler(NotificationController.getListNotificationByUser))
+router.post('/', asyncHandler(BookingController.createBooking))
 
 module.exports = router

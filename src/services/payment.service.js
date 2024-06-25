@@ -123,11 +123,17 @@ class PaymentService {
                 global.logger.error(`Update user balance error: ${err.message}`)
             })
         // send notification to user
-        await NotificationService.createNotification({
+        const noti = await NotificationService.createNotification({
             receiver_id: transaction.user_id,
             sender_id: transaction.user_id,
-            content: `Deposit ${transaction.amount} completed`,
+            content: `Nạp tiền vào tài khoản với ${transaction.amount}VND thành công `,
         })
+
+        global.io
+            .to(global.onLineUser.get(transaction.user_id))
+            .emit('receive-notification', {
+                content: noti.content,
+            })
 
         global.logger.info(
             `Deposit ${transaction.amount} to ${transaction.user_id} completed`
@@ -163,7 +169,7 @@ class PaymentService {
         await NotificationService.createNotification({
             user_id: transaction.user_id,
             title: 'Deposit cancelled',
-            content: `Processing payment with ${transaction.amount} cancelled`,
+            content: `Quá trình thanh toán with ${transaction.amount}VND bị hủy`,
         })
         return transaction
     }

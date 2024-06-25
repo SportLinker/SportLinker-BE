@@ -69,7 +69,7 @@ class AuthenService {
             name: userExist.name,
         }
         const token = await authUtil.createTokenPair(payload, privateKey, publicKey)
-        console.log('token::', token)
+        // console.log('token::', token)
         // save refreshToken , public key to redis
         await redisClient.set(
             `keyToken:${userExist.id}`,

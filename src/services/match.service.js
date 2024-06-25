@@ -279,6 +279,56 @@ class MatchService {
     }
 
     /**
+     * @function: Get Match By User
+     * @param {*} user_id
+     */
+
+    async getMatchByUser(user_id) {
+        // 1. Get match by user
+        const match_by_user = await prisma.match.findMany({
+            where: {
+                match_join: {
+                    some: {
+                        user_join_id: user_id,
+                    },
+                },
+            },
+            select: {
+                match_id: true,
+                match_name: true,
+                cid: true,
+                sport_name: true,
+                total_join: true,
+                maximum_join: true,
+                start_time: true,
+                end_time: true,
+                status: true,
+                user_create: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
+                option: {
+                    select: {
+                        budget: true,
+                    },
+                },
+            },
+            orderBy: [
+                {
+                    status: 'asc',
+                },
+                {
+                    start_time: 'asc',
+                },
+            ],
+        })
+        return match_by_user
+    }
+
+    /**
      *@function: Get Match Detail
      * @param {*} match_id
      */

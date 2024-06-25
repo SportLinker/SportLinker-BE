@@ -11,6 +11,13 @@ class MatchController {
         }).send(res)
     }
 
+    async getMatchByUser(req, res, next) {
+        new Ok({
+            message: 'Get match by user successfully',
+            metadata: await MatchService.getMatchByUser(req.user.id),
+        }).send(res)
+    }
+
     async getListMatch(req, res, next) {
         new Ok({
             message: 'Get list match successfully',

@@ -6,6 +6,8 @@ const { authentication } = require('../middlewares/auth.middleware')
 
 router.use(authentication)
 
+router.get('/getMatchByUser', asyncHandler(matchController.getMatchByUser))
+
 router.get('/:match_id', asyncHandler(matchController.getMatchDetail))
 
 router.get('/', asyncHandler(matchController.getListMatch))

@@ -10,13 +10,11 @@ const socketListener = () => {
 
     global.onLineUser = new Map()
     io.on('connection', (socket) => {
-        global.logger.info(`A user connected with socket id: ${socket.id}`)
-
         socket.on('online-user', async (userId) => {
             console.log(`online-user: ${userId}`)
             // set online user
             global.onLineUser.set(userId, socket.id)
-            console.log(global.onLineUser)
+            global.logger.info(`Online user: ${global.onLineUser}`)
             // get list group message of user
             const listGroupMessage = await GroupMessageService.getListGroupMessageByUser(
                 userId
@@ -52,7 +50,7 @@ const socketListener = () => {
 
         // disconnect
         socket.on('disconnect', () => {
-            console.log('A user disconnected')
+            global.logger.info(`User disconnected: ${socket.id}`)
         })
     })
 }

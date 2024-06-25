@@ -4,8 +4,13 @@ const express = require('express')
 const router = express.Router()
 const { asyncHandler } = require('../helpers/asyncHandler.helper')
 const YardController = require('../controllers/yard.controller')
+const { authentication } = require('../middlewares/auth.middleware')
+
+router.use(authentication)
 
 router.post('/:stadium_id', asyncHandler(YardController.createYard))
+
+router.get('/getAllYardByOwner', asyncHandler(YardController.getAllYardByOwner))
 
 router.get(
     '/getListYardByUser/:stadium_id',

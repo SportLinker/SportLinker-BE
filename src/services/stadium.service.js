@@ -276,13 +276,13 @@ class StadiumService {
         await NotificationService.createNotification({
             sender_id: stadium.stadium_owner_id,
             receiver_id: `${global.config.get(`ADMIN_ID`)}`,
-            content: `Stadium ${stadium.stadium_name} has been deleted.`,
+            content: `Sân vận động ${stadium.stadium_name} của bạn đã bị xóa.`,
         })
         // send notification to owner
         await NotificationService.createNotification({
             sender_id: `${global.config.get(`ADMIN_ID`)}`,
             receiver_id: stadium.stadium_owner_id,
-            content: `Your stadium ${stadium.stadium_name} has been deleted.`,
+            content: `Sân vận động ${stadium.stadium_name} đã bị xóa.`,
         })
 
         return stadium

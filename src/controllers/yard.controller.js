@@ -11,6 +11,13 @@ class YardController {
         }).send(res)
     }
 
+    async getAllYardByOwner(req, res, next) {
+        new Ok({
+            message: 'Yards fetched successfully.',
+            metadata: await YardService.getAllYardByOwner(req.user.id),
+        }).send(res)
+    }
+
     async getListYardByUser(req, res, next) {
         new Ok({
             message: 'Yards fetched successfully.',

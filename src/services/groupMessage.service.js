@@ -17,11 +17,15 @@ class GroupMessageService {
      */
     async getListGroupMessageByUser(userId) {
         // Get group message join by user
-        const groupMessageJoinByUser = await prisma.groupMessageJoin.findMany({
-            where: {
-                user_join_id: userId,
-            },
-        })
+        const groupMessageJoinByUser = await prisma.groupMessageJoin
+            .findMany({
+                where: {
+                    user_join_id: userId,
+                },
+            })
+            .catch((error) => {
+                global.logger.error(`Error: ${error.message}`)
+            })
         const id = groupMessageJoinByUser.map(
             (groupMessageJoin) => groupMessageJoin.group_message_id
         )
