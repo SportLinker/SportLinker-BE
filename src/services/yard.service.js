@@ -179,6 +179,11 @@ class YardService {
                         },
                     },
                 },
+                stadium: {
+                    select: {
+                        stadium_name: true,
+                    },
+                },
             },
             where: {
                 stadium_id: stadium_id,

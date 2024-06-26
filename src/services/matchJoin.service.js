@@ -82,10 +82,10 @@ class MatchJoinService {
             },
         })
         // 7. send notification to owner of match
-        await NotificationSerivce.createNotification({
-            sender_id: userId,
+        const noti = await NotificationSerivce.createNotification({
             receiver_id: isMatchExist.user_create_id,
-            content: `Người chơi ${userJoin.name} vừa tham gia trận đấu ${isMatchExist.match_name}`,
+            sender_id: global.config.get(`ADMIN_ID`),
+            content: `Người chơi ${userJoin.name} vừa tham gia ${isMatchExist.match_name}`,
         })
         // emit socket to owner of match
         if (global.onLineUser.has(isMatchExist.user_create_id)) {
@@ -93,7 +93,7 @@ class MatchJoinService {
             global.io
                 .to(global.onLineUser.get(isMatchExist.user_create_id))
                 .emit('receive-notification', {
-                    content: `Người chơi ${userJoin.name} vừa tham gia ${isMatchExist.match_name}`,
+                    content: noti.content,
                 })
         }
         // logs

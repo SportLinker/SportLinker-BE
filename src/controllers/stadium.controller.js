@@ -31,7 +31,10 @@ class StadiumController {
     async getStadiumByAdmin(req, res, next) {
         new Ok({
             message: 'Get stadium by owner sucessfully',
-            metadata: await StadiumService.getStadiumByAdmin(),
+            metadata: await StadiumService.getStadiumByAdmin(
+                req.query.page_size,
+                req.query.page_number
+            ),
         }).send(res)
     }
 
@@ -57,6 +60,16 @@ class StadiumController {
         new Ok({
             message: 'Stadium deleted successfully.',
             metadata: await StadiumService.deleteStadium(req.params.stadium_id),
+        }).send(res)
+    }
+
+    async updateStatusStadium(req, res, next) {
+        new Ok({
+            message: 'Stadium status updated successfully.',
+            metadata: await StadiumService.updateStatusStadium(
+                req.params.stadium_id,
+                req.body
+            ),
         }).send(res)
     }
 }

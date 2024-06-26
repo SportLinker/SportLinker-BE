@@ -14,6 +14,17 @@ class TransactionController {
         }).send(res)
     }
 
+    async getTransactionByUser(req, res, next) {
+        new Ok({
+            message: 'Get transaction by user success',
+            metadata: await TransactionService.getTransactionByUser(
+                req.query.page_size,
+                req.query.page_number,
+                req.user.id
+            ),
+        }).send(res)
+    }
+
     async updateTransaction(req, res, next) {
         new Ok({
             message: 'Update transaction success',

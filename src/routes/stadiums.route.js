@@ -22,6 +22,8 @@ router.put('/:stadium_id', asyncHandler(StadiumController.updateStadium))
 
 router.delete('/:stadium_id', asyncHandler(StadiumController.deleteStadium))
 
+router.patch('/:stadium_id', asyncHandler(StadiumController.updateStatusStadium))
+
 // router.delete('/:id', asyncHandler(StadiumController.deleteStadium))
 
 module.exports = router

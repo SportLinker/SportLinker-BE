@@ -130,9 +130,13 @@ class StadiumService {
      * 4. Return list stadium
      */
 
-    async getStadiumByAdmin() {
+    async getStadiumByAdmin(page_size, page_number) {
+        page_size = parseInt(page_size)
+        page_number = parseInt(page_number)
+
         const list_stadium = await prisma.stadium.findMany({
             select: {
+                id: true,
                 stadium_name: true,
                 stadium_address: true,
                 stadium_thumnail: true,
@@ -140,21 +144,32 @@ class StadiumService {
                 stadium_description: true,
                 stadium_status: true,
                 created_at: true,
-                stadium_owner: {
+                owner: {
                     select: {
-                        user_id: true,
-                        user_name: true,
-                        user_email: true,
-                        user_phone: true,
+                        id: true,
+                        name: true,
+                        avatar_url: true,
                     },
                 },
             },
-            orderBy: {
-                stadium_status: 'desc',
-                created_at: 'desc',
-            },
+            orderBy: [
+                {
+                    stadium_status: 'desc',
+                },
+                {
+                    created_at: 'desc',
+                },
+            ],
+            skip: page_size * (page_number - 1),
+            take: page_size,
         })
-        return list_stadium
+        // find total_page
+        const total_stadium = await prisma.stadium.count()
+        const total_page = Math.ceil(total_stadium / page_size)
+        return {
+            list_stadium,
+            total_page,
+        }
     }
 
     /**
@@ -286,6 +301,45 @@ class StadiumService {
         })
 
         return stadium
+    }
+
+    /**
+     * @function updateStatusStadium
+     * @param {*} stadiumId
+     * @param {*} data
+     * @logic
+     * 1. Find stadium by id
+     * 2. If stadium does not exist, return bad request
+     * 3. If stadium exists, update status
+     * 4. Return stadium
+     */
+
+    async updateStatusStadium(stadiumId, data) {
+        // 1. Find stadium by id
+        const stadium = await prisma.stadium.findFirst({
+            where: {
+                id: stadiumId,
+            },
+        })
+        if (!stadium) {
+            throw new BadRequestError('Stadium does not exist.')
+        }
+        // 2. Update status
+        const updatedStadium = await prisma.stadium.update({
+            where: {
+                id: stadiumId,
+            },
+            data: {
+                stadium_status: data.stadium_status,
+            },
+        })
+        // 3. Send notification to owner
+        await NotificationService.createNotification({
+            sender_id: `${global.config.get(`ADMIN_ID`)}`,
+            receiver_id: stadium.stadium_owner_id,
+            content: `Sân vận động ${stadium.stadium_name} của bạn đã được ${data.stadium_status}.`,
+        })
+        return updatedStadium
     }
 }
 
