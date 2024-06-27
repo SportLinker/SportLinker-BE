@@ -479,18 +479,20 @@ class MatchService {
                 throw new BadRequestError(error)
             })
         // 3. Update match option
-        await prisma.matchOption
-            .update({
-                where: {
-                    match_id: match_id,
-                },
-                data: {
-                    ...data.option,
-                },
-            })
-            .catch((error) => {
-                throw new BadRequestError(error)
-            })
+        if (data.option) {
+            await prisma.matchOption
+                .update({
+                    where: {
+                        match_id: match_id,
+                    },
+                    data: {
+                        ...data.option,
+                    },
+                })
+                .catch((error) => {
+                    throw new BadRequestError(error)
+                })
+        }
         // 3. Return result
         return updateMatch
     }
