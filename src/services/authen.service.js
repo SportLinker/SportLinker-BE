@@ -114,8 +114,70 @@ class AuthenService {
     }
 
     async loginWithGoogle(user) {
-        // Your Google login logic here
-        // passport
+        //find user by email
+        const is_exist_user = await prisma.user.findUnique({
+            where: {
+                email: user.email,
+            },
+        })
+        // if user exist
+        if (is_exist_user) {
+            const payload = {
+                id: is_exist_user.id,
+                name: is_exist_user.name,
+                email: is_exist_user.email,
+                role: is_exist_user.role,
+            }
+            const token = await authUtil.createTokenPair(payload)
+            // save refreshToken , public key to redis
+            await redisClient.set(
+                `keyToken:${is_exist_user.id}`,
+                JSON.stringify({
+                    refreshToken: token.refreshToken,
+                    publicKey: token.publicKey,
+                })
+            )
+            // logs
+            global.logger.info(`User ${is_exist_user.id} login successfully`)
+            return {
+                user: is_exist_user,
+                token: {
+                    accessToken: token.accessToken,
+                    refreshToken: token.refreshToken,
+                },
+            }
+        }
+        // if user not exist
+        const new_user = await prisma.user.create({
+            data: {
+                ...user,
+            },
+        })
+        // create token
+        const payload = {
+            id: new_user.id,
+            name: new_user.name,
+            email: new_user.email,
+            role: new_user.role,
+        }
+        const token = await authUtil.createTokenPair(payload)
+        // save refreshToken , public key to redis
+        await redisClient.set(
+            `keyToken:${new_user.id}`,
+            JSON.stringify({
+                refreshToken: token.refreshToken,
+                publicKey: token.publicKey,
+            })
+        )
+        // logs
+        global.logger.info(`User ${new_user.id} login successfully`)
+        return {
+            user: new_user,
+            token: {
+                accessToken: token.accessToken,
+                refreshToken: token.refreshToken,
+            },
+        }
     }
 
     async loginWithPhone(user) {

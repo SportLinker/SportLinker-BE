@@ -24,7 +24,7 @@ class Prisma {
         return Prisma.instance
     }
 
-    async connect() { 
+    async connect() {
         await this.client
             .$connect()
             .then(() => {

@@ -12,7 +12,7 @@ const {
 
 class MatchService {
     /**
-     *
+     *@function: Create New Match
      * @param {*} match
      * @param {*} user_create_id
      * @returns
@@ -98,7 +98,7 @@ class MatchService {
     }
 
     /**
-     *
+     *@function: Get List Match
      * @param {*} lat (lat origin of user)
      * @param {*} long (long origin of user)
      * @param {*} distance string (meters)
@@ -283,7 +283,7 @@ class MatchService {
      * @param {*} user_id
      */
 
-    async getMatchByUser(user_id) {
+    async getMatchByUser(user_id, lat, long) {
         // 1. Get match by user
         const match_by_user = await prisma.match.findMany({
             where: {
@@ -310,11 +310,7 @@ class MatchService {
                         avatar_url: true,
                     },
                 },
-                option: {
-                    select: {
-                        budget: true,
-                    },
-                },
+                option: true,
             },
             orderBy: [
                 {
@@ -325,6 +321,68 @@ class MatchService {
                 },
             ],
         })
+        // find distance and place_detail of user and match
+        for (let i = 0; i < match_by_user.length; i++) {
+            // 1. Get detail place of match
+            let placeDetail = await redis.get(`stadium:${match_by_user[i].cid}`)
+            placeDetail = JSON.parse(placeDetail)
+            if (!placeDetail) {
+                placeDetail = await getPlaceDetail({
+                    cid: match_by_user[i].cid,
+                })
+                await redis.set(
+                    `stadium:${match_by_user[i].cid}`,
+                    JSON.stringify(placeDetail)
+                )
+            }
+            // wait distance matrix to 30s
+            await new Promise((resolve) => setTimeout(resolve, 200))
+
+            // 2. Check distance of user and match
+            let distanceMatrix = await getDistance({
+                latOrigin: lat,
+                longOrigin: long,
+                latDestination: placeDetail.latitude,
+                longDestination: placeDetail.longitude,
+            })
+            distanceMatrix = distanceMatrix.rows[0].elements[0].distance
+            console.log(`Distance: ${distanceMatrix.value}`)
+            // push detail place to listMatch and distance
+            match_by_user[i].place_detail = placeDetail
+            match_by_user[i].distance = distanceMatrix
+        }
+        // combine by date
+        let result = match_by_user.reduce((acc, match) => {
+            const date = getStringByDate(match.start_time)
+            if (!acc[date]) {
+                acc[date] = {
+                    date: date,
+                    match_group_by_date: [],
+                }
+            }
+            acc[date].match_group_by_date.push(match)
+            return acc
+        }, {})
+        result = Object.values(result)
+        // combine by time
+        for (let i = 0; i < result.length; i++) {
+            const match_group_by_time = result[i].match_group_by_date.reduce(
+                (acc, match) => {
+                    const time = getStringHourAndMinut(match.start_time)
+                    if (!acc[time]) {
+                        acc[time] = {
+                            time: time,
+                            matches: [],
+                        }
+                    }
+                    acc[time].matches.push(match)
+                    return acc
+                },
+                {}
+            )
+            result[i].match_group_by_date = Object.values(match_group_by_time)
+        }
+
         return match_by_user
     }
 
@@ -408,7 +466,7 @@ class MatchService {
     }
 
     /**
-     *
+     *@function: delete Match
      * @param {*} match_id
      * @param {*} user_id
      */

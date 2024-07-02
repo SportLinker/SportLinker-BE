@@ -125,7 +125,6 @@ class PaymentService {
         // send notification to user
         const noti = await NotificationService.createNotification({
             receiver_id: transaction.user_id,
-            sender_id: transaction.user_id,
             content: `Nạp tiền vào tài khoản với ${transaction.amount}VND thành công `,
         })
 
@@ -167,8 +166,7 @@ class PaymentService {
         })
         // send notification to user
         await NotificationService.createNotification({
-            user_id: transaction.user_id,
-            title: 'Deposit cancelled',
+            receiver_id: transaction.user_id,
             content: `Quá trình thanh toán with ${transaction.amount}VND bị hủy`,
         })
         return transaction

@@ -128,7 +128,6 @@ class TransactionService {
             const noti = await NotificationService.createNotification({
                 content: `Giao dịch của bạn ${transaction.transaction_code} đã bị từ chối với lí do: ${data.rejected_reason}`,
                 receiver_id: transaction.user_id,
-                sender_id: global.config.get(`ADMIN_ID`),
             })
             // emit socket
             global.io
@@ -151,7 +150,6 @@ class TransactionService {
             const noti = await NotificationService.createNotification({
                 content: `Giao dịch của bạn với ${transaction.transaction_code} thành công!`,
                 receiver_id: transaction.user_id,
-                sender_id: global.config.get(`ADMIN_ID`),
             })
             // emit socket
             global.io
