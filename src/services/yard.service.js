@@ -292,11 +292,32 @@ class YardService {
     }
 
     async deleteYard(yard_id) {
-        return await prisma.yard.delete({
+        const booking_yard = await prisma.bookingYard.findMany({
+            where: {
+                yard_id: yard_id,
+                status: 'accepted',
+            },
+        })
+        if (booking_yard.length > 0) {
+            throw new BadRequestError('Sân đã có người đặt không thể xóa')
+        }
+        // delete booking
+        await prisma.bookingYard.deleteMany({
             where: {
                 yard_id: yard_id,
             },
         })
+        // delete yard
+        const yard = prisma.yard
+            .delete({
+                where: {
+                    yard_id: yard_id,
+                },
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+        return 'Yard deleted'
     }
 }
 

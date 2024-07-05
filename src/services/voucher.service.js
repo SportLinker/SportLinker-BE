@@ -140,6 +140,49 @@ class VoucherService {
         })
         return 'Voucher deleted'
     }
+
+    /**
+     * @function getVoucherById
+     * @param {*} voucher_id
+     * @logic
+     * 1. get voucher by id
+     * 2. return voucher
+     */
+
+    async getVoucherById(voucher_id) {
+        const voucher = await prisma.voucher.findFirst({
+            select: {
+                id: true,
+                voucher_code: true,
+                voucher_name: true,
+                created_at: true,
+                expired_at: true,
+            },
+            where: {
+                id: voucher_id,
+            },
+        })
+        const user_voucher = await prisma.voucherUser.findMany({
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
+                status: true,
+                created_at: true,
+            },
+            where: {
+                voucher_id: voucher_id,
+            },
+        })
+        return {
+            voucher: voucher,
+            detail: user_voucher,
+        }
+    }
 }
 
 module.exports = new VoucherService()

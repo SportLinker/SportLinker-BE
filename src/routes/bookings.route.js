@@ -10,6 +10,8 @@ router.use(authentication)
 
 router.post('/', asyncHandler(BookingController.createBooking))
 
-router.patch('/:booking_id', asyncHandler(BookingController.updateBooking))
+router.put('/:booking_id', asyncHandler(BookingController.updateBooking))
+
+router.get('/getByUser', asyncHandler(BookingController.getAllBookingUser))
 
 module.exports = router

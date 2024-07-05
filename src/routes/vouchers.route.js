@@ -7,6 +7,8 @@ const VoucherController = require('../controllers/voucher.controller')
 
 router.get('/', asyncHandler(VoucherController.getAllVoucher))
 
+router.get('/:voucher_id', asyncHandler(VoucherController.getVoucherById))
+
 router.post('/', asyncHandler(VoucherController.createVoucher))
 
 router.delete('/:voucher_id', asyncHandler(VoucherController.deleteVoucher))

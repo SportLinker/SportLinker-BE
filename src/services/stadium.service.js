@@ -231,7 +231,7 @@ class StadiumService {
 
     async updateStadium(userId, stadiumId, data) {
         // 1. Find stadium by id
-        const stadium = await prisma.stadium.findFirst({
+        const stadium = await prisma.stadium.findUnique({
             where: {
                 id: stadiumId,
             },

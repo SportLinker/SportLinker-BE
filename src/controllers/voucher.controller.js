@@ -20,6 +20,12 @@ class VoucherController {
         }).send(res)
     }
 
+    async getVoucherById(req, res) {
+        new Ok({
+            metadata: await VoucherService.getVoucherById(req.params.voucher_id),
+        }).send(res)
+    }
+
     async getAllVoucherUser(req, res) {
         new Ok({
             metadata: await VoucherService.getAllVoucherUser(req.user.id),

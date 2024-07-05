@@ -125,6 +125,38 @@ class BookingService {
 
         return booking
     }
+
+    async getAllBookingUser(userId) {
+        const bookings = await prisma.bookingYard
+            .findMany({
+                where: {
+                    user_id: userId,
+                },
+                orderBy: [
+                    {
+                        created_at: 'desc',
+                    },
+                    {
+                        status: 'asc',
+                    },
+                ],
+                include: {
+                    yard: {
+                        include: {
+                            stadium: {
+                                select: {
+                                    stadium_name: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        return bookings
+    }
 }
 
 module.exports = new BookingService()

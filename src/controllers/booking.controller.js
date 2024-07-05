@@ -17,6 +17,13 @@ class BookingController {
             metadata: await BookingService.updateBooking(req.params.booking_id, req.body),
         }).send(res)
     }
+
+    async getAllBookingUser(req, res, next) {
+        new Ok({
+            message: 'Get all booking user successfully',
+            metadata: await BookingService.getAllBookingUser(req.user.id),
+        }).send(res)
+    }
 }
 
 module.exports = new BookingController()
