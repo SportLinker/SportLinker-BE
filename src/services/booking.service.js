@@ -31,6 +31,7 @@ class BookingService {
     }
 
     async updateBooking(bookingId, data) {
+        console.log(`data`, JSON.stringify(data))
         // update status booking
         const booking = await prisma.bookingYard.findUnique({
             select: {
@@ -38,6 +39,7 @@ class BookingService {
                 yard_id: true,
                 time_start: true,
                 user_id: true,
+                status: true,
                 yard: {
                     select: {
                         yard_name: true,
@@ -60,6 +62,7 @@ class BookingService {
                 id: booking.user_id,
             },
         })
+        console.log(data.status)
         // update booking same time to rejected
         if (data.status === 'accepted') {
             // check time_start of yard is booked
@@ -87,24 +90,27 @@ class BookingService {
                 receiver_id: user.id,
                 content: `Đặt sân ${booking.yard.yard_name} vào lúc ${booking.time_start} - ${booking.time_end} đã được chấp nhận`,
             })
-
-            const update_yard_reject = await prisma.bookingYard.updateMany({
+            // update all booking same time to rejected
+            const yard_reject = await prisma.bookingYard.findMany({
                 where: {
                     yard_id: booking.yard_id,
                     time_start: booking.time_start,
                     status: 'pending',
-                },
-                data: {
-                    status: 'rejected',
+                    id: {
+                        not: bookingId,
+                    },
                 },
             })
             // send notification to user
-            for (let i = 0; i < update_yard_reject.count; i++) {
+            for (let i = 0; i < yard_reject.length; i++) {
                 await NotificationService.createNotification({
-                    receiver_id: update_yard_reject[i].user_id,
+                    receiver_id: yard_reject[i].user_id,
                     content: `Đặt sân ${booking.yard.yard_name} vào lúc ${booking.time_start} - ${booking.time_end} đã bị từ chối`,
                 })
             }
+            // logs
+            global.logger.info(`Booking ${bookingId} has been accepted by ${user.id}`)
+            return `Booking ${bookingId} has been accepted`
         }
         // status is rejected
         if (data.status === 'rejected') {
@@ -121,9 +127,12 @@ class BookingService {
                 receiver_id: user.id,
                 content: `Đặt sân ${booking.yard.yard_name} vào lúc ${booking.time_start} - ${booking.time_end} đã bị từ chối`,
             })
+            // logs
+            global.logger.info(`Booking ${bookingId} has been rejected by ${user.id}`)
+            return `Booking ${bookingId} has been rejected`
         }
-
-        return booking
+        global.logger.info(`NO ACTION for booking ${bookingId}`)
+        return `NO ACTION for booking ${bookingId}`
     }
 
     async getAllBookingUser(userId) {

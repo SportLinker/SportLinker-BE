@@ -6,11 +6,16 @@ const bcrypt = require('bcrypt')
 const redis = require('../configs/redis.config').client
 
 class UserService {
-    async getAllUser(pageSize, pageNumber) {
+    async getAllUser(pageSize, pageNumber, name) {
         // convert to number of pageSize and pageNumber
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         const list_user = await prisma.user.findMany({
+            where: {
+                name: {
+                    contains: name,
+                },
+            },
             skip: pageSize * (pageNumber - 1),
             take: pageSize,
             orderBy: [

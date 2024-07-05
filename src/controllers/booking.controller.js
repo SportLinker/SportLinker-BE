@@ -12,6 +12,7 @@ class BookingController {
     }
 
     async updateBooking(req, res, next) {
+        console.log(`req.body`, req.body)
         new Ok({
             message: 'Update booking successfully',
             metadata: await BookingService.updateBooking(req.params.booking_id, req.body),

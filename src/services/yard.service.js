@@ -58,6 +58,7 @@ class YardService {
                         },
                     },
                 },
+                stadium: true,
             },
             where: {
                 stadium_id: {

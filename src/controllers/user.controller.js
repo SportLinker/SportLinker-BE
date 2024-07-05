@@ -9,7 +9,8 @@ class UserController {
             message: 'Get all user successfully',
             metadata: await UserService.getAllUser(
                 req.query.page_size,
-                req.query.page_number
+                req.query.page_number,
+                req.query.name
             ),
         }).send(res)
     }
