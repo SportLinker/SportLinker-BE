@@ -49,6 +49,9 @@ model User {
   Transaction           Transaction[]
   BookingYard           BookingYard[]
   Notification          Notification[]
+  Blog                  Blog[]
+  BlogUser              BlogUser[]
+  BlogComment           BlogComment[]
 }
 
 enum UserStatus {
@@ -101,6 +104,7 @@ model Sport {
   icon        String?
   Match       Match[]
   StadiumYard Yard[]
+  Blog        Blog[]
 }
 
 // Match
@@ -363,9 +367,31 @@ enum TransactionStatus {
 // Blog
 
 model Blog {
-  id           String @id @default(cuid())
-  blog_content String
-  blog_address String
+  id              String        @id @default(cuid())
+  blog_owner      String
+  blog_content    String
+  blog_address    String?
+  blog_sport      String?
+  total_like      Int           @default(0)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  // Relation
+  owner           User          @relation(fields: [blog_owner], references: [id])
+  blog_link       BlogLink[]
+  BlogUser        BlogUser[]
+  Sport           Sport?        @relation(fields: [sportSport_name], references: [sport_name])
+  sportSport_name String?
+  BlogComment     BlogComment[]
+}
+
+model BlogUser {
+  id      String  @id @default(cuid())
+  user_id String
+  blog_id String
+  is_read Boolean @default(false)
+  // Relation
+  user    User    @relation(fields: [user_id], references: [id])
+  blog    Blog    @relation(fields: [blog_id], references: [id])
 }
 
 model BlogLink {
@@ -373,9 +399,24 @@ model BlogLink {
   blog_id String
   url     String
   type    BlogLinkType
+  // Relation
+  Blog    Blog?        @relation(fields: [blogId], references: [id])
+  blogId  String?
 }
 
 enum BlogLinkType {
   image
   video
+}
+
+model BlogComment {
+  id             String   @id @default(cuid())
+  user_id        String
+  blog_id        String
+  parent_comment String   @default("")
+  content        String
+  created_at     DateTime @default(now())
+  // Relation
+  user           User     @relation(fields: [user_id], references: [id])
+  blog           Blog     @relation(fields: [blog_id], references: [id])
 }

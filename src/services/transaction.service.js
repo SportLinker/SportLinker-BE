@@ -13,34 +13,21 @@ class TransactionService {
             where: {
                 user_id: user_id,
             },
-            select: {
-                id: true,
-                transaction_code: true,
-                amount: true,
-                bank_account: true,
-                bank_name: true,
-                bank_short_name: true,
-                rejected_reason: true,
-                type: true,
-                method: true,
-                status: true,
-                created_at: true,
-                expired_at: true,
+            include: {
                 user: {
                     select: {
                         id: true,
                         name: true,
                         avatar_url: true,
+                        Wallet: {
+                            select: {
+                                balance: true,
+                            },
+                        },
                     },
                 },
             },
             orderBy: [
-                {
-                    type: 'desc',
-                },
-                {
-                    status: 'asc',
-                },
                 {
                     created_at: 'desc',
                 },
