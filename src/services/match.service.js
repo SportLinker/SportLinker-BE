@@ -293,16 +293,7 @@ class MatchService {
                     },
                 },
             },
-            select: {
-                match_id: true,
-                match_name: true,
-                cid: true,
-                sport_name: true,
-                total_join: true,
-                maximum_join: true,
-                start_time: true,
-                end_time: true,
-                status: true,
+            include: {
                 user_create: {
                     select: {
                         id: true,
@@ -317,7 +308,7 @@ class MatchService {
                     status: 'asc',
                 },
                 {
-                    start_time: 'asc',
+                    start_time: 'desc',
                 },
             ],
         })
@@ -383,7 +374,7 @@ class MatchService {
             result[i].match_group_by_date = Object.values(match_group_by_time)
         }
 
-        return match_by_user
+        return result
     }
 
     /**

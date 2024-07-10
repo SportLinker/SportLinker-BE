@@ -49,16 +49,16 @@ class VoucherService {
             return voucher
         }
         // 3. create voucher for specific user(s)
-await Promise.all(
-    to.map(async (userId) => {
-        await prisma.voucherUser.create({
-            data: {
-                user_id: userId, // Assuming userId is a valid string
-                voucher_id: voucher.id,
-            },
-        });
-    })
-);
+        await Promise.all(
+            to.map(async (userId) => {
+                await prisma.voucherUser.create({
+                    data: {
+                        user_id: userId, // Assuming userId is a valid string
+                        voucher_id: voucher.id,
+                    },
+                })
+            })
+        )
 
         return voucher
     }

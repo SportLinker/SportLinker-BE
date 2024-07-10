@@ -359,3 +359,23 @@ enum TransactionStatus {
   rejected
   cancelled
 }
+
+// Blog
+
+model Blog {
+  id           String @id @default(cuid())
+  blog_content String
+  blog_address String
+}
+
+model BlogLink {
+  id      String       @id @default(cuid())
+  blog_id String
+  url     String
+  type    BlogLinkType
+}
+
+enum BlogLinkType {
+  image
+  video
+}
