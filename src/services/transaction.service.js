@@ -6,39 +6,45 @@ const NotificationService = require('./notification.service')
 
 class TransactionService {
     async getTransactionByUser(pageSize, pageNumber, user_id) {
+        console.log(pageSize, pageNumber, user_id)
         // parse page size and page number
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
-        const transactions = await prisma.transaction.findMany({
+        const transactions = await prisma.transaction
+            .findMany({
+                where: {
+                    user_id: user_id,
+                },
+                orderBy: [
+                    {
+                        created_at: 'desc',
+                    },
+                ],
+                skip: pageSize * (pageNumber - 1),
+                take: pageSize,
+            })
+            .catch((err) => {
+                console.log(JSON.stringify(err))
+            })
+        const total_page = Math.ceil((await prisma.transaction.count()) / pageSize)
+        const user = await prisma.user.findUnique({
             where: {
-                user_id: user_id,
+                id: user_id,
             },
-            include: {
-                user: {
+            select: {
+                name: true,
+                avatar_url: true,
+                Wallet: {
                     select: {
-                        id: true,
-                        name: true,
-                        avatar_url: true,
-                        Wallet: {
-                            select: {
-                                balance: true,
-                            },
-                        },
+                        balance: true,
                     },
                 },
             },
-            orderBy: [
-                {
-                    created_at: 'desc',
-                },
-            ],
-            skip: pageSize * (pageNumber - 1),
-            take: pageSize,
         })
-        const total_page = Math.ceil((await prisma.transaction.count()) / pageSize)
         return {
-            total_page: total_page,
+            user: user,
             transactions: transactions,
+            total_page: total_page,
         }
     }
 

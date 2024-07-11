@@ -51,6 +51,7 @@ class AuthenService {
                     gender: user.gender,
                     role: user.role,
                     date_of_birth: user.date_of_birth,
+                    avatar_url: user.avatar_url,
                 },
             })
             .catch((err) => {
@@ -90,6 +91,7 @@ class AuthenService {
                     gender: user.gender,
                     role: user.role,
                     date_of_birth: user.date_of_birth,
+                    avatar_url: user.avatar_url,
                 },
             })
             .catch((err) => {

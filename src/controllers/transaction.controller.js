@@ -18,8 +18,8 @@ class TransactionController {
         new Ok({
             message: 'Get transaction by user success',
             metadata: await TransactionService.getTransactionByUser(
-                req.query.page_size,
-                req.query.page_number,
+                req.query.pageSize,
+                req.query.pageNumber,
                 req.user.id
             ),
         }).send(res)
