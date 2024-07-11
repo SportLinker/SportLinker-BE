@@ -9,7 +9,7 @@ class AuthenService {
     loginStrategies = {
         phone: this.loginWithPhone,
         google: this.loginWithGoogle,
-        username: this.loginWithPhone,
+        username: this.loginWithUsername,
     }
 
     registerStrategies = {
