@@ -7,6 +7,7 @@ class FavoriteService {
         await redis.set(`favorite:${userId}`, JSON.stringify(data)).catch((err) => {
             throw new BadRequestError(err)
         })
+        return data
     }
 
     async getListFavoriteByUserId(userId) {

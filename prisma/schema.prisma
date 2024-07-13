@@ -252,13 +252,13 @@ model Stadium {
 model Yard {
   yard_id          String        @id @default(cuid())
   stadium_id       String
-  yard_name        String // sân số 1 
+  yard_name        String
   yard_sport       String
-  yard_description String // sân 5 
+  yard_description String
   price_per_hour   Float
   yard_status      YardStatus    @default(avaiable)
   created_at       DateTime      @default(now())
-  //Relation
+  // Relation
   stadium          Stadium       @relation(fields: [stadium_id], references: [id])
   sport            Sport         @relation(fields: [yard_sport], references: [sport_name])
   BookingYard      BookingYard[]

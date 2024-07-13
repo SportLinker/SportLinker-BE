@@ -25,6 +25,13 @@ class BookingController {
             metadata: await BookingService.getAllBookingUser(req.user.id),
         }).send(res)
     }
+
+    async deleteBooking(req, res, next) {
+        new Ok({
+            message: 'Delete booking successfully',
+            metadata: await BookingService.deleteBooking(req.params.booking_id),
+        }).send(res)
+    }
 }
 
 module.exports = new BookingController()
