@@ -72,6 +72,17 @@ class StadiumController {
             ),
         }).send(res)
     }
+
+    async createRating(req, res, next) {
+        new CREATED({
+            message: 'Rating created successfully.',
+            metadata: await StadiumService.createRating(
+                req.body,
+                req.user.id,
+                req.params.stadium_id
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new StadiumController()

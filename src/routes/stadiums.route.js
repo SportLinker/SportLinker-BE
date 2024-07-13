@@ -20,10 +20,10 @@ router.get('/:stadium_id', asyncHandler(StadiumController.getStadiumById))
 
 router.put('/:stadium_id', asyncHandler(StadiumController.updateStadium))
 
-router.delete('/:stadium_id', asyncHandler(StadiumController.deleteStadium))
-
 router.patch('/:stadium_id', asyncHandler(StadiumController.updateStatusStadium))
 
-// router.delete('/:id', asyncHandler(StadiumController.deleteStadium))
+router.delete('/:stadium_id', asyncHandler(StadiumController.deleteStadium))
+
+router.post('/rating/:stadium_id', asyncHandler(StadiumController.createRating))
 
 module.exports = router

@@ -338,6 +338,64 @@ class StadiumService {
         })
         return updatedStadium
     }
+
+    /**
+     * @function createRating
+     * @param {*} data
+     * @param {*} userId
+     * @logic
+     * 1. Find stadium by id
+     * 2. If stadium does not exist, return bad request
+     * 3. If stadium exists, create rating
+     * 4. Return rating
+     */
+
+    async createRating(data, userId, stadiumId) {
+        // 1. Find stadium by id
+        const stadium = await prisma.stadium.findFirst({
+            where: {
+                id: stadiumId,
+            },
+        })
+        if (!stadium) {
+            throw new BadRequestError('Stadium does not exist.')
+        }
+        // 2. Create rating
+        await prisma.stadiumRating.create({
+            data: {
+                stadium_id: stadiumId,
+                user_id: userId,
+                rating: data.rating,
+            },
+        })
+        // 3. update rating in stadium
+        const list_rating = await prisma.stadiumRating.findMany({
+            where: {
+                stadium_id: stadiumId,
+            },
+        })
+        let total_rating = 0
+        for (let i = 0; i < list_rating.length; i++) {
+            total_rating += list_rating[i].rating
+        }
+        const average_rating = total_rating / list_rating.length
+
+        // 4. Update rating in stadium
+        await prisma.stadium.update({
+            where: {
+                id: stadiumId,
+            },
+            data: {
+                stadium_rating: average_rating,
+            },
+        })
+        // send notification to owner
+        await NotificationService.createNotification({
+            receiver_id: stadium.stadium_owner_id,
+            content: `Sân vận động ${stadium.stadium_name} của bạn đã được đánh giá.`,
+        })
+        return `Rating created successfully.`
+    }
 }
 
 module.exports = new StadiumService()

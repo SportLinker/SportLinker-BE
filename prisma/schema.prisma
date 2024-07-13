@@ -52,6 +52,8 @@ model User {
   Blog                  Blog[]
   BlogUser              BlogUser[]
   BlogComment           BlogComment[]
+  StadiumRating         StadiumRating[]
+  BlogReact             BlogReact[]
 }
 
 enum UserStatus {
@@ -232,7 +234,7 @@ model NotificationMessage {
 
 // Stadium
 model Stadium {
-  id                  String        @id @default(cuid())
+  id                  String          @id @default(cuid())
   stadium_owner_id    String
   stadium_name        String
   stadium_lat         Float
@@ -240,13 +242,14 @@ model Stadium {
   stadium_address     String
   stadium_thumnail    String?
   stadium_time        String?
-  stadium_rating      Float         @default(0)
+  stadium_rating      Float           @default(0)
   stadium_description String
-  stadium_status      StadiumStatus @default(approved)
-  created_at          DateTime      @default(now())
+  stadium_status      StadiumStatus   @default(approved)
+  created_at          DateTime        @default(now())
   // Relation
-  owner               User          @relation(fields: [stadium_owner_id], references: [id])
+  owner               User            @relation(fields: [stadium_owner_id], references: [id])
   yards               Yard[]
+  StadiumRating       StadiumRating[]
 }
 
 model Yard {
@@ -382,6 +385,7 @@ model Blog {
   Sport           Sport?        @relation(fields: [sportSport_name], references: [sport_name])
   sportSport_name String?
   BlogComment     BlogComment[]
+  BlogReact       BlogReact[]
 }
 
 model BlogUser {
@@ -419,4 +423,24 @@ model BlogComment {
   // Relation
   user           User     @relation(fields: [user_id], references: [id])
   blog           Blog     @relation(fields: [blog_id], references: [id])
+}
+
+model StadiumRating {
+  id         String   @id @default(cuid())
+  stadium_id String
+  user_id    String
+  rating     Float
+  created_at DateTime @default(now())
+  // Relation
+  stadium    Stadium  @relation(fields: [stadium_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
+model BlogReact {
+  id      String @id @default(cuid())
+  blog_id String
+  user_id String
+  // Relation
+  blog    Blog   @relation(fields: [blog_id], references: [id])
+  user    User   @relation(fields: [user_id], references: [id])
 }
