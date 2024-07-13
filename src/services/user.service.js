@@ -101,6 +101,13 @@ class UserService {
                 ...data,
             },
         })
+        // update favorite
+        if (data.favorite) {
+            await redis.set(`favorite:${user_id}`, JSON.stringify(data.favorite))
+        }
+        // find favorite
+        const favorite = await redis.get(`favorite:${user_id}`)
+        user.favorite = favorite ? JSON.parse(favorite) : []
         return user
     }
 

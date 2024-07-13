@@ -257,6 +257,13 @@ class AuthenService {
         )
         // logs
         global.logger.info(`User ${userExist.id} login successfully`)
+        // get favorite list from redis
+        const favorite = await redisClient.get(`favorite:${userExist.id}`)
+        if (favorite) {
+            userExist.favorite = JSON.parse(favorite)
+        } else {
+            userExist.favorite = []
+        }
         return {
             user: userExist,
             token: {

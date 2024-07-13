@@ -1,5 +1,4 @@
 const { PrismaClient } = require('@prisma/client')
-const {} = require('prisma')
 
 class Prisma {
     constructor() {

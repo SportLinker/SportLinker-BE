@@ -40,14 +40,6 @@ class StadiumService {
                 stadium_description: data.stadium_description,
             },
         })
-        // 3, Create notification to admin
-        // await prisma.notification.create({
-        //     data: {
-        //         content: `New stadium created with name ${stadium.stadium_name}`,
-        //         receiver_id
-        //     },
-        // })
-        // 4. Return stadium
         return stadium
     }
 
@@ -64,24 +56,8 @@ class StadiumService {
 
     async getStadiumByPlayer(lat, long) {
         const list_stadium = await prisma.stadium.findMany({
-            select: {
-                id: true,
-                stadium_name: true,
-                stadium_address: true,
-                stadium_long: true,
-                stadium_lat: true,
-                stadium_thumnail: true,
-                stadium_rating: true,
-                stadium_time: true,
-                stadium_description: true,
-                stadium_status: true,
-                owner: {
-                    select: {
-                        id: true,
-                        name: true,
-                        avatar_url: true,
-                    },
-                },
+            include: {
+                owner: true,
             },
             where: {
                 stadium_status: 'approved',
@@ -97,7 +73,15 @@ class StadiumService {
                 latDestination: list_stadium[i].stadium_lat,
                 longDestination: list_stadium[i].stadium_long,
             })
+            // set distance
             list_stadium[i].distance = distance.rows[0].elements[0].distance
+            // find total rating
+            const total_rating = await prisma.stadiumRating.count({
+                where: {
+                    stadium_id: list_stadium[i].id,
+                },
+            })
+            list_stadium[i].total_rating = total_rating
         }
         list_stadium.sort((a, b) => a.distance.value - b.distance.value)
         return list_stadium
@@ -135,22 +119,8 @@ class StadiumService {
         page_number = parseInt(page_number)
 
         const list_stadium = await prisma.stadium.findMany({
-            select: {
-                id: true,
-                stadium_name: true,
-                stadium_address: true,
-                stadium_thumnail: true,
-                stadium_time: true,
-                stadium_description: true,
-                stadium_status: true,
-                created_at: true,
-                owner: {
-                    select: {
-                        id: true,
-                        name: true,
-                        avatar_url: true,
-                    },
-                },
+            include: {
+                owner: true,
             },
             orderBy: [
                 {
@@ -182,38 +152,20 @@ class StadiumService {
 
     async getStadiumById(stadiumId) {
         const stadium = await prisma.stadium.findFirst({
-            select: {
-                stadium_name: true,
-                stadium_address: true,
-                stadium_description: true,
-                stadium_thumnail: true,
-                stadium_time: true,
-                stadium_status: true,
-                stadium_rating: true,
-                created_at: true,
-                yards: {
-                    select: {
-                        yard_id: true,
-                        yard_name: true,
-                        price_per_hour: true,
-                        yard_sport: true,
-                        yard_description: true,
-                        yard_status: true,
-                        created_at: true,
-                    },
-                },
-                owner: {
-                    select: {
-                        avatar_url: true,
-                        id: true,
-                        name: true,
-                    },
-                },
-            },
             where: {
                 id: stadiumId,
             },
+            include: {
+                yards: true,
+                owner: true,
+            },
         })
+        const total_rating = await prisma.stadiumRating.count({
+            where: {
+                stadium_id: stadiumId,
+            },
+        })
+        stadium.total_rating = total_rating
         return stadium
     }
 
