@@ -389,13 +389,14 @@ model Blog {
 }
 
 model BlogUser {
-  id      String  @id @default(cuid())
-  user_id String
-  blog_id String
-  is_read Boolean @default(false)
+  id         String   @id @default(cuid())
+  user_id    String
+  blog_id    String
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
   // Relation
-  user    User    @relation(fields: [user_id], references: [id])
-  blog    Blog    @relation(fields: [blog_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
+  blog       Blog     @relation(fields: [blog_id], references: [id])
 }
 
 model BlogLink {
@@ -404,8 +405,7 @@ model BlogLink {
   url     String
   type    BlogLinkType
   // Relation
-  Blog    Blog?        @relation(fields: [blogId], references: [id])
-  blogId  String?
+  Blog    Blog?        @relation(fields: [blog_id], references: [id])
 }
 
 enum BlogLinkType {

@@ -22,24 +22,28 @@ class BlogService {
             },
         })
         // 2. Create image
-        for (const image of data.images) {
-            await prisma.blogLink.create({
-                data: {
-                    blog_id: newBlog.id,
-                    url: image,
-                    type: 'image',
-                },
-            })
+        if (data.images) {
+            for (let i = 0; i < data.images.length; i++) {
+                await prisma.blogLink.create({
+                    data: {
+                        blog_id: newBlog.id,
+                        url: data.images[i],
+                        type: 'image',
+                    },
+                })
+            }
         }
         // 3. Create video
-        for (const video of data.videos) {
-            await prisma.blogLink.create({
-                data: {
-                    blog_id: newBlog.id,
-                    url: video,
-                    type: 'video',
-                },
-            })
+        if (data.videos) {
+            for (let i = 0; i < data.videos.length; i++) {
+                await prisma.blogLink.create({
+                    data: {
+                        blog_id: newBlog.id,
+                        url: data.videos[i],
+                        type: 'video',
+                    },
+                })
+            }
         }
         // 4. Create new Blog for user
         const list_user = await prisma.user.findMany({
@@ -50,15 +54,48 @@ class BlogService {
                 },
             },
         })
-        for (const user of list_user) {
+        for (let i = 0; i < list_user.length; i++) {
             await prisma.blogUser.create({
                 data: {
                     blog_id: newBlog.id,
-                    user_id: user.id,
+                    user_id: list_user[i].id,
                 },
             })
         }
         return newBlog
+    }
+
+    /**
+     * @function getBlogList
+     * @param {*} userId
+     * @logic
+     * 1. Get blog list
+     * 2. Get image or video of blog
+     */
+
+    async getBlogList(userId) {
+        // 1. Get blog list
+        const blog_of_user = await prisma.blogUser.findMany({
+            where: {
+                user_id: userId,
+            },
+            include: {
+                blog: true,
+            },
+        })
+        // 2. get detail of blog
+        let blogs = []
+        for (let i = 0; i < blog_of_user.length; i++) {
+            const blog_detail = await prisma.blog.findUnique({
+                where: {
+                    id: blog_of_user[i].blog_id,
+                },
+                include: {
+                    blog_link: true,
+                },
+            })
+            blogs.push(blog_detail)
+        }
     }
 }
 

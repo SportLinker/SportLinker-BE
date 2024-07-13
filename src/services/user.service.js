@@ -98,7 +98,11 @@ class UserService {
                 id: user_id,
             },
             data: {
-                ...data,
+                name: data.name,
+                date_of_birth: data.date_of_birth,
+                role: data.role,
+                gender: data.gender,
+                avatar_url: data.avatar_url,
             },
         })
         // update favorite

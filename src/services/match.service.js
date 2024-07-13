@@ -107,9 +107,8 @@ class MatchService {
      * @param {*} sport_name array (sport name)
      */
     async getListMatch(lat, long, distance, start_time, end_time, sport_name, user_id) {
-        let listMatchByTimeAndSportName
+        let listMatchByTimeAndSportName = []
         // check sport_name is empty
-        console.log(sport_name)
         if (!sport_name) {
             listMatchByTimeAndSportName = await prisma.match.findMany({
                 where: {
@@ -121,28 +120,13 @@ class MatchService {
                 orderBy: {
                     start_time: 'asc',
                 },
-                select: {
-                    match_id: true,
-                    match_name: true,
-                    cid: true,
-                    sport_name: true,
-                    total_join: true,
-                    maximum_join: true,
-                    start_time: true,
-                    status: true,
-                    user_create_id: true,
+                include: {
                     match_join: {
                         where: {
                             status: 'accepted',
                         },
-                        select: {
-                            user_join: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    avatar_url: true,
-                                },
-                            },
+                        include: {
+                            user_join: true,
                         },
                     },
                 },
@@ -163,28 +147,13 @@ class MatchService {
                 orderBy: {
                     start_time: 'asc',
                 },
-                select: {
-                    match_id: true,
-                    match_name: true,
-                    cid: true,
-                    sport_name: true,
-                    total_join: true,
-                    maximum_join: true,
-                    start_time: true,
-                    status: true,
-                    user_create_id: true,
+                include: {
                     match_join: {
                         where: {
                             status: 'accepted',
                         },
-                        select: {
-                            user_join: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    avatar_url: true,
-                                },
-                            },
+                        include: {
+                            user_join: true,
                         },
                     },
                 },
@@ -294,13 +263,7 @@ class MatchService {
                 },
             },
             include: {
-                user_create: {
-                    select: {
-                        id: true,
-                        name: true,
-                        avatar_url: true,
-                    },
-                },
+                user_create: true,
                 option: true,
             },
             orderBy: [
@@ -389,43 +352,19 @@ class MatchService {
                 where: {
                     match_id: match_id,
                 },
-                select: {
-                    match_id: true,
-                    match_name: true,
-                    cid: true,
-                    sport_name: true,
-                    total_join: true,
-                    maximum_join: true,
-                    start_time: true,
-                    end_time: true,
-                    status: true,
-                    created_at: true,
-                    user_create: {
-                        select: {
-                            id: true,
-                            name: true,
-                            avatar_url: true,
-                        },
-                    },
+                include: {
+                    user_create: true,
+
                     match_join: {
                         where: {
                             status: 'accepted',
                         },
-                        select: {
-                            user_join: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    avatar_url: true,
-                                },
-                            },
+                        include: {
+                            user_join: true,
                         },
                     },
-                    option: {
-                        select: {
-                            budget: true,
-                        },
-                    },
+
+                    option: true,
                 },
             })
             .catch((error) => {
@@ -573,28 +512,9 @@ class MatchService {
             orderBy: {
                 start_time: 'asc',
             },
-            select: {
-                match_id: true,
-                match_name: true,
-                cid: true,
-                sport_name: true,
-                total_join: true,
-                maximum_join: true,
-                start_time: true,
-                end_time: true,
-                status: true,
-                user_create: {
-                    select: {
-                        id: true,
-                        name: true,
-                        avatar_url: true,
-                    },
-                },
-                option: {
-                    select: {
-                        budget: true,
-                    },
-                },
+            include: {
+                user_create: true,
+                option: true,
             },
         })
         // get detail place of match
