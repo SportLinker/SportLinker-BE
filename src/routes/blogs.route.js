@@ -18,4 +18,6 @@ router.post('/react', asyncHandler(BlogController.reactBlog))
 
 router.delete('/react', asyncHandler(BlogController.removeReactBlog))
 
+router.delete('/:blog_id', asyncHandler(BlogController.removeBlog))
+
 module.exports = router

@@ -18,6 +18,13 @@ class BlogController {
         }).send(res)
     }
 
+    async removeBlog(req, res, next) {
+        new Ok({
+            message: 'Blog removed',
+            metadata: await BlogService.removeBlog(req.params.blog_id, req.user.id),
+        }).send(res)
+    }
+
     async getCommentList(req, res, next) {
         new Ok({
             message: 'Comment list',

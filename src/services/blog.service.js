@@ -154,6 +154,27 @@ class BlogService {
 
         return `Remove react blog success`
     }
+
+    /**
+     * @function removeBlog
+     * @param {*} blogId, userId
+     * @logic
+     * 1. Remove blog
+     */
+
+    async removeBlog(blogId, userId) {
+        // 1. Remove blog
+        await prisma.blog.update({
+            where: {
+                id: blogId,
+            },
+            data: {
+                status: 'deleted',
+            },
+        })
+
+        return `Remove blog success`
+    }
 }
 
 module.exports = new BlogService()

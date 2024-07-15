@@ -378,6 +378,7 @@ model Blog {
   total_like      Int           @default(0)
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
+  status          BlogStatus?   @default(approved)
   // Relation
   owner           User          @relation(fields: [blog_owner], references: [id])
   blog_link       BlogLink[]
@@ -386,6 +387,11 @@ model Blog {
   sportSport_name String?
   BlogComment     BlogComment[]
   BlogReact       BlogReact[]
+}
+
+enum BlogStatus {
+  approved
+  deleted
 }
 
 model BlogUser {
