@@ -12,4 +12,10 @@ router.post('/', asyncHandler(BlogController.createNewBlog))
 
 router.get('/', asyncHandler(BlogController.getBlogList))
 
+router.get('/comment/:blog_id', asyncHandler(BlogController.getCommentList))
+
+router.post('/react', asyncHandler(BlogController.reactBlog))
+
+router.delete('/react', asyncHandler(BlogController.removeReactBlog))
+
 module.exports = router

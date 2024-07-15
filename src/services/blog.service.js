@@ -89,6 +89,71 @@ class BlogService {
         })
         return blog_of_user
     }
+
+    /**
+     * @function getCommentList
+     * @param {*} blogId
+     * @logic
+     * 1. Get comment list
+     */
+
+    async getCommentListByBlog(blogId) {
+        // 1. Get comment list
+        const comment_of_blog = await prisma.blogComment.findMany({
+            where: {
+                blog_id: blogId,
+            },
+            include: {
+                user: true,
+            },
+        })
+
+        return comment_of_blog
+    }
+
+    /**
+     * @function reactBlog
+     * @param {*} data, userId
+     * @logic
+     * 1. React blog
+     */
+
+    async reactBlog(data, userId) {
+        // 1. React blog
+        const react_blog = await prisma.blogReact.create({
+            data: {
+                blog_id: data.blog_id,
+                user_id: userId,
+            },
+        })
+
+        return react_blog
+    }
+
+    /**
+     * @function removeReactBlog
+     * @param {*} data, userId
+     * @logic
+     * 1. Remove react blog
+     */
+
+    async removeReactBlog(data, userId) {
+        // 1. Remove react blog
+        const react_blog = await prisma.blogReact.findFirst({
+            where: {
+                blog_id: data.blog_id,
+                user_id: userId,
+            },
+        })
+
+        await prisma.blogReact.delete({
+            where: {
+                id: react_blog.id,
+            },
+        })
+
+        return `Remove react blog success`
+    }
 }
 
 module.exports = new BlogService()
