@@ -73,29 +73,21 @@ class BlogService {
      * 2. Get image or video of blog
      */
 
-    async getBlogList(userId) {
+    async getBlogListByUser(userId) {
         // 1. Get blog list
         const blog_of_user = await prisma.blogUser.findMany({
             where: {
                 user_id: userId,
             },
             include: {
-                blog: true,
+                blog: {
+                    include: {
+                        blog_link: true,
+                    },
+                },
             },
         })
-        // 2. get detail of blog
-        let blogs = []
-        for (let i = 0; i < blog_of_user.length; i++) {
-            const blog_detail = await prisma.blog.findUnique({
-                where: {
-                    id: blog_of_user[i].blog_id,
-                },
-                include: {
-                    blog_link: true,
-                },
-            })
-            blogs.push(blog_detail)
-        }
+        return blog_of_user
     }
 }
 

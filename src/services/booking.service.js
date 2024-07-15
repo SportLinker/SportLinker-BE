@@ -305,6 +305,9 @@ class BookingService {
             where: {
                 id: bookingId,
             },
+            include: {
+                yard: true,
+            },
         })
         if (booking.status === 'accepted') {
             throw new BadRequestError('Không thể xóa đặt sân đã được chấp nhận')
