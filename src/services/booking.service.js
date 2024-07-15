@@ -24,7 +24,7 @@ class BookingService {
         // find yard detail
         const yard = await prisma.yard.findUnique({
             where: {
-                id: data.yard_id,
+                yard_id: data.yard_id,
             },
         })
         // find stadium detail
@@ -309,12 +309,9 @@ class BookingService {
         if (booking.status === 'accepted') {
             throw new BadRequestError('Không thể xóa đặt sân đã được chấp nhận')
         }
-        await prisma.bookingYard.update({
+        await prisma.bookingYard.delete({
             where: {
                 id: bookingId,
-            },
-            data: {
-                status: 'rejected',
             },
         })
         // get user booking detail

@@ -330,7 +330,9 @@ class StadiumService {
         for (let i = 0; i < list_rating.length; i++) {
             total_rating += list_rating[i].rating
         }
-        const average_rating = total_rating / list_rating.length
+        let average_rating = total_rating / list_rating.length
+
+        average_rating = Number(average_rating.toFixed(1))
 
         // 4. Update rating in stadium
         await prisma.stadium.update({
