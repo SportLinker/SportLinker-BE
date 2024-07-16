@@ -18,7 +18,6 @@ const getFavorite = async () => {
 }
 
 const test = async () => {
-    let test_rating = 1.124124124
     global.logger.info('Test log info is running')
 }
 

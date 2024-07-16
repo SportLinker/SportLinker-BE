@@ -340,6 +340,7 @@ model Transaction {
   bank_account     String?
   bank_name        String?
   bank_short_name  String?
+  bank_logo        String?
   rejected_reason  String?
   type             TransactionType
   method           TransactionMethod

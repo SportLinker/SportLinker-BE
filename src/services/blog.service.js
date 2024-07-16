@@ -86,6 +86,14 @@ class BlogService {
                     },
                 },
             },
+            orderBy: [
+                {
+                    is_read: 'asc',
+                },
+                {
+                    created_at: 'desc',
+                },
+            ],
         })
         return blog_of_user
     }

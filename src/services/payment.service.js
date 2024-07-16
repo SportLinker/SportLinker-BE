@@ -15,7 +15,7 @@ class PaymentService {
         },
         withdraw: {
             momo: 'momo',
-            bank: 'bank',
+            bank: this.withdrawBank,
         },
     }
 
@@ -177,6 +177,60 @@ class PaymentService {
             where: {
                 transaction_code: transaction_code,
             },
+        })
+        return transaction
+    }
+
+    async withdrawBank(userId, body) {
+        // create code for deposit bank include random 8 char
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+        // check if code is exist
+        const isExist = await prisma.transaction.findFirst({
+            where: {
+                transaction_code: code,
+            },
+        })
+        if (isExist) {
+            return this.withdrawBank(userId, body)
+        }
+        // check wallet of user
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            include: {
+                Wallet: true,
+            },
+        })
+        if (user.Wallet.balance < body.amount) {
+            throw new BadRequestError('Số dư không đủ')
+        }
+        // create transaction
+        const transaction = await prisma.transaction.create({
+            data: {
+                bank_account: body.bank_account,
+                bank_name: body.bank_name,
+                bank_short_name: body.bank_short_name,
+                user_id: userId,
+                amount: body.amount,
+                transaction_code: code,
+            },
+        })
+        // update user balance
+        await prisma.wallet.update({
+            where: {
+                user_id: userId,
+            },
+            data: {
+                balance: {
+                    decrement: body.amount,
+                },
+            },
+        })
+        // send notification to user
+        await NotificationService.createNotification({
+            receiver_id: userId,
+            content: `Rút tiền với số tiền ${body.amount}VND đã được tạo`,
         })
         return transaction
     }

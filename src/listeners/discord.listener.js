@@ -23,6 +23,8 @@ const discordListener = () => {
             if (transaction_code) {
                 await PaymentService.handleSuccessDepositPaymentBank(transaction_code)
             }
+        } else {
+            return
         }
     })
 
