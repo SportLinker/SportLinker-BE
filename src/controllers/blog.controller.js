@@ -49,6 +49,13 @@ class BlogController {
             metadata: await BlogService.removeReactBlog(req.params.blog_id, req.user.id),
         }).send(res)
     }
+
+    async getMyBlogList(req, res, next) {
+        new Ok({
+            message: 'My blog list',
+            metadata: await BlogService.getMyBlogList(req.user.id),
+        }).send(res)
+    }
 }
 
 module.exports = new BlogController()

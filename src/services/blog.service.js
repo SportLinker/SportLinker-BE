@@ -74,6 +74,8 @@ class BlogService {
      */
 
     async getBlogListByUser(userId, pageSize, pageNumber) {
+        pageSize = parseInt(pageSize)
+        pageNumber = parseInt(pageNumber)
         // 1. Get blog list
         const blog_of_user = await prisma.blogUser.findMany({
             where: {
@@ -102,7 +104,7 @@ class BlogService {
             skip: (pageNumber - 1) * pageSize,
         })
 
-        const total = prisma.blogUser.count({
+        const total = await prisma.blogUser.count({
             where: {
                 user_id: userId,
                 blog: {
@@ -111,9 +113,13 @@ class BlogService {
             },
         })
 
-        blog_of_user.total_page = Math.ceil(total / pageSize)
+        const total_page = Math.ceil(total / pageSize)
 
-        return blog_of_user
+        return {
+            list_blog: blog_of_user,
+            total_page: total_page,
+            page_number: pageNumber,
+        }
     }
 
     /**
@@ -200,6 +206,26 @@ class BlogService {
         })
 
         return `Remove blog success`
+    }
+
+    /**
+     * @function getMyBlogList
+     * @param {*} userId
+     * @logic
+     * 1. Get my blog list
+     */
+
+    async getMyBlogList(userId) {
+        const my_blog = await prisma.blog.findMany({
+            where: {
+                blog_owner: userId,
+            },
+            include: {
+                blog_link: true,
+            },
+        })
+
+        return my_blog
     }
 }
 

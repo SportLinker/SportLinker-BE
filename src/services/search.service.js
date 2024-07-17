@@ -2,6 +2,9 @@
 
 const { BadRequestError } = require('../core/error.response')
 const prisma = require('../configs/prisma.config').client
+const { getStringByDate, getStringHourAndMinut } = require('../helpers/timestamp.helper')
+const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
+const redis = require('../configs/redis.config').client
 
 class SearchService {
     searchStrategy = {
@@ -10,45 +13,25 @@ class SearchService {
         stadium: this.searchStadium,
     }
 
-    async search(pageSize, pageNumber, search, type) {
-        return this.searchStrategy[type](pageSize, pageNumber, search)
+    async search(pageSize, pageNumber, search, type, userId) {
+        return this.searchStrategy[type](pageSize, pageNumber, search, lat, long, userId)
     }
     // search user
-    async searchUser(pageSize, pageNumber, search) {
+    async searchUser(pageSize, pageNumber, search, lat, long, userId) {
         // parse page size and page number
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         // search user by search and type
         const users = await prisma.user.findMany({
             where: {
-                OR: [
-                    {
-                        username: {
-                            contains: search,
-                            mode: 'insensitive',
-                        },
-                    },
-                    {
-                        email: {
-                            contains: search,
-                            mode: 'insensitive',
-                        },
-                    },
-                    {
-                        phone: {
-                            contains: search,
-                            mode: 'insensitive',
-                        },
-                    },
-                    {
-                        name: {
-                            contains: search,
-                            mode: 'insensitive',
-                        },
-                    },
-                ],
+                name: {
+                    contains: search,
+                },
                 status: 'active',
                 role: 'player',
+                id: {
+                    not: userId,
+                },
             },
             take: pageSize,
             skip: pageSize * (pageNumber - 1),
@@ -58,36 +41,85 @@ class SearchService {
 
     // search match
 
-    async searchMatch(pageSize, pageNumber, search) {
+    async searchMatch(pageSize, pageNumber, search, lat, long, userId) {
         // parse page size and page number
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         // search match by search and type
-        const matches = await prisma.match.findMany({
+        let matches = await prisma.match.findMany({
+            include: {
+                match_join: {
+                    where: {
+                        status: 'accepted',
+                    },
+                    include: {
+                        user_join: true,
+                    },
+                },
+            },
             where: {
-                OR: [
-                    {
-                        name: {
-                            contains: search,
-                            mode: 'insensitive',
-                        },
-                    },
-                    {
-                        description: {
-                            contains: search,
-                            mode: 'insensitive',
-                        },
-                    },
-                ],
+                match_name: {
+                    contains: search,
+                },
                 status: 'upcomming',
             },
             take: pageSize,
             skip: pageSize * (pageNumber - 1),
+            orderBy: {
+                start_time: 'asc',
+            },
         })
-        return matches
+
+        for (let i = 0; i < matches.length; i++) {
+            // 1. Get detail place of match
+            let placeDetail = await redis.get(`stadium:${matches[i].cid}`)
+            placeDetail = JSON.parse(placeDetail)
+            if (!placeDetail) {
+                placeDetail = await getPlaceDetail({
+                    cid: matches[i].cid,
+                })
+                await redis.set(`stadium:${matches[i].cid}`, JSON.stringify(placeDetail))
+            }
+            // wait distance matrix to 30s
+            await new Promise((resolve) => setTimeout(resolve, 200))
+
+            matches[i].place_detail = placeDetail
+        }
+
+        let result = matches.reduce((acc, match) => {
+            const date = getStringByDate(match.start_time)
+            if (!acc[date]) {
+                acc[date] = {
+                    date: date,
+                    match_group_by_date: [],
+                }
+            }
+            acc[date].match_group_by_date.push(match)
+            return acc
+        }, {})
+        result = Object.values(result)
+        // loop to group by start_time
+        for (let i = 0; i < result.length; i++) {
+            const match_group_by_time = result[i].match_group_by_date.reduce(
+                (acc, match) => {
+                    const time = getStringHourAndMinut(match.start_time)
+                    if (!acc[time]) {
+                        acc[time] = {
+                            time: time,
+                            matches: [],
+                        }
+                    }
+                    acc[time].matches.push(match)
+                    return acc
+                },
+                {}
+            )
+            result[i].match_group_by_date = Object.values(match_group_by_time)
+        }
+        return result
     }
     // search stadium
-    async searchStadium(pageSize, pageNumber, search) {
+    async searchStadium(pageSize, pageNumber, search, lat, long, userId) {
         // parse page size and page number
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
@@ -96,13 +128,36 @@ class SearchService {
             where: {
                 stadium_name: {
                     contains: search,
-                    mode: 'insensitive',
                 },
                 stadium_status: 'approved',
             },
             take: pageSize,
             skip: pageSize * (pageNumber - 1),
+            include: {
+                owner: true,
+            },
         })
+
+        for (let i = 0; i < stadiums.length; i++) {
+            // wait 150ms
+            await new Promise((resolve) => setTimeout(resolve, 150))
+            const distance = await getDistance({
+                latOrigin: lat,
+                longOrigin: long,
+                latDestination: stadiums[i].stadium_lat,
+                longDestination: stadiums[i].stadium_long,
+            })
+            // set distance
+            stadiums[i].distance = distance.rows[0].elements[0].distance
+            // find total rating
+            const total_rating = await prisma.stadiumRating.count({
+                where: {
+                    stadium_id: stadiums[i].id,
+                },
+            })
+            stadiums[i].total_rating = total_rating
+        }
+
         return stadiums
     }
 }

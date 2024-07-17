@@ -12,6 +12,8 @@ router.post('/', asyncHandler(BlogController.createNewBlog))
 
 router.get('/', asyncHandler(BlogController.getBlogList))
 
+router.get('/getMyBlog', asyncHandler(BlogController.getMyBlogList))
+
 router.get('/comment/:blog_id', asyncHandler(BlogController.getCommentList))
 
 router.post('/react', asyncHandler(BlogController.reactBlog))

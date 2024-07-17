@@ -11,7 +11,10 @@ class SearchController {
                 req.query.page_size,
                 req.query.page_number,
                 req.query.search,
-                req.query.type
+                req.query.type,
+                req.query.lat,
+                req.query.long,
+                req.user.id
             ),
         }).send(res)
     }
