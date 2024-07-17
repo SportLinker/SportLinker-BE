@@ -149,11 +149,11 @@ class BlogService {
      * 1. Remove react blog
      */
 
-    async removeReactBlog(data, userId) {
+    async removeReactBlog(blogId, userId) {
         // 1. Remove react blog
         const react_blog = await prisma.blogReact.findFirst({
             where: {
-                blog_id: data.blog_id,
+                blog_id: blogId,
                 user_id: userId,
             },
         })

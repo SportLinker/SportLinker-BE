@@ -16,7 +16,7 @@ router.get('/comment/:blog_id', asyncHandler(BlogController.getCommentList))
 
 router.post('/react', asyncHandler(BlogController.reactBlog))
 
-router.delete('/react', asyncHandler(BlogController.removeReactBlog))
+router.delete('/react/:blog_id', asyncHandler(BlogController.removeReactBlog))
 
 router.delete('/:blog_id', asyncHandler(BlogController.removeBlog))
 

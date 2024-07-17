@@ -42,7 +42,7 @@ class BlogController {
     async removeReactBlog(req, res, next) {
         new Ok({
             message: 'Remove react blog',
-            metadata: await BlogService.removeReactBlog(req.body, req.user.id),
+            metadata: await BlogService.removeReactBlog(req.params.blog_id, req.user.id),
         }).send(res)
     }
 }
