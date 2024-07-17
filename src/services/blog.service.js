@@ -78,6 +78,9 @@ class BlogService {
         const blog_of_user = await prisma.blogUser.findMany({
             where: {
                 user_id: userId,
+                blog: {
+                    status: 'approved',
+                },
             },
             include: {
                 blog: {

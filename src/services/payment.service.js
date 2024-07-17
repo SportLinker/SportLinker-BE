@@ -211,9 +211,12 @@ class PaymentService {
                 bank_account: body.bank_account,
                 bank_name: body.bank_name,
                 bank_short_name: body.bank_short_name,
+                bank_logo: body.bank_logo,
                 user_id: userId,
                 amount: body.amount,
                 transaction_code: code,
+                type: 'withdraw',
+                method: 'bank',
             },
         })
         // update user balance
@@ -232,6 +235,7 @@ class PaymentService {
             receiver_id: userId,
             content: `Rút tiền với số tiền ${body.amount}VND đã được tạo`,
         })
+
         return transaction
     }
 }

@@ -41,7 +41,10 @@ class StadiumController {
     async getStadiumById(req, res, next) {
         new Ok({
             message: 'Get stadium by id sucessfully',
-            metadata: await StadiumService.getStadiumById(req.params.stadium_id),
+            metadata: await StadiumService.getStadiumById(
+                req.params.stadium_id,
+                req.user.id
+            ),
         }).send(res)
     }
 

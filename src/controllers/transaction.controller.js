@@ -9,7 +9,8 @@ class TransactionController {
             message: 'Get all transaction success',
             metadata: await TransactionService.getAllTransaction(
                 req.query.page_size,
-                req.query.page_number
+                req.query.page_number,
+                req.query.type
             ),
         }).send(res)
     }

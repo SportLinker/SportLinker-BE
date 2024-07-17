@@ -150,7 +150,7 @@ class StadiumService {
      * 2. return stadium
      */
 
-    async getStadiumById(stadiumId) {
+    async getStadiumById(stadiumId, userId) {
         const stadium = await prisma.stadium.findFirst({
             where: {
                 id: stadiumId,
@@ -160,12 +160,24 @@ class StadiumService {
                 owner: true,
             },
         })
+        // find total rating
         const total_rating = await prisma.stadiumRating.count({
             where: {
                 stadium_id: stadiumId,
             },
         })
-        stadium.total_rating = total_rating
+        // check can rating
+        const can_rating = await prisma.stadiumRating.findFirst({
+            where: {
+                stadium_id: stadiumId,
+                user_id: userId,
+            },
+        })
+
+        stadium.can_rating = can_rating ? true : false
+
+        stadium.total_rating = total_rating ? total_rating : 0
+
         return stadium
     }
 
@@ -227,16 +239,22 @@ class StadiumService {
         })
         // 2. delete all yard in stadium
         for (let i = 0; i < list_yard.length; i++) {
-            await prisma.yard.delete({
+            await prisma.yard.update({
                 where: {
                     yard_id: list_yard[i].yard_id,
+                },
+                data: {
+                    yard_status: 'deleted',
                 },
             })
         }
         // 3. delete stadium
-        const stadium = await prisma.stadium.delete({
+        const stadium = await prisma.stadium.update({
             where: {
                 id: stadiumId,
+            },
+            data: {
+                stadium_status: 'deleted',
             },
         })
         // send notification to admin and owner

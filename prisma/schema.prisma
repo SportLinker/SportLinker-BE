@@ -280,6 +280,7 @@ enum YardStatus {
   booked
   avaiable
   mantainance
+  deleted
 }
 
 model BookingYard {

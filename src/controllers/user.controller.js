@@ -53,6 +53,13 @@ class UserController {
             metadata: await UserService.getProfile(req.user.id),
         }).send(res)
     }
+
+    async getAllPlayer(req, res, next) {
+        new Ok({
+            message: 'Get all player successfully',
+            metadata: await UserService.getAllPlayer(),
+        }).send(res)
+    }
 }
 
 module.exports = new UserController()

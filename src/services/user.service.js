@@ -188,6 +188,25 @@ class UserService {
 
         return user
     }
+
+    async getAllPlayer() {
+        const players = await prisma.user.findMany({
+            select: {
+                id: true,
+                avatar_url: true,
+                name: true,
+                role: true,
+            },
+            where: {
+                role: 'player',
+                status: 'active',
+            },
+            orderBy: {
+                name: 'asc',
+            },
+        })
+        return players
+    }
 }
 
 module.exports = new UserService()

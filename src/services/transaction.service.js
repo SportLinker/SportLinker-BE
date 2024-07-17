@@ -48,31 +48,13 @@ class TransactionService {
         }
     }
 
-    async getAllTransaction(pageSize, pageNumber) {
+    async getAllTransaction(pageSize, pageNumber, type) {
         // parse page size and page number
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         const transactions = await prisma.transaction.findMany({
-            select: {
-                id: true,
-                transaction_code: true,
-                amount: true,
-                bank_account: true,
-                bank_name: true,
-                bank_short_name: true,
-                rejected_reason: true,
-                type: true,
-                method: true,
-                status: true,
-                created_at: true,
-                expired_at: true,
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        avatar_url: true,
-                    },
-                },
+            include: {
+                user: true,
             },
             orderBy: [
                 {
@@ -87,8 +69,12 @@ class TransactionService {
             ],
             skip: pageSize * (pageNumber - 1),
             take: pageSize,
+            where: {
+                type: type,
+            },
         })
         const total_page = Math.ceil((await prisma.transaction.count()) / pageSize)
+
         return {
             total_page: total_page,
             transactions: transactions,
