@@ -110,54 +110,62 @@ class MatchService {
         let listMatchByTimeAndSportName = []
         // check sport_name is empty
         if (!sport_name) {
-            listMatchByTimeAndSportName = await prisma.match.findMany({
-                where: {
-                    start_time: {
-                        gte: new Date(),
-                    },
-                    status: 'upcomming',
-                },
-                orderBy: {
-                    start_time: 'asc',
-                },
-                include: {
-                    match_join: {
-                        where: {
-                            status: 'accepted',
+            listMatchByTimeAndSportName = await prisma.match
+                .findMany({
+                    where: {
+                        start_time: {
+                            gte: new Date(),
                         },
-                        include: {
-                            user_join: true,
+                        status: 'upcomming',
+                    },
+                    orderBy: {
+                        start_time: 'asc',
+                    },
+                    include: {
+                        match_join: {
+                            where: {
+                                status: 'accepted',
+                            },
+                            include: {
+                                user_join: true,
+                            },
                         },
                     },
-                },
-            })
+                })
+                .catch((error) => {
+                    console.log('Error get list match', error)
+                })
         } else {
             sport_name = sport_name.split(',')
             // 1. Get list match by sport name, now time and filter by time
-            listMatchByTimeAndSportName = await prisma.match.findMany({
-                where: {
-                    start_time: {
-                        gte: new Date(),
-                    },
-                    sport_name: {
-                        in: sport_name,
-                    },
-                    status: 'upcomming',
-                },
-                orderBy: {
-                    start_time: 'asc',
-                },
-                include: {
-                    match_join: {
-                        where: {
-                            status: 'accepted',
+            listMatchByTimeAndSportName = await prisma.match
+                .findMany({
+                    where: {
+                        start_time: {
+                            gte: new Date(),
                         },
-                        include: {
-                            user_join: true,
+                        sport_name: {
+                            in: sport_name,
+                        },
+                        status: 'upcomming',
+                    },
+                    orderBy: {
+                        start_time: 'asc',
+                    },
+                    include: {
+                        match_join: {
+                            where: {
+                                status: 'accepted',
+                            },
+                            include: {
+                                user_join: true,
+                            },
                         },
                     },
-                },
-            })
+                })
+                .catch((error) => {
+                    console.log('Error get list match', error)
+                })
         }
 
         // if list match empty return empty list

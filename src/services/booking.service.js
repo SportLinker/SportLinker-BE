@@ -342,6 +342,49 @@ class BookingService {
         })
         return `Delete booking ${bookingId} successfully`
     }
+
+    async getAllBookingByAdmin(pageSize, pageNumber) {
+        pageSize = parseInt(pageSize)
+        pageNumber = parseInt(pageNumber)
+
+        const bookings = await prisma.bookingYard.findMany({
+            orderBy: [
+                {
+                    created_at: 'desc',
+                },
+                {
+                    status: 'asc',
+                },
+            ],
+            include: {
+                yard: {
+                    include: {
+                        stadium: {
+                            select: {
+                                stadium_name: true,
+                            },
+                        },
+                    },
+                },
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
+            },
+            skip: pageSize * (pageNumber - 1),
+            take: pageSize,
+        })
+        // check total_page
+        const total_page = Math.ceil(bookings.length / pageSize)
+
+        return {
+            bookings: bookings,
+            total_page: total_page,
+        }
+    }
 }
 
 module.exports = new BookingService()

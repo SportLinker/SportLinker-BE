@@ -84,6 +84,20 @@ class GroupMessageService {
         }
         return groupMessage
     }
+
+    /**
+     *
+     * @param {*} data
+     * @param {*} userId
+     * @logic
+     * 1. Create group message
+     * 2. Create group message join
+     * 3. Create message
+     * 4. Create notification message
+     * @returns
+     */
+
+    async createGroupMessage(data, userId) {}
 }
 
 module.exports = new GroupMessageService()

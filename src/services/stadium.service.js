@@ -158,6 +158,17 @@ class StadiumService {
             include: {
                 yards: true,
                 owner: true,
+                ratings: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                avatar_url: true,
+                            },
+                        },
+                    },
+                },
             },
         })
         // find total rating
@@ -336,6 +347,7 @@ class StadiumService {
                 stadium_id: stadiumId,
                 user_id: userId,
                 rating: data.rating,
+                comment: data.comment,
             },
         })
         // 3. update rating in stadium

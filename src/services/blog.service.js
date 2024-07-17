@@ -113,6 +113,21 @@ class BlogService {
             },
         })
 
+        // check user react blog
+        for (let i = 0; i < blog_of_user.length; i++) {
+            const react_blog = await prisma.blogReact.findFirst({
+                where: {
+                    blog_id: blog_of_user[i].blog_id,
+                    user_id: userId,
+                },
+            })
+            if (react_blog) {
+                blog_of_user[i].blog.is_react = true
+            } else {
+                blog_of_user[i].blog.is_react = false
+            }
+        }
+
         const total_page = Math.ceil(total / pageSize)
 
         return {

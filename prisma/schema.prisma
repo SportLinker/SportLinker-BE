@@ -249,7 +249,19 @@ model Stadium {
   // Relation
   owner               User            @relation(fields: [stadium_owner_id], references: [id])
   yards               Yard[]
-  StadiumRating       StadiumRating[]
+  ratings             StadiumRating[]
+}
+
+model StadiumRating {
+  id         String   @id @default(cuid())
+  stadium_id String
+  user_id    String
+  rating     Float
+  comment    String   @default("no comment")
+  created_at DateTime @default(now())
+  // Relation
+  stadium    Stadium  @relation(fields: [stadium_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
 }
 
 model Yard {
@@ -431,17 +443,6 @@ model BlogComment {
   // Relation
   user           User     @relation(fields: [user_id], references: [id])
   blog           Blog     @relation(fields: [blog_id], references: [id])
-}
-
-model StadiumRating {
-  id         String   @id @default(cuid())
-  stadium_id String
-  user_id    String
-  rating     Float
-  created_at DateTime @default(now())
-  // Relation
-  stadium    Stadium  @relation(fields: [stadium_id], references: [id])
-  user       User     @relation(fields: [user_id], references: [id])
 }
 
 model BlogReact {

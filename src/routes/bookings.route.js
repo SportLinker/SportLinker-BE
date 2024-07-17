@@ -14,6 +14,8 @@ router.put('/:booking_id', asyncHandler(BookingController.updateBooking))
 
 router.get('/getByUser', asyncHandler(BookingController.getAllBookingUser))
 
+router.get('/getByAdmin', asyncHandler(BookingController.getAllBookingByAdmin))
+
 router.delete('/:booking_id', asyncHandler(BookingController.deleteBooking))
 
 module.exports = router

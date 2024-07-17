@@ -32,6 +32,16 @@ class BookingController {
             metadata: await BookingService.deleteBooking(req.params.booking_id),
         }).send(res)
     }
+
+    async getAllBookingByAdmin(req, res, next) {
+        new Ok({
+            message: 'Get all booking by admin successfully',
+            metadata: await BookingService.getAllBookingByAdmin(
+                req.query.page_size,
+                req.query.page_number
+            ),
+        }).send(res)
+    }
 }
 
 module.exports = new BookingController()

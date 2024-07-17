@@ -13,7 +13,9 @@ const getDistance = async ({
         `&vehicle=car` +
         `&api_key=${global.config.get(`DISTANCEMATRIX_API_KEY`)}`
 
-    let response = await fetch(distanceMatrixAPI)
+    let response = await fetch(distanceMatrixAPI).catch((error) => {
+        console.error(`Error get distance`, error)
+    })
     response = await response.json()
     return response
 }

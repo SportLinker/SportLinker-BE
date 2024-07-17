@@ -13,7 +13,7 @@ class SearchService {
         stadium: this.searchStadium,
     }
 
-    async search(pageSize, pageNumber, search, type, userId) {
+    async search(pageSize, pageNumber, search, type, lat, long, userId) {
         return this.searchStrategy[type](pageSize, pageNumber, search, lat, long, userId)
     }
     // search user
@@ -22,20 +22,24 @@ class SearchService {
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         // search user by search and type
-        const users = await prisma.user.findMany({
-            where: {
-                name: {
-                    contains: search,
+        const users = await prisma.user
+            .findMany({
+                where: {
+                    name: {
+                        contains: search,
+                    },
+                    status: 'active',
+                    role: 'player',
+                    id: {
+                        not: userId,
+                    },
                 },
-                status: 'active',
-                role: 'player',
-                id: {
-                    not: userId,
-                },
-            },
-            take: pageSize,
-            skip: pageSize * (pageNumber - 1),
-        })
+                take: pageSize,
+                skip: pageSize * (pageNumber - 1),
+            })
+            .catch((err) => {
+                console.log('Error search user', err)
+            })
         return users
     }
 
@@ -46,29 +50,33 @@ class SearchService {
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         // search match by search and type
-        let matches = await prisma.match.findMany({
-            include: {
-                match_join: {
-                    where: {
-                        status: 'accepted',
-                    },
-                    include: {
-                        user_join: true,
+        let matches = await prisma.match
+            .findMany({
+                include: {
+                    match_join: {
+                        where: {
+                            status: 'accepted',
+                        },
+                        include: {
+                            user_join: true,
+                        },
                     },
                 },
-            },
-            where: {
-                match_name: {
-                    contains: search,
+                where: {
+                    match_name: {
+                        contains: search,
+                    },
+                    status: 'upcomming',
                 },
-                status: 'upcomming',
-            },
-            take: pageSize,
-            skip: pageSize * (pageNumber - 1),
-            orderBy: {
-                start_time: 'asc',
-            },
-        })
+                take: pageSize,
+                skip: pageSize * (pageNumber - 1),
+                orderBy: {
+                    start_time: 'asc',
+                },
+            })
+            .catch((err) => {
+                console.log('Error search match', err)
+            })
 
         for (let i = 0; i < matches.length; i++) {
             // 1. Get detail place of match
@@ -124,19 +132,23 @@ class SearchService {
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         // search stadium by search and type
-        const stadiums = await prisma.stadium.findMany({
-            where: {
-                stadium_name: {
-                    contains: search,
+        const stadiums = await prisma.stadium
+            .findMany({
+                where: {
+                    stadium_name: {
+                        contains: search,
+                    },
+                    stadium_status: 'approved',
                 },
-                stadium_status: 'approved',
-            },
-            take: pageSize,
-            skip: pageSize * (pageNumber - 1),
-            include: {
-                owner: true,
-            },
-        })
+                take: pageSize,
+                skip: pageSize * (pageNumber - 1),
+                include: {
+                    owner: true,
+                },
+            })
+            .catch((err) => {
+                console.log('Error Search stadium', err)
+            })
 
         for (let i = 0; i < stadiums.length; i++) {
             // wait 150ms
