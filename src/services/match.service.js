@@ -194,7 +194,6 @@ class MatchService {
                 longDestination: placeDetail.longitude,
             })
             distanceMatrix = distanceMatrix.rows[0].elements[0].distance
-            console.log(`Distance: ${distanceMatrix.value}`)
             // 3. Check is owner of match
             if (listMatchByTimeAndSportName[i].user_create_id === user_id) {
                 listMatchByTimeAndSportName[i].is_owner = true
@@ -300,7 +299,6 @@ class MatchService {
                 longDestination: placeDetail.longitude,
             })
             distanceMatrix = distanceMatrix.rows[0].elements[0].distance
-            console.log(`Distance: ${distanceMatrix.value}`)
             // push detail place to listMatch and distance
             match_by_user[i].place_detail = placeDetail
             match_by_user[i].distance = distanceMatrix

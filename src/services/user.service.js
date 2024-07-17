@@ -205,6 +205,12 @@ class UserService {
                 name: 'asc',
             },
         })
+
+        for (let i = 0; i < players.length; i++) {
+            const favorite = await redis.get(`favorite:${players[i].id}`)
+            players[i].favorite = favorite ? JSON.parse(favorite) : []
+        }
+
         return players
     }
 }

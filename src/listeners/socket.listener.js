@@ -11,17 +11,15 @@ const socketListener = () => {
     global.onLineUser = new Map()
     io.on('connection', (socket) => {
         socket.on('online-user', async (userId) => {
-            console.log(`online-user: ${userId}`)
             // set online user
             global.onLineUser.set(userId, socket.id)
-            global.logger.info(`Online user: ${global.onLineUser}`)
+            global.logger.info(`Online user: ${JSON.stringify(global.onLineUser)}`)
             // get list group message of user
             const listGroupMessage = await GroupMessageService.getListGroupMessageByUser(
                 userId
             )
             // join room group message of user
             listGroupMessage.forEach((groupMessage) => {
-                console.log(`join room: ${groupMessage.group_message_id}`)
                 socket.join(groupMessage.group_message_id)
             })
         })

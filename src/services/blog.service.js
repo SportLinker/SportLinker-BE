@@ -86,6 +86,7 @@ class BlogService {
                 blog: {
                     include: {
                         blog_link: true,
+                        owner: true,
                     },
                 },
             },
