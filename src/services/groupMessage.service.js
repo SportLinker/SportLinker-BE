@@ -25,10 +25,15 @@ class GroupMessageService {
             })
             .catch((error) => {
                 global.logger.error(`Error: ${error.message}`)
+                return
             })
-        const id = groupMessageJoinByUser.map(
-            (groupMessageJoin) => groupMessageJoin.group_message_id
-        )
+        // get group message id
+        let id
+        if (groupMessageJoinByUser) {
+            id = groupMessageJoinByUser.map(
+                (groupMessageJoin) => groupMessageJoin.group_message_id
+            )
+        }
         // Get group message by user
         const groupMessage = await prisma.groupMessage.findMany({
             where: {

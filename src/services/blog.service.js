@@ -73,7 +73,7 @@ class BlogService {
      * 2. Get image or video of blog
      */
 
-    async getBlogListByUser(userId) {
+    async getBlogListByUser(userId, pageSize, pageNumber) {
         // 1. Get blog list
         const blog_of_user = await prisma.blogUser.findMany({
             where: {
@@ -98,7 +98,21 @@ class BlogService {
                     created_at: 'desc',
                 },
             ],
+            take: pageSize,
+            skip: (pageNumber - 1) * pageSize,
         })
+
+        const total = prisma.blogUser.count({
+            where: {
+                user_id: userId,
+                blog: {
+                    status: 'approved',
+                },
+            },
+        })
+
+        blog_of_user.total_page = Math.ceil(total / pageSize)
+
         return blog_of_user
     }
 

@@ -14,7 +14,11 @@ class BlogController {
     async getBlogList(req, res, next) {
         new Ok({
             message: 'Blog list',
-            metadata: await BlogService.getBlogListByUser(req.user.id),
+            metadata: await BlogService.getBlogListByUser(
+                req.user.id,
+                req.query.page_size,
+                req.query.page_number
+            ),
         }).send(res)
     }
 

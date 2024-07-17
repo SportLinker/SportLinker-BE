@@ -57,7 +57,7 @@ class UserController {
     async getAllPlayer(req, res, next) {
         new Ok({
             message: 'Get all player successfully',
-            metadata: await UserService.getAllPlayer(),
+            metadata: await UserService.getAllPlayer(req.user.id),
         }).send(res)
     }
 }

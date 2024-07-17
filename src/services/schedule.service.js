@@ -38,7 +38,8 @@ const runSchedule = () => {
             })
         }
 
-        global.logger.info(`Schedule, set status match to completed`)
+        global.logger.info(`Schedule: Set status match`)
+        return
     })
 
     // check list transaction is out of date
@@ -72,7 +73,8 @@ const runSchedule = () => {
             })
         }
 
-        global.logger.info(`Schedule, set status transaction to cancel`)
+        global.logger.info(`Schedule: Set status transaction`)
+        return
     })
 
     global.logger.info(`Schedule job is running`)

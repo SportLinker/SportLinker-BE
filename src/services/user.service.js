@@ -189,17 +189,21 @@ class UserService {
         return user
     }
 
-    async getAllPlayer() {
+    async getAllPlayer(userId) {
         const players = await prisma.user.findMany({
             select: {
                 id: true,
                 avatar_url: true,
                 name: true,
                 role: true,
+                username: true,
             },
             where: {
                 role: 'player',
                 status: 'active',
+                id: {
+                    not: userId,
+                },
             },
             orderBy: {
                 name: 'asc',
