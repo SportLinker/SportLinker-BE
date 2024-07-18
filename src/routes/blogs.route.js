@@ -16,6 +16,10 @@ router.get('/getMyBlog', asyncHandler(BlogController.getMyBlogList))
 
 router.get('/comment/:blog_id', asyncHandler(BlogController.getCommentList))
 
+router.post('/comment/:blog_id', asyncHandler(BlogController.createComment))
+
+router.delete('/comment/:comment_id', asyncHandler(BlogController.removeComment))
+
 router.post('/react', asyncHandler(BlogController.reactBlog))
 
 router.delete('/react/:blog_id', asyncHandler(BlogController.removeReactBlog))

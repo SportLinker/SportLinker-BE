@@ -7,7 +7,10 @@ class groupMessageController {
     async getListGroupMessageByUser(req, res, next) {
         new Ok({
             message: 'Match created successfully',
-            metadata: await GroupMessageService.getListGroupMessageByUser(req.user.id),
+            metadata: await GroupMessageService.getListGroupMessageByUser(
+                req.user.id,
+                req.query.search
+            ),
         }).send(res)
     }
 

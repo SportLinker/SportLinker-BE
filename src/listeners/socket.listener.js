@@ -13,7 +13,7 @@ const socketListener = () => {
         socket.on('online-user', async (userId) => {
             // set online user
             global.onLineUser.set(userId, socket.id)
-            global.logger.info(`Online user: ${JSON.stringify(global.onLineUser)}`)
+            global.logger.info(`Online user`, global.onLineUser)
             // get list group message of user
             const listGroupMessage = await GroupMessageService.getListGroupMessageByUser(
                 userId

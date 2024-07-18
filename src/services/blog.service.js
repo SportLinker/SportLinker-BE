@@ -1,6 +1,7 @@
 'use strict'
 
 const prisma = require('../configs/prisma.config').client
+const NotificationService = require('./notification.service')
 
 class BlogService {
     /**
@@ -138,6 +139,50 @@ class BlogService {
     }
 
     /**
+     * @function removeBlog
+     * @param {*} blogId, userId
+     * @logic
+     * 1. Remove blog
+     */
+
+    async removeBlog(blogId, userId) {
+        // 1. Remove blog
+        await prisma.blog.update({
+            where: {
+                id: blogId,
+            },
+            data: {
+                status: 'deleted',
+            },
+        })
+
+        return `Remove blog success`
+    }
+
+    /**
+     * @function getMyBlogList
+     * @param {*} userId
+     * @logic
+     * 1. Get my blog list
+     */
+
+    async getMyBlogList(userId) {
+        const my_blog = await prisma.blog.findMany({
+            where: {
+                blog_owner: userId,
+            },
+            include: {
+                blog_link: true,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        })
+
+        return my_blog
+    }
+
+    /**
      * @function getCommentList
      * @param {*} blogId
      * @logic
@@ -151,11 +196,96 @@ class BlogService {
                 blog_id: blogId,
             },
             include: {
-                user: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
             },
         })
 
         return comment_of_blog
+    }
+
+    /**
+     * @function createComment
+     * @param {*} blogId, data, userId
+     * @logic
+     * 1. Create comment
+     * 2. Create notification
+     * 3. Get user of blog
+     **/
+
+    async createComment(blogId, data, user) {
+        // 1. Create comment
+        const new_comment = await prisma.blogComment.create({
+            data: {
+                blog_id: blogId,
+                user_id: user.id,
+                content: data.content,
+            },
+        })
+
+        // 2. Create notification
+        const owner_of_blog = await prisma.blog.findFirst({
+            where: {
+                id: blogId,
+            },
+            include: {
+                owner: true,
+            },
+        })
+
+        await NotificationService.createNotification({
+            content: `${user.name} commented trên blog của bạn `,
+            receiver_id: owner_of_blog.owner.id,
+        })
+
+        return new_comment
+    }
+
+    /**
+     * @function removeComment
+     * @param {*} blogId, userId
+     * @logic
+     * 1. Remove comment
+     *
+     */
+
+    async removeComment(commentId, userId) {
+        // get detail comment
+        const comment = await prisma.blogComment.findFirst({
+            where: {
+                id: commentId,
+            },
+            include: {
+                blog: {
+                    include: {
+                        owner: true,
+                    },
+                },
+                user: true,
+            },
+        })
+        // check user is owner of comment
+        if (comment.user.id !== userId) {
+            throw new Error('Bạn không có quyền xóa comment này')
+        }
+        // remove comment
+        await prisma.blogComment.delete({
+            where: {
+                id: commentId,
+            },
+        })
+        // create noti
+        await NotificationService.createNotification({
+            content: `${comment.user.name} đã xóa comment trên blog của bạn`,
+            receiver_id: comment.blog.owner.id,
+        })
+
+        return `Remove comment success`
     }
 
     /**
@@ -200,47 +330,6 @@ class BlogService {
         })
 
         return `Remove react blog success`
-    }
-
-    /**
-     * @function removeBlog
-     * @param {*} blogId, userId
-     * @logic
-     * 1. Remove blog
-     */
-
-    async removeBlog(blogId, userId) {
-        // 1. Remove blog
-        await prisma.blog.update({
-            where: {
-                id: blogId,
-            },
-            data: {
-                status: 'deleted',
-            },
-        })
-
-        return `Remove blog success`
-    }
-
-    /**
-     * @function getMyBlogList
-     * @param {*} userId
-     * @logic
-     * 1. Get my blog list
-     */
-
-    async getMyBlogList(userId) {
-        const my_blog = await prisma.blog.findMany({
-            where: {
-                blog_owner: userId,
-            },
-            include: {
-                blog_link: true,
-            },
-        })
-
-        return my_blog
     }
 }
 

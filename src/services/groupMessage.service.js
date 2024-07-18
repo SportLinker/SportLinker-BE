@@ -15,7 +15,8 @@ class GroupMessageService {
      * 4. Get notification message to check is seen
      * @returns
      */
-    async getListGroupMessageByUser(userId) {
+    async getListGroupMessageByUser(userId, search) {
+        if (!search) search = ''
         // Get group message join by user
         const groupMessageJoinByUser = await prisma.groupMessageJoin
             .findMany({
@@ -39,6 +40,9 @@ class GroupMessageService {
             where: {
                 group_message_id: {
                     in: id,
+                },
+                group_message_name: {
+                    contains: search,
                 },
             },
             orderBy: [

@@ -65,8 +65,8 @@ class StadiumService {
         })
         // get distance and sort by distance
         for (let i = 0; i < list_stadium.length; i++) {
-            // wait 150ms
-            await new Promise((resolve) => setTimeout(resolve, 150))
+            // wait 200ms
+            await new Promise((resolve) => setTimeout(resolve, 200))
             const distance = await getDistance({
                 latOrigin: lat,
                 longOrigin: long,

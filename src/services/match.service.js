@@ -4,11 +4,7 @@ const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const redis = require('../configs/redis.config').client
 const { getPlaceDetail, getDistance } = require('../helpers/place.helper')
-const {
-    getUCLHourAndMinute,
-    getStringHourAndMinut,
-    getStringByDate,
-} = require('../helpers/timestamp.helper')
+const { getStringHourAndMinut, getStringByDate } = require('../helpers/timestamp.helper')
 
 class MatchService {
     /**

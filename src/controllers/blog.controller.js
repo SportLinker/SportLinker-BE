@@ -4,6 +4,7 @@ const { Ok, CREATED } = require('../core/sucess.response')
 const BlogService = require('../services/blog.service')
 
 class BlogController {
+    // Blog
     async createNewBlog(req, res, next) {
         new CREATED({
             message: 'Blog created successfully',
@@ -28,7 +29,7 @@ class BlogController {
             metadata: await BlogService.removeBlog(req.params.blog_id, req.user.id),
         }).send(res)
     }
-
+    // Comment
     async getCommentList(req, res, next) {
         new Ok({
             message: 'Comment list',
@@ -36,6 +37,24 @@ class BlogController {
         }).send(res)
     }
 
+    async createComment(req, res, next) {
+        new CREATED({
+            message: 'Comment created',
+            metadata: await BlogService.createComment(
+                req.params.blog_id,
+                req.body,
+                req.user
+            ),
+        }).send(res)
+    }
+
+    async removeComment(req, res, next) {
+        new Ok({
+            message: 'Comment removed',
+            metadata: await BlogService.removeComment(req.params.comment_id, req.user.id),
+        }).send(res)
+    }
+    // React
     async reactBlog(req, res, next) {
         new Ok({
             message: 'React blog',
