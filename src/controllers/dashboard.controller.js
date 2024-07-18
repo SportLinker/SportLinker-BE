@@ -8,7 +8,6 @@ class DashboardController {
         new Ok({
             message: 'Get dashboard data successfully',
             metadata: await DashboardService.getDashboardData(
-                req.query.type,
                 req.query.month,
                 req.query.year
             ),
