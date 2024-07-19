@@ -303,6 +303,17 @@ class BlogService {
                 user_id: userId,
             },
         })
+        // update total react blog
+        await prisma.blog.update({
+            where: {
+                id: data.blog_id,
+            },
+            data: {
+                total_like: {
+                    increment: 1,
+                },
+            },
+        })
 
         return react_blog
     }
@@ -329,7 +340,46 @@ class BlogService {
             },
         })
 
+        // update total react blog
+        await prisma.blog.update({
+            where: {
+                id: blogId,
+            },
+            data: {
+                total_like: {
+                    decrement: 1,
+                },
+            },
+        })
+
         return `Remove react blog success`
+    }
+
+    /**
+     * @function getReactList
+     * @param {*} blogId
+     * @logic
+     * 1. Get react list
+     */
+
+    async getReactList(blogId) {
+        // 1. Get react list
+        const react_list = await prisma.blogReact.findMany({
+            where: {
+                blog_id: blogId,
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar_url: true,
+                    },
+                },
+            },
+        })
+
+        return react_list
     }
 }
 

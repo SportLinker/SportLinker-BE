@@ -2,7 +2,7 @@
 const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const redisClient = require('../configs/redis.config').client
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const authUtil = require('../utils/auth.utils')
 
 class AuthenService {

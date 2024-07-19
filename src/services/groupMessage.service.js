@@ -53,9 +53,34 @@ class GroupMessageService {
                     type: 'asc',
                 },
             ],
+            include: {
+                GroupMessageJoin: true,
+            },
         })
         // Get last message of group message
         for (let i = 0; i < groupMessage.length; i++) {
+            // set back group message name
+            if (groupMessage[i].type === 'single') {
+                const groupMessageJoinOfUserMessage =
+                    await prisma.groupMessageJoin.findFirst({
+                        where: {
+                            group_message_id: groupMessage[i].group_message_id,
+                            user_join_id: {
+                                not: userId,
+                            },
+                        },
+                        include: {
+                            user_join: true,
+                        },
+                    })
+                // set group message name to name of user
+                groupMessage[i].group_message_name =
+                    groupMessageJoinOfUserMessage.user_join.name
+
+                groupMessage[i].group_message_thumnail =
+                    groupMessageJoinOfUserMessage.user_join.avatar_url
+            }
+
             const lastMessage = await prisma.message.findFirst({
                 where: {
                     message_to: groupMessage[i].group_message_id,
@@ -101,7 +126,55 @@ class GroupMessageService {
      * @returns
      */
 
-    async createGroupMessage(data, userId) {}
+    async createGroupMessage(userMessageId, userId) {
+        // get detail use message and user id
+        const userMessage = await prisma.user.findFirst({
+            where: {
+                user_id: userMessageId,
+            },
+        })
+
+        const user = await prisma.user.findFirst({
+            where: {
+                user_id: userId,
+            },
+        })
+
+        // check group message
+        const groupMessage = await prisma.groupMessage.findFirst({
+            where: {
+                group_message_name: {
+                    contains: `${user.name}-${userMessage.name}-${userMessageId}-${userId}`,
+                },
+                type: 'single',
+            },
+        })
+        if (groupMessage) {
+            return groupMessage
+        }
+        // create group message
+        const newGroupMessage = await prisma.groupMessage.create({
+            data: {
+                group_message_name: `${user.name}-${userMessage.name}-${userMessageId}-${userId}`,
+                type: 'single',
+            },
+        })
+        // create join group message for user and user message
+        await prisma.groupMessageJoin.createMany({
+            data: [
+                {
+                    user_join_id: userId,
+                    group_message_id: newGroupMessage.group_message_id,
+                },
+                {
+                    user_join_id: userMessageId,
+                    group_message_id: newGroupMessage.group_message_id,
+                },
+            ],
+        })
+
+        return newGroupMessage
+    }
 }
 
 module.exports = new GroupMessageService()

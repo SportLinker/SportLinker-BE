@@ -102,9 +102,11 @@ class MessageService {
             if (userInGroupMessage.length === 0) {
                 throw new BadRequestError('User not in group message')
             }
-            groupMessage.group_message_id = userInGroupMessage[0].user_join_id
+            // set group message detail
+            // groupMessage.group_message_id = userInGroupMessage[0].user_join_id
             groupMessage.group_message_name = userInGroupMessage[0].user.name
             groupMessage.group_message_thumnail = userInGroupMessage[0].user.avatar_url
+
             return {
                 group_message_detail: groupMessage,
                 messages: listMessage,

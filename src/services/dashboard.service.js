@@ -24,6 +24,9 @@ class DashboardService {
                     lt: new Date(year, month, 1),
                 },
             },
+            orderBy: {
+                start_time: 'asc',
+            },
         })
 
         // get list match month before
