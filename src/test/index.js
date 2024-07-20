@@ -18,7 +18,7 @@ const getFavorite = async () => {
 }
 
 const test = async () => {
-    global.logger.info('Test log info is running')
+    global.logger.info('Test log info is running ...')
 }
 
 module.exports = {
