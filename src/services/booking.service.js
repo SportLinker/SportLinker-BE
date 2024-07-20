@@ -217,6 +217,14 @@ class BookingService {
                     },
                 })
             }
+            // create transaction for booking owner
+            await prisma.transaction.create({
+                data: {
+                    user_id: owner.id,
+                    amount: priceBookingForOwner,
+                    type: 'booking',
+                },
+            })
             // logs
             global.logger.info(`Booking ${bookingId} has been accepted by ${user.id}`)
             return `Booking ${bookingId} has been accepted`

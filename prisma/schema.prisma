@@ -367,6 +367,7 @@ model Transaction {
 enum TransactionType {
   deposit
   withdraw
+  booking
 }
 
 enum TransactionMethod {
