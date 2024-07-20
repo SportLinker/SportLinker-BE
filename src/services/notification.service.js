@@ -5,12 +5,21 @@ const { BadRequestError } = require('../core/error.response')
 
 class NotificationSerivce {
     async createNotification({ receiver_id, content }) {
-        return await prisma.notification.create({
+        const data = await prisma.notification.create({
             data: {
                 receiver_id: receiver_id,
                 content: content,
             },
         })
+        // emit socket
+        if (global.onLineUser.has(receiver_id)) {
+            global.io
+                .to(global.onLineUser.get(receiver_id))
+                .emit('receive-notification', {
+                    content: data.content,
+                })
+        }
+        return data
     }
 
     async getListNotificationByUser(user_id) {
