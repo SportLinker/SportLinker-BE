@@ -67,7 +67,11 @@ class AuthenService {
                 balance: 0,
             },
         })
-        global.logger.info(`User ${newUser.id} register successfully`)
+        // create blog for new user
+        await this.createBlogForNewUser(newUser.id)
+
+        global.logger.info(`User ${newUser.name} register successfully`)
+
         return newUser
     }
 
@@ -107,7 +111,12 @@ class AuthenService {
                 balance: 0,
             },
         })
-        global.logger.info(`User ${newUser.id} register successfully`)
+        // create blog for new user
+        await this.createBlogForNewUser(newUser.id)
+
+        global.logger.info(
+            `User ${newUser.name} register successfully with username ${newUser.username}`
+        )
         return newUser
     }
 
@@ -295,6 +304,29 @@ class AuthenService {
         // logs
         global.logger.info(`User ${userId} logout successfully`)
         return 'Logout OK'
+    }
+
+    async createBlogForNewUser(userId) {
+        // find all blog active
+        const list_blog = await prisma.blog.findMany({
+            where: {
+                status: 'approved',
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        })
+        // create blog for new user
+        for (let i = 0; i < list_blog.length; i++) {
+            await prisma.blogUser.create({
+                data: {
+                    user_id: userId,
+                    blog_id: list_blog[i].id,
+                },
+            })
+        }
+
+        return
     }
 }
 

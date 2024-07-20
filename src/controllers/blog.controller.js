@@ -82,6 +82,13 @@ class BlogController {
             metadata: await BlogService.getReactList(req.params.blog_id),
         }).send(res)
     }
+
+    async getBlogDetail(req, res, next) {
+        new Ok({
+            message: 'Blog detail',
+            metadata: await BlogService.getBlogDetail(req.params.blog_id),
+        }).send(res)
+    }
 }
 
 module.exports = new BlogController()

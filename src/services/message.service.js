@@ -88,8 +88,7 @@ class MessageService {
                     },
                 },
                 select: {
-                    user_join_id: true,
-                    user: {
+                    user_join: {
                         select: {
                             avatar_url: true,
                             name: true,
@@ -104,8 +103,9 @@ class MessageService {
             }
             // set group message detail
             // groupMessage.group_message_id = userInGroupMessage[0].user_join_id
-            groupMessage.group_message_name = userInGroupMessage[0].user.name
-            groupMessage.group_message_thumnail = userInGroupMessage[0].user.avatar_url
+            groupMessage.group_message_name = userInGroupMessage[0].user_join.name
+            groupMessage.group_message_thumnail =
+                userInGroupMessage[0].user_join.avatar_url
 
             return {
                 group_message_detail: groupMessage,

@@ -381,6 +381,29 @@ class BlogService {
 
         return react_list
     }
+
+    /**
+     * @function getBlogDetail
+     * @param {*} blogId
+     * @logic
+     * 1. Get blog detail
+     * 2. Get image or video of blog
+     */
+
+    async getBlogDetail(blogId) {
+        // 1. Get blog detail
+        const blog_detail = await prisma.blog.findFirst({
+            where: {
+                id: blogId,
+            },
+            include: {
+                blog_link: true,
+                owner: true,
+            },
+        })
+
+        return blog_detail
+    }
 }
 
 module.exports = new BlogService()

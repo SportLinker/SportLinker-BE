@@ -130,13 +130,13 @@ class GroupMessageService {
         // get detail use message and user id
         const userMessage = await prisma.user.findFirst({
             where: {
-                user_id: userMessageId,
+                id: userMessageId,
             },
         })
 
         const user = await prisma.user.findFirst({
             where: {
-                user_id: userId,
+                id: userId,
             },
         })
 
