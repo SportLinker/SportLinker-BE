@@ -18,6 +18,8 @@ const getFavorite = async () => {
 }
 
 const test = async () => {
+    // day of week
+    console.log(new Date().getDay())
     global.logger.info('Test log info is running ...')
 }
 

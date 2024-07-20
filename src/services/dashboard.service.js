@@ -253,11 +253,16 @@ class DashboardService {
             revenue_this_time,
             revenue_last_month
         )
+        // combine booking by day of week
+        const booking_by_day_of_week = await this.combineByDayOfWeek(
+            total_booking_by_this_time
+        )
 
         return {
             bookings: {
                 total_booking: total_booking_by_this_time.length,
                 compare_last_month: compare_booking,
+                booking_by_day_of_week: booking_by_day_of_week,
             },
             incomes: {
                 total_income: income_by_this_time,
@@ -276,6 +281,20 @@ class DashboardService {
         } else {
             return ((total_this_month - total_last_month) / total_last_month) * 100
         }
+    }
+
+    async combineByDayOfWeek(data) {
+        return data.reduce((acc, item) => {
+            const day = new Date(item.time_start).getDay()
+            if (!acc[day]) {
+                acc[day] = {
+                    day: day,
+                    total: 0,
+                }
+            }
+            acc[day].total++
+            return acc
+        }, [])
     }
 }
 

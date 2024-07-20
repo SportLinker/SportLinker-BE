@@ -67,8 +67,26 @@ class AuthenService {
                 balance: 0,
             },
         })
+        // find all blog active
+        const list_blog = await prisma.blog.findMany({
+            where: {
+                status: 'approved',
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        })
         // create blog for new user
-        await this.createBlogForNewUser(newUser.id)
+        for (let i = 0; i < list_blog.length; i++) {
+            await prisma.blogUser.create({
+                data: {
+                    user_id: newUser.id,
+                    blog_id: list_blog[i].id,
+                },
+            })
+        }
+
+        global.logger.info(`Create blog for user ${newUser.id} successfully`)
 
         global.logger.info(`User ${newUser.name} register successfully`)
 
@@ -112,7 +130,26 @@ class AuthenService {
             },
         })
         // create blog for new user
-        await this.createBlogForNewUser(newUser.id)
+        // find all blog active
+        const list_blog = await prisma.blog.findMany({
+            where: {
+                status: 'approved',
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        })
+        // create blog for new user
+        for (let i = 0; i < list_blog.length; i++) {
+            await prisma.blogUser.create({
+                data: {
+                    user_id: newUser.id,
+                    blog_id: list_blog[i].id,
+                },
+            })
+        }
+
+        global.logger.info(`Create blog for user ${newUser.id} successfully`)
 
         global.logger.info(
             `User ${newUser.name} register successfully with username ${newUser.username}`
@@ -304,29 +341,6 @@ class AuthenService {
         // logs
         global.logger.info(`User ${userId} logout successfully`)
         return 'Logout OK'
-    }
-
-    async createBlogForNewUser(userId) {
-        // find all blog active
-        const list_blog = await prisma.blog.findMany({
-            where: {
-                status: 'approved',
-            },
-            orderBy: {
-                created_at: 'desc',
-            },
-        })
-        // create blog for new user
-        for (let i = 0; i < list_blog.length; i++) {
-            await prisma.blogUser.create({
-                data: {
-                    user_id: userId,
-                    blog_id: list_blog[i].id,
-                },
-            })
-        }
-
-        return
     }
 }
 
