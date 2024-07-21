@@ -390,7 +390,7 @@ class BlogService {
      * 2. Get image or video of blog
      */
 
-    async getBlogDetail(blogId) {
+    async getBlogDetail(blogId, userId) {
         // 1. Get blog detail
         const blog_detail = await prisma.blog.findFirst({
             where: {
@@ -401,6 +401,18 @@ class BlogService {
                 owner: true,
             },
         })
+        // find react blog
+        const react_blog = await prisma.blogReact.findFirst({
+            where: {
+                blog_id: blogId,
+                user_id: userId,
+            },
+        })
+        if (react_blog) {
+            blog_detail.is_react = true
+        } else {
+            blog_detail.is_react = false
+        }
 
         return blog_detail
     }

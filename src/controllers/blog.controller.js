@@ -86,7 +86,7 @@ class BlogController {
     async getBlogDetail(req, res, next) {
         new Ok({
             message: 'Blog detail',
-            metadata: await BlogService.getBlogDetail(req.params.blog_id),
+            metadata: await BlogService.getBlogDetail(req.params.blog_id, req.user.id),
         }).send(res)
     }
 }
