@@ -178,6 +178,20 @@ class BlogService {
                 created_at: 'desc',
             },
         })
+        // check react blog
+        for (let i = 0; i < my_blog.length; i++) {
+            const react_blog = await prisma.blogReact.findFirst({
+                where: {
+                    blog_id: my_blog[i].id,
+                    user_id: userId,
+                },
+            })
+            if (react_blog) {
+                my_blog[i].is_react = true
+            } else {
+                my_blog[i].is_react = false
+            }
+        }
 
         return my_blog
     }
