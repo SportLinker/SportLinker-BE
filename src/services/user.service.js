@@ -103,6 +103,7 @@ class UserService {
                 role: data.role,
                 gender: data.gender,
                 avatar_url: data.avatar_url,
+                bio: data.bio,
             },
         })
         // update favorite
