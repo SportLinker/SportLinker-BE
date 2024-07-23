@@ -252,7 +252,7 @@ class UserService {
         // update wallet
         await prisma.wallet.update({
             where: {
-                id: user.wallet_id,
+                user_id: user.id,
             },
             data: {
                 balance: {
@@ -276,10 +276,26 @@ class UserService {
                 amount: price,
                 method: 'wallet',
                 type: 'premium',
+                status: 'completed',
             },
         })
 
-        return user
+        // create log premium
+        await prisma.premiumAccount.create({
+            data: {
+                user_id: user.id,
+                type: 'month',
+                expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            },
+        })
+
+        const newUser = await prisma.user.findUnique({
+            where: {
+                id: user.id,
+            },
+        })
+
+        return newUser
     }
 
     async premiumYear(user) {
@@ -293,7 +309,7 @@ class UserService {
         // update wallet
         await prisma.wallet.update({
             where: {
-                id: user.wallet_id,
+                user_id: user.id,
             },
             data: {
                 balance: {
@@ -317,10 +333,38 @@ class UserService {
                 amount: price,
                 method: 'wallet',
                 type: 'premium',
+                status: 'completed',
+            },
+        })
+        // create log premium
+        await prisma.premiumAccount.create({
+            data: {
+                user_id: user.id,
+                type: 'year',
+                expired_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             },
         })
 
-        return user
+        const newUser = await prisma.user.findUnique({
+            where: {
+                id: user.id,
+            },
+        })
+
+        return newUser
+    }
+
+    async getPremiumByUser(userId) {
+        const premium = await prisma.premiumAccount.findMany({
+            where: {
+                user_id: userId,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        })
+
+        return premium[0]
     }
 }
 

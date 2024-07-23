@@ -227,6 +227,7 @@ class BookingService {
                     amount: priceBookingForOwner,
                     type: 'booking',
                     method: 'wallet',
+                    status: 'completed',
                 },
             })
             // logs

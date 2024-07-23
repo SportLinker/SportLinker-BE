@@ -67,6 +67,13 @@ class UserController {
             metadata: await UserService.createPremium(req.user.id, req.query.type),
         }).send(res)
     }
+
+    async getPremiumByUser(req, res, next) {
+        new Ok({
+            message: 'Get premium by user successfully',
+            metadata: await UserService.getPremiumByUser(req.user.id),
+        }).send(res)
+    }
 }
 
 module.exports = new UserController()

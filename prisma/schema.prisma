@@ -55,6 +55,7 @@ model User {
   BlogComment           BlogComment[]
   StadiumRating         StadiumRating[]
   BlogReact             BlogReact[]
+  PremiumAccount        PremiumAccount[]
 }
 
 enum UserStatus {
@@ -456,4 +457,25 @@ model BlogReact {
   // Relation
   blog    Blog   @relation(fields: [blog_id], references: [id])
   user    User   @relation(fields: [user_id], references: [id])
+}
+
+model PremiumAccount {
+  id         String        @id @default(cuid())
+  user_id    String
+  expired_at DateTime
+  created_at DateTime      @default(now())
+  type       PremiumType
+  status     PremiumStatus @default(active)
+  // Relation
+  user       User          @relation(fields: [user_id], references: [id])
+}
+
+enum PremiumType {
+  month
+  year
+}
+
+enum PremiumStatus {
+  active
+  expired
 }

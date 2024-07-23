@@ -12,6 +12,8 @@ router.get('/getProfile', asyncHandler(UserController.getProfile))
 
 router.get('/getAllPlayer', asyncHandler(UserController.getAllPlayer))
 
+router.get('/premium/getByUser', asyncHandler(UserController.getPremiumByUser))
+
 router.get('/:user_id', asyncHandler(UserController.getUserById))
 
 router.post('/', asyncHandler(UserController.createUser))
