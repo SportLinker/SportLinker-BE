@@ -144,6 +144,8 @@ class BookingService {
                 Wallet: true,
             },
         })
+        // get total hour of booking
+        const total_hour = (booking.time_end - booking.time_start) / 3600000
         // check status
         if (data.status === 'accepted') {
             // check time_start of yard is booked
@@ -167,7 +169,8 @@ class BookingService {
                 },
             })
             // price booking of user send to owner 15%
-            const priceBookingForOwner = (booking.yard.price_per_hour * 15) / 100
+            const priceBookingForOwner =
+                (booking.yard.price_per_hour * total_hour * 15) / 100
             // update wallet for stadium
             await prisma.wallet.update({
                 where: {
@@ -216,7 +219,7 @@ class BookingService {
                     data: {
                         balance:
                             yard_reject[i].user.Wallet.balance +
-                            (booking.yard.price_per_hour * 30) / 100,
+                            (booking.yard.price_per_hour * 30 * total_hour) / 100,
                     },
                 })
             }
@@ -251,7 +254,8 @@ class BookingService {
                 },
                 data: {
                     balance:
-                        user.Wallet.balance + (booking.yard.price_per_hour * 30) / 100,
+                        user.Wallet.balance +
+                        (booking.yard.price_per_hour * total_hour * 30) / 100,
                 },
             })
             // send notification
