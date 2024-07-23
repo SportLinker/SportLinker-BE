@@ -40,6 +40,11 @@ class SearchService {
             .catch((err) => {
                 console.log('Error search user', err)
             })
+        // get detail favorite user
+        for (let i = 0; i < users.length; i++) {
+            const favorite = await redis.get(`favorite:${users[i].id}`)
+            users[i].favorite = favorite ? JSON.parse(favorite) : []
+        }
         return users
     }
 

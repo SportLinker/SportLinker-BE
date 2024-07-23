@@ -16,6 +16,8 @@ router.get('/:user_id', asyncHandler(UserController.getUserById))
 
 router.post('/', asyncHandler(UserController.createUser))
 
+router.post('/premium', asyncHandler(UserController.createPremium))
+
 router.put('/:user_id', asyncHandler(UserController.updateUser))
 
 router.delete('/:user_id', asyncHandler(UserController.deleteUser))

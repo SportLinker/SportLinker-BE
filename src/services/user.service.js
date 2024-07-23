@@ -218,6 +218,110 @@ class UserService {
 
         return players
     }
+
+    premiumStrategies = {
+        month: this.premiumMonth,
+        year: this.premiumYear,
+    }
+
+    async createPremium(userId, type) {
+        // check user is premium
+        const userDetail = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+            include: {
+                Wallet: true,
+            },
+        })
+        if (userDetail.is_premium === true) {
+            throw new BadRequestError('Bạn đã là thành viên premium')
+        }
+
+        return await this.premiumStrategies[type](userDetail)
+    }
+
+    async premiumMonth(user) {
+        // get price pre month
+        let price = global.config.get('PREMIUM_PRICE_PER_MONTH')
+        price = parseInt(price)
+        // check balance
+        if (user.Wallet.balance < price) {
+            throw new BadRequestError('Ví của bạn không đủ để thanh toán')
+        }
+        // update wallet
+        await prisma.wallet.update({
+            where: {
+                id: user.wallet_id,
+            },
+            data: {
+                balance: {
+                    decrement: price,
+                },
+            },
+        })
+        // create premium
+        await prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                is_premium: true,
+            },
+        })
+        // create transaction
+        await prisma.transaction.create({
+            data: {
+                user_id: user.id,
+                amount: price,
+                method: 'wallet',
+                type: 'premium',
+            },
+        })
+
+        return `Bạn đã trở thành thành viên premium trong 1 tháng`
+    }
+
+    async premiumYear(user) {
+        // get price pre year
+        let price = global.config.get('PREMIUM_PRICE_PER_YEAR')
+        price = parseInt(price)
+        // check balance
+        if (user.Wallet.balance < price) {
+            throw new BadRequestError('Ví của bạn không đủ để thanh toán')
+        }
+        // update wallet
+        await prisma.wallet.update({
+            where: {
+                id: user.wallet_id,
+            },
+            data: {
+                balance: {
+                    decrement: price,
+                },
+            },
+        })
+        // create premium
+        await prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                is_premium: true,
+            },
+        })
+        // create transaction
+        await prisma.transaction.create({
+            data: {
+                user_id: user.id,
+                amount: price,
+                method: 'wallet',
+                type: 'premium',
+            },
+        })
+
+        return `Bạn đã trở thành thành viên premium trong 1 năm`
+    }
 }
 
 module.exports = new UserService()

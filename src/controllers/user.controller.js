@@ -60,6 +60,13 @@ class UserController {
             metadata: await UserService.getAllPlayer(req.user.id),
         }).send(res)
     }
+
+    async createPremium(req, res, next) {
+        new CREATED({
+            message: 'Create premium successfully',
+            metadata: await UserService.createPremium(req.user.id, req.query.type),
+        }).send(res)
+    }
 }
 
 module.exports = new UserController()

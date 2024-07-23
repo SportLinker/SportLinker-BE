@@ -140,6 +140,9 @@ class BookingService {
             where: {
                 id: stadium.stadium_owner_id,
             },
+            include: {
+                Wallet: true,
+            },
         })
         // check status
         if (data.status === 'accepted') {
@@ -223,6 +226,7 @@ class BookingService {
                     user_id: owner.id,
                     amount: priceBookingForOwner,
                     type: 'booking',
+                    method: 'wallet',
                 },
             })
             // logs
