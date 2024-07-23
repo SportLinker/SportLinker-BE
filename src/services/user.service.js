@@ -279,7 +279,7 @@ class UserService {
             },
         })
 
-        return `Bạn đã trở thành thành viên premium trong 1 tháng`
+        return user
     }
 
     async premiumYear(user) {
@@ -320,7 +320,7 @@ class UserService {
             },
         })
 
-        return `Bạn đã trở thành thành viên premium trong 1 năm`
+        return user
     }
 }
 
