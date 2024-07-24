@@ -491,7 +491,7 @@ class MatchService {
                 })
         }
         // 3. Return result
-        return updateMatch
+        return 'Cập nhật thành công trận đấu thành công!'
     }
 
     /**
