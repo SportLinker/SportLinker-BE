@@ -52,7 +52,7 @@ class MatchController {
     }
 
     async updateMatch(req, res, next) {
-        new NO_CONTENT({
+        new Ok({
             message: 'Update match successfully',
             metadata: await MatchService.updateMatch(
                 req.params.match_id,
