@@ -60,6 +60,7 @@ class MatchService {
             data: {
                 match_id: newMatch.match_id,
                 budget: match.option.budget,
+                note: match.option.note,
             },
         })
         // Check cache stadium info is exist
