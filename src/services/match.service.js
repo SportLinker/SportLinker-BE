@@ -463,7 +463,12 @@ class MatchService {
                     match_id: match_id,
                 },
                 data: {
-                    ...data,
+                    match_name: data.match_name,
+                    cid: data.cid,
+                    sport_name: data.sport_name,
+                    maximum_join: data.maximum_join,
+                    start_time: data.start_time,
+                    end_time: data.end_time,
                 },
             })
             .catch((error) => {
@@ -477,7 +482,8 @@ class MatchService {
                         match_id: match_id,
                     },
                     data: {
-                        ...data.option,
+                        budget: data.option.budget,
+                        note: data.option.note,
                     },
                 })
                 .catch((error) => {

@@ -36,27 +36,32 @@ class GroupMessageService {
             )
         }
         // Get group message by user
-        const groupMessage = await prisma.groupMessage.findMany({
-            where: {
-                group_message_id: {
-                    in: id,
+        const groupMessage = await prisma.groupMessage
+            .findMany({
+                where: {
+                    group_message_id: {
+                        in: id,
+                    },
+                    group_message_name: {
+                        contains: search,
+                    },
                 },
-                group_message_name: {
-                    contains: search,
+                orderBy: [
+                    {
+                        last_active_time: 'desc',
+                    },
+                    {
+                        type: 'asc',
+                    },
+                ],
+                include: {
+                    GroupMessageJoin: true,
                 },
-            },
-            orderBy: [
-                {
-                    last_active_time: 'desc',
-                },
-                {
-                    type: 'asc',
-                },
-            ],
-            include: {
-                GroupMessageJoin: true,
-            },
-        })
+            })
+            .catch((error) => {
+                global.logger.error(`Error get list message: ${error.message}`)
+                return
+            })
         // Get last message of group message
         for (let i = 0; i < groupMessage.length; i++) {
             // set back group message name

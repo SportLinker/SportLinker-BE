@@ -366,7 +366,7 @@ class UserService {
 
         if (premium.length === 0) {
             return {
-                status: false,
+                status: 'inactive',
             }
         }
 
