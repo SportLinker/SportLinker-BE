@@ -26,6 +26,9 @@ class UserService {
                     role: 'asc',
                 },
                 {
+                    is_premium: 'desc',
+                },
+                {
                     createdAt: 'desc',
                 },
             ],
