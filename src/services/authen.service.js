@@ -100,7 +100,7 @@ class AuthenService {
                 username: user.username,
             },
         })
-        if (usernameExist) throw new BadRequestError('Username already exist')
+        if (usernameExist) throw new BadRequestError('Username đã tồn tại')
         // generate hash password
         const newPass = await bcrypt.hash(user.password, 8)
         // create user
