@@ -136,7 +136,7 @@ class AuthenService {
                 status: 'approved',
             },
             orderBy: {
-                created_at: 'desc',
+                created_at: 'asc',
             },
         })
         // create blog for new user
