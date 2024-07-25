@@ -146,6 +146,8 @@ class BookingService {
         })
         // get total hour of booking
         const total_hour = (booking.time_end - booking.time_start) / 3600000
+
+        console.log(`total_hour`, total_hour)
         // check status
         if (data.status === 'accepted') {
             // check time_start of yard is booked
