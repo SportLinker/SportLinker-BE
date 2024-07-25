@@ -328,6 +328,22 @@ class BlogService {
                 },
             },
         })
+        // update is read blog user
+        const blog_user = await prisma.blogUser.findFirst({
+            where: {
+                blog_id: data.blog_detail,
+                user_id: userId,
+            },
+        })
+
+        await prisma.blogUser.update({
+            where: {
+                id: blog_user.id,
+            },
+            data: {
+                is_read: true,
+            },
+        })
 
         return react_blog
     }
