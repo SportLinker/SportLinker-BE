@@ -38,7 +38,7 @@ const runSchedule = () => {
             })
         }
 
-        global.logger.info(`Schedule: Set status match`)
+        // global.logger.info(`Schedule: Set status match`)
         return
     })
 
@@ -73,7 +73,7 @@ const runSchedule = () => {
             })
         }
 
-        global.logger.info(`Schedule: Set status transaction`)
+        // global.logger.info(`Schedule: Set status transaction`)
         return
     })
 
