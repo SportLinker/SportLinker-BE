@@ -78,7 +78,7 @@ class MatchService {
             data: {
                 group_message_id: newMatch.match_id,
                 group_message_name: newMatch.match_name,
-                group_message_thumnail: `https://res.cloudinary.com/dcbsbl9zg/image/upload/v1718024452/SportLinker/Avatar/Default/group-chat.jpg`,
+                group_message_thumnail: `https://png.pngtree.com/png-clipart/20220124/original/pngtree-sports-logo-icon-picture-png-image_7179399.png`,
                 type: 'match',
             },
         })
