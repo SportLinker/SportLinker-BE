@@ -124,7 +124,7 @@ class StadiumService {
             },
             orderBy: [
                 {
-                    stadium_status: 'desc',
+                    stadium_status: 'asc',
                 },
                 {
                     created_at: 'desc',
