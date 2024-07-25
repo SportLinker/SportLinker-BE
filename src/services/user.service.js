@@ -202,9 +202,14 @@ class UserService {
                     not: userId,
                 },
             },
-            orderBy: {
-                name: 'asc',
-            },
+            orderBy: [
+                {
+                    is_premium: 'desc',
+                },
+                {
+                    name: 'asc',
+                },
+            ],
         })
 
         for (let i = 0; i < players.length; i++) {
