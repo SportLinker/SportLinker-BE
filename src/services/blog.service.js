@@ -95,7 +95,7 @@ class BlogService {
             },
             orderBy: [
                 {
-                    is_read: 'asc',
+                    is_read: 'desc',
                 },
                 {
                     created_at: 'desc',
