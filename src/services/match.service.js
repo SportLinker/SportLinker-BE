@@ -518,9 +518,14 @@ class MatchService {
             },
             skip: (page_number - 1) * page_size,
             take: page_size,
-            orderBy: {
-                start_time: 'asc',
-            },
+            orderBy: [
+                {
+                    status: 'asc',
+                },
+                {
+                    start_time: 'desc',
+                },
+            ],
             include: {
                 user_create: true,
                 option: true,

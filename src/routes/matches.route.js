@@ -8,16 +8,16 @@ router.use(authentication)
 
 router.get('/getMatchByUser', asyncHandler(matchController.getMatchByUser))
 
-router.get('/:match_id', asyncHandler(matchController.getMatchDetail))
+router.get('/admin/getAllMatch', asyncHandler(matchController.getAllMatchByAdmin))
 
 router.get('/', asyncHandler(matchController.getListMatch))
+
+router.get('/:match_id', asyncHandler(matchController.getMatchDetail))
 
 router.put('/:match_id', asyncHandler(matchController.updateMatch))
 
 router.post('/', asyncHandler(matchController.createNewMatch))
 
 router.delete('/:match_id', asyncHandler(matchController.deleteMatch))
-
-router.get('/admin/getAllMatch', asyncHandler(matchController.getAllMatchByAdmin))
 
 module.exports = router
