@@ -33,8 +33,11 @@ class BookingService {
                 id: yard.stadium_id,
             },
         })
+        // get total hour of booking
+        const total_hour = (new Date(data.time_end) - new Date(data.time_start)) / 3600000
+        console.log(`total_hour`, total_hour)
         // check wallet balannce
-        const priceBooking = (yard.price_per_hour * 30) / 100
+        const priceBooking = (yard.price_per_hour * total_hour * 30) / 100
         if (user.Wallet.balance < priceBooking) {
             throw new BadRequestError('Số dư trong ví không đủ để đặt sân')
         }
@@ -65,7 +68,19 @@ class BookingService {
                 user_id: userId,
             },
             data: {
-                balance: user.Wallet.balance - priceBooking,
+                balance: {
+                    decrement: priceBooking,
+                },
+            },
+        })
+        // create transaction for booking
+        await prisma.transaction.create({
+            data: {
+                user_id: userId,
+                amount: -priceBooking,
+                type: 'booking',
+                method: 'wallet',
+                status: 'completed',
             },
         })
         // 3. create notification to stadium
@@ -179,7 +194,9 @@ class BookingService {
                     user_id: owner.id,
                 },
                 data: {
-                    balance: owner.Wallet.balance + priceBookingForOwner,
+                    balance: {
+                        increment: priceBookingForOwner,
+                    },
                 },
             })
             // send notification to user booking
@@ -258,6 +275,17 @@ class BookingService {
                     balance:
                         user.Wallet.balance +
                         (booking.yard.price_per_hour * total_hour * 30) / 100,
+                },
+            })
+            // create transaction for booking
+            await prisma.transaction.create({
+                data: {
+                    user_id: booking.user_id,
+                    amount: (booking.yard.price_per_hour * total_hour * 30) / 100,
+                    type: 'booking',
+                    method: 'wallet',
+                    status: 'completed',
+                    rejected_reason: 'Chủ sân từ chối',
                 },
             })
             // send notification

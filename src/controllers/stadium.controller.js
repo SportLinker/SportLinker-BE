@@ -62,7 +62,10 @@ class StadiumController {
     async deleteStadium(req, res, next) {
         new Ok({
             message: 'Stadium deleted successfully.',
-            metadata: await StadiumService.deleteStadium(req.params.stadium_id),
+            metadata: await StadiumService.deleteStadium(
+                req.params.stadium_id,
+                req.user.id
+            ),
         }).send(res)
     }
 

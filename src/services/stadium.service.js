@@ -4,6 +4,7 @@ const { BadRequestError } = require('../core/error.response')
 const prisma = require('../configs/prisma.config').client
 const { getDistance } = require('../helpers/place.helper')
 const NotificationService = require('./notification.service')
+const yardService = require('./yard.service')
 
 class StadiumService {
     /**
@@ -241,26 +242,33 @@ class StadiumService {
      * 4. Return stadium
      */
 
-    async deleteStadium(stadiumId) {
+    async deleteStadium(stadiumId, userId) {
+        // get stadium by id
+        const stadium = await prisma.stadium.findFirst({
+            where: {
+                id: stadiumId,
+            },
+        })
+        // check is owner
+        if (stadium.stadium_owner_id !== userId) {
+            throw new BadRequestError('Bạn không có quyền hành này!')
+        }
         // 1. find all yard in stadium
         const list_yard = await prisma.yard.findMany({
             where: {
                 stadium_id: stadiumId,
             },
         })
-        // 2. delete all yard in stadium
+        // find all booking yard in list yard
         for (let i = 0; i < list_yard.length; i++) {
-            await prisma.yard.update({
-                where: {
-                    yard_id: list_yard[i].yard_id,
-                },
-                data: {
-                    yard_status: 'deleted',
-                },
-            })
+            await yardService
+                .deleteYard(list_yard[i].yard_id, stadium.stadium_owner_id)
+                .catch((err) => {
+                    throw new BadRequestError(err.message)
+                })
         }
-        // 3. delete stadium
-        const stadium = await prisma.stadium.update({
+        // 2. delete stadium
+        await prisma.stadium.update({
             where: {
                 id: stadiumId,
             },

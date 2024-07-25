@@ -34,6 +34,8 @@ class GroupMessageService {
             id = groupMessageJoinByUser.map(
                 (groupMessageJoin) => groupMessageJoin.group_message_id
             )
+        } else {
+            return []
         }
         // Get group message by user
         const groupMessage = await prisma.groupMessage

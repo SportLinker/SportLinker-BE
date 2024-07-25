@@ -49,7 +49,7 @@ class YardController {
     async deleteYard(req, res, next) {
         new Ok({
             message: 'Yard deleted successfully.',
-            metadata: await YardService.deleteYard(req.params.yard_id),
+            metadata: await YardService.deleteYard(req.params.yard_id, req.user.id),
         }).send(res)
     }
 }

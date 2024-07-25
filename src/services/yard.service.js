@@ -3,6 +3,7 @@
 const prisma = require('../configs/prisma.config').client
 const { BadRequestError } = require('../core/error.response')
 const { getStringHourAndMinut, getTimeByFormat } = require('../helpers/timestamp.helper')
+const notificationService = require('./notification.service')
 
 class YardService {
     async createYard(data, stadium_id) {
@@ -292,33 +293,53 @@ class YardService {
         })
     }
 
-    async deleteYard(yard_id) {
+    async deleteYard(yard_id, userId) {
         const booking_yard = await prisma.bookingYard.findMany({
             where: {
                 yard_id: yard_id,
                 status: 'accepted',
+                time_start: {
+                    gte: new Date(),
+                },
             },
         })
-        if (booking_yard.length > 0) {
-            throw new BadRequestError('Sân đã có người đặt không thể xóa')
-        }
-        // delete booking
-        await prisma.bookingYard.deleteMany({
+        // get yard detail
+        const yard_detail = await prisma.yard.findUnique({
             where: {
                 yard_id: yard_id,
             },
         })
+        // get stadium detail
+        const stadium_detail = await prisma.stadium.findUnique({
+            where: {
+                id: yard_detail.stadium_id,
+            },
+        })
+        // check is owner
+        if (stadium_detail.stadium_owner_id !== userId) {
+            throw new BadRequestError('Bạn không có quyền xóa sân này!')
+        }
+        // check is booking
+        if (booking_yard.length > 0) {
+            throw new BadRequestError(
+                `Sân ${yard_detail.yard_name} đã có người đặt không thể xóa`
+            )
+        }
         // delete yard
-        const yard = prisma.yard
-            .delete({
+        await prisma.yard
+            .update({
                 where: {
                     yard_id: yard_id,
+                },
+                data: {
+                    yard_status: 'deleted',
                 },
             })
             .catch((err) => {
                 console.log(err)
             })
-        return 'Yard deleted'
+
+        return 'Xóa sân thành công!'
     }
 }
 

@@ -207,7 +207,7 @@ class PaymentService {
                 bank_short_name: body.bank_short_name,
                 bank_logo: body.bank_logo,
                 user_id: userId,
-                amount: body.amount,
+                amount: -body.amount,
                 transaction_code: code,
                 type: 'withdraw',
                 method: 'bank',
