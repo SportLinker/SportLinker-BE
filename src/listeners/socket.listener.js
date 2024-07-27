@@ -48,6 +48,8 @@ const socketListener = () => {
 
         // disconnect
         socket.on('disconnect', () => {
+            // remove user from online user
+            global.onLineUser.delete(socket.id)
             global.logger.info(`User disconnected: ${socket.id}`)
         })
     })
