@@ -386,6 +386,17 @@ class BookingService {
                 },
             },
         })
+        // create transaction for booking
+        await prisma.transaction.create({
+            data: {
+                user_id: booking.user_id,
+                amount: (booking.yard.price_per_hour * total_hour * 30) / 100,
+                type: 'booking',
+                method: 'wallet',
+                status: 'completed',
+                rejected_reason: 'Người dùng hủy',
+            },
+        })
         // notification
         await NotificationService.createNotification({
             receiver_id: booking.user_id,
