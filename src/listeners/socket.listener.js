@@ -13,7 +13,8 @@ const socketListener = () => {
         socket.on('online-user', async (userId) => {
             // set online user
             global.onLineUser.set(userId, socket.id)
-            global.logger.info(`Online user`, global.onLineUser)
+            global.logger.info(`Online user  ${userId} connected: ${socket.id}`)
+            global.logger.info(`Total online user: ${global.onLineUser.size}`)
             // get list group message of user
             const listGroupMessage = await GroupMessageService.getListGroupMessageByUser(
                 userId
@@ -50,6 +51,7 @@ const socketListener = () => {
         socket.on('disconnect', () => {
             // remove user from online user
             global.onLineUser.delete(socket.id)
+            global.logger.info(`Total online user: ${global.onLineUser.size}`)
             global.logger.info(`User disconnected: ${socket.id}`)
         })
     })

@@ -364,6 +364,8 @@ class BookingService {
                 id: bookingId,
             },
         })
+        // get total hour of booking
+        const total_hour = (booking.time_end - booking.time_start) / 3600000
         // get user booking detail
         const user = await prisma.user.findUnique({
             where: {
@@ -379,7 +381,9 @@ class BookingService {
                 user_id: booking.user_id,
             },
             data: {
-                balance: user.Wallet.balance + (booking.yard.price_per_hour * 30) / 100,
+                balance: {
+                    increment: (booking.yard.price_per_hour * total_hour * 30) / 100,
+                },
             },
         })
         // notification
@@ -387,7 +391,8 @@ class BookingService {
             receiver_id: booking.user_id,
             content: `Đặt sân ${booking.yard.yard_name} vào lúc ${booking.time_start} - ${booking.time_end} đã bị xóa`,
         })
-        return `Delete booking ${bookingId} successfully`
+
+        return `User ${user.username} cancels booking ${booking.yard.yard_name} !`
     }
 
     async getAllBookingByAdmin(pageSize, pageNumber) {
