@@ -130,7 +130,7 @@ class MatchService {
                     },
                 })
                 .catch((error) => {
-                    console.log('Error get list match', error)
+                    global.logger.error(`Get list match fail: ${error.message}`)
                 })
         } else {
             sport_name = sport_name.split(',')
@@ -161,7 +161,7 @@ class MatchService {
                     },
                 })
                 .catch((error) => {
-                    console.log('Error get list match', error)
+                    global.logger.error(`Get list match fail: ${error.message}`)
                 })
         }
 

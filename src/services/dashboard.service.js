@@ -13,6 +13,7 @@ class DashboardService {
             users: await this.getListUserDashBoard(month, year),
             blogs: await this.getBlogDashBoard(month, year),
             bookings: await this.getBookingDashboard(month, year),
+            // premiums: await this.getPremiumDashboard(month, year),
         }
     }
 
@@ -272,6 +273,37 @@ class DashboardService {
                 total_revenue: revenue_this_time,
                 compare_last_month: compare_revenue,
             },
+        }
+    }
+
+    async getPremiumDashboard(month, year) {
+        // get total premium by this time
+        const total_premium_by_this_time = await prisma.premiumAccount.findMany({
+            where: {
+                created_at: {
+                    gte: new Date(year, month - 1, 1),
+                    lt: new Date(year, month, 1),
+                },
+            },
+        })
+        // get total premium by last month
+        const total_premium_by_last_month = await prisma.premiumAccount.findMany({
+            where: {
+                created_at: {
+                    gte: new Date(year, month - 2, 1),
+                    lt: new Date(year, month - 1, 1),
+                },
+            },
+        })
+        // compare with last month to percent
+        let compare_premium = await this.compareLastMonth(
+            total_premium_by_this_time.length,
+            total_premium_by_last_month.length
+        )
+
+        return {
+            total_premium: total_premium_by_this_time.length,
+            compare_last_month: compare_premium,
         }
     }
 
