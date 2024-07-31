@@ -10,7 +10,8 @@ class UserController {
             metadata: await UserService.getAllUser(
                 req.query.page_size,
                 req.query.page_number,
-                req.query.name
+                req.query.name,
+                req.query.is_premium
             ),
         }).send(res)
     }

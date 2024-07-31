@@ -13,7 +13,8 @@ class DashboardService {
             users: await this.getListUserDashBoard(month, year),
             blogs: await this.getBlogDashBoard(month, year),
             bookings: await this.getBookingDashboard(month, year),
-            // premiums: await this.getPremiumDashboard(month, year),
+            premiums: await this.getPremiumDashboard(month, year),
+            revenues: await this.getIncomeDashboard(month, year),
         }
     }
 
@@ -216,48 +217,49 @@ class DashboardService {
             total_booking_by_this_time.length,
             total_booking_by_last_month.length
         )
-        // get income
-        const income_by_this_time = total_booking_by_this_time.reduce((acc, booking) => {
-            const total_hour = (booking.time_end - booking.time_start) / 3600000
-            acc += total_hour * booking.yard.price_per_hour * 0.15
-            return acc
-        }, 0)
-        // get income by last month
-        const income_by_last_month = total_booking_by_last_month.reduce(
-            (acc, booking) => {
-                const total_hour = (booking.time_end - booking.time_start) / 3600000
-                acc += total_hour * booking.yard.price_per_hour * 0.15
-                return acc
-            },
-            0
-        )
-        // compare with last month to percent
-        let compare_income = await this.compareLastMonth(
-            income_by_this_time,
-            income_by_last_month
-        )
-        // get revenue
-        // get income
-        const revenue_this_time = total_booking_by_this_time.reduce((acc, booking) => {
-            const total_hour = (booking.time_end - booking.time_start) / 3600000
-            acc += total_hour * booking.yard.price_per_hour
-            return acc
-        }, 0)
-        // get income by last month
-        const revenue_last_month = total_booking_by_last_month.reduce((acc, booking) => {
-            const total_hour = (booking.time_end - booking.time_start) / 3600000
-            acc += total_hour * booking.yard.price_per_hour
-            return acc
-        }, 0)
-        // compare with last month to percent
-        let compare_revenue = await this.compareLastMonth(
-            revenue_this_time,
-            revenue_last_month
-        )
         // combine booking by day of week
         const booking_by_day_of_week = await this.combineByDayOfWeek(
             total_booking_by_this_time
         )
+        // // get income
+        // const income_by_this_time = total_booking_by_this_time.reduce((acc, booking) => {
+        //     const total_hour = (booking.time_end - booking.time_start) / 3600000
+        //     acc += total_hour * booking.yard.price_per_hour * 0.15
+        //     return acc
+        // }, 0)
+        // // get income by last month
+        // const income_by_last_month = total_booking_by_last_month.reduce(
+        //     (acc, booking) => {
+        //         const total_hour = (booking.time_end - booking.time_start) / 3600000
+        //         acc += total_hour * booking.yard.price_per_hour * 0.15
+        //         return acc
+        //     },
+        //     0
+        // )
+        // // compare with last month to percent
+        // let compare_income = await this.compareLastMonth(
+        //     income_by_this_time,
+        //     income_by_last_month
+        // )
+        // // get revenue
+        // // get income
+        // const revenue_this_time = total_booking_by_this_time.reduce((acc, booking) => {
+        //     const total_hour = (booking.time_end - booking.time_start) / 3600000
+        //     acc += total_hour * booking.yard.price_per_hour
+        //     return acc
+        // }, 0)
+        // // get income by last month
+        // const revenue_last_month = total_booking_by_last_month.reduce((acc, booking) => {
+        //     const total_hour = (booking.time_end - booking.time_start) / 3600000
+        //     acc += total_hour * booking.yard.price_per_hour
+        //     return acc
+        // }, 0)
+        // // compare with last month to percent
+        // let compare_revenue = await this.compareLastMonth(
+        //     revenue_this_time,
+        //     revenue_last_month
+        // )
+        // combine booking by day of week
 
         return {
             bookings: {
@@ -265,14 +267,14 @@ class DashboardService {
                 compare_last_month: compare_booking,
                 booking_by_day_of_week: booking_by_day_of_week,
             },
-            incomes: {
-                total_income: income_by_this_time,
-                compare_last_month: compare_income,
-            },
-            revenues: {
-                total_revenue: revenue_this_time,
-                compare_last_month: compare_revenue,
-            },
+            // incomes: {
+            //     total_income: income_by_this_time,
+            //     compare_last_month: compare_income,
+            // },
+            // revenues: {
+            //     total_revenue: revenue_this_time,
+            //     compare_last_month: compare_revenue,
+            // },
         }
     }
 
@@ -304,6 +306,54 @@ class DashboardService {
         return {
             total_premium: total_premium_by_this_time.length,
             compare_last_month: compare_premium,
+        }
+    }
+
+    async getIncomeDashboard(month, year) {
+        // get total booking by this month
+        const total_booking = await prisma.bookingYard.findMany({
+            where: {
+                created_at: {
+                    gte: new Date(year, month - 1, 1),
+                    lt: new Date(year, month, 1),
+                },
+                status: 'accepted',
+            },
+            include: {
+                yard: true,
+            },
+        })
+        // get total revenues of booking
+        const total_revenues_booking = total_booking.reduce((acc, booking) => {
+            const total_hour = (booking.time_end - booking.time_start) / 3600000
+            acc += total_hour * booking.yard.price_per_hour * 0.3
+            return acc
+        }, 0)
+        // total revenue of booking
+        const total_income_booking = total_revenues_booking * 0.5
+        // get total premium by this month
+        const total_premium = await prisma.premiumAccount.findMany({
+            where: {
+                created_at: {
+                    gte: new Date(year, month - 1, 1),
+                    lt: new Date(year, month, 1),
+                },
+            },
+        })
+        // get total revenues of premium
+        const total_revenues_premium = total_premium.reduce((acc, premium) => {
+            if (premium.type === 'year') {
+                // prase to int
+                acc += parseInt(global.config.get(`PREMIUM_PRICE_PER_YEAR`))
+            } else if (premium.type === 'month') {
+                acc += parseInt(global.config.get(`PREMIUM_PRICE_PER_MONTH`))
+            }
+            return acc
+        }, 0)
+
+        return {
+            revenue: total_revenues_booking + total_revenues_premium,
+            income: total_income_booking + total_revenues_premium,
         }
     }
 

@@ -6,15 +6,23 @@ const bcrypt = require('bcryptjs')
 const redis = require('../configs/redis.config').client
 
 class UserService {
-    async getAllUser(pageSize, pageNumber, name) {
+    async getAllUser(pageSize, pageNumber, name, is_premium) {
         // convert to number of pageSize and pageNumber
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
+        // convert is_premium to boolean
+        if (is_premium === 'true') {
+            is_premium = true
+        } else if (is_premium === 'false') {
+            is_premium = false
+        }
+
         const list_user = await prisma.user.findMany({
             where: {
                 name: {
                     contains: name,
                 },
+                is_premium: is_premium,
             },
             skip: pageSize * (pageNumber - 1),
             take: pageSize,

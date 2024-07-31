@@ -12,13 +12,13 @@ class BlogService {
      * 2. Create image or video of blog
      */
 
-    async createNewBlog(data, userId) {
+    async createNewBlog(data, user) {
         // 1. Create a new blog
         const newBlog = await prisma.blog.create({
             data: {
                 blog_content: data.blog_content,
                 blog_address: data.blog_address,
-                blog_owner: userId,
+                blog_owner: user.id,
                 blog_sport: data.blog_sport,
             },
         })
@@ -63,6 +63,9 @@ class BlogService {
                 },
             })
         }
+
+        global.logger.info(`User ${user.name} created a new blog`)
+
         return newBlog
     }
 
@@ -78,7 +81,7 @@ class BlogService {
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         // 1. Get blog list
-        const blog_of_user = await prisma.blogUser.findMany({
+        let blog_of_user = await prisma.blogUser.findMany({
             where: {
                 user_id: userId,
                 blog: {
@@ -130,6 +133,17 @@ class BlogService {
         }
 
         const total_page = Math.ceil(total / pageSize)
+
+        // sort blog by premium of user
+        blog_of_user.sort((a, b) => {
+            if (a.blog.owner.is_premium && !b.blog.owner.is_premium) {
+                return -1
+            }
+            if (!a.blog.owner.is_premium && b.blog.owner.is_premium) {
+                return 1
+            }
+            return 0
+        })
 
         return {
             list_blog: blog_of_user,
