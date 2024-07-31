@@ -7,25 +7,41 @@ class DashboardService {
     async getDashboardData(month, year) {
         month = parseInt(month)
         year = parseInt(year)
-        const revenue_this_month = await this.getIncomeDashboard(month, year)
-        const revenue_last_month = await this.getIncomeDashboard(month - 1, year)
+        let [
+            revenue_this_month,
+            revenue_last_month,
+            matches,
+            users,
+            blogs,
+            bookings,
+            premiums,
+        ] = await Promise.all([
+            this.getIncomeDashboard(month, year),
+            this.getIncomeDashboard(month - 1, year),
+            this.getListMatchDashBoard(month, year),
+            this.getListUserDashBoard(month, year),
+            this.getBlogDashBoard(month, year),
+            this.getBookingDashboard(month, year),
+            this.getPremiumDashboard(month, year),
+        ])
         // compare revenue
-        let compare_revenue = await this.compareLastMonth(
-            revenue_this_month.total_revenue,
-            revenue_last_month.total_revenue
-        )
-        // compare income
-        let compare_income = await this.compareLastMonth(
-            revenue_this_month.total_income,
-            revenue_last_month.total_income
-        )
+        let [compare_revenue, compare_income] = await Promise.all([
+            this.compareLastMonth(
+                revenue_this_month.total_revenue,
+                revenue_last_month.total_revenue
+            ),
+            this.compareLastMonth(
+                revenue_this_month.total_income,
+                revenue_last_month.total_income
+            ),
+        ])
 
         return {
-            matchs: await this.getListMatchDashBoard(month, year),
-            users: await this.getListUserDashBoard(month, year),
-            blogs: await this.getBlogDashBoard(month, year),
-            bookings: await this.getBookingDashboard(month, year),
-            premiums: await this.getPremiumDashboard(month, year),
+            matches: matches,
+            users: users,
+            blogs: blogs,
+            bookings: bookings,
+            premiums: premiums,
             revenues: {
                 revenue: {
                     total_revenue: revenue_this_month.total_revenue,
