@@ -18,7 +18,7 @@ const getStringByDate = (date) => {
 }
 
 const getStringHourAndMinut = (time) => {
-    let hour = new Date(time).getHours()
+    let hour = new Date(time).getHours() - 1 // -1 because of timezone difference
     let minute = new Date(time).getMinutes()
     if (hour < 10) {
         hour = `0${hour}`
