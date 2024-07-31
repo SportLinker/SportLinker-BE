@@ -18,6 +18,14 @@ class DashboardService {
         }
     }
 
+    /**
+     *
+     * @param {*} month
+     * @param {*} year
+     * @function getListMatchDashBoard
+     * @returns
+     */
+
     async getListMatchDashBoard(month, year) {
         const matchs_by_this_time = await prisma.match.findMany({
             where: {
@@ -72,6 +80,14 @@ class DashboardService {
         }
         return result
     }
+
+    /**
+     *
+     * @param {*} month
+     * @param {*} year
+     * @function getListUserDashBoard
+     * @returns
+     */
 
     async getListUserDashBoard(month, year) {
         // Get player
@@ -149,6 +165,14 @@ class DashboardService {
         }
     }
 
+    /**
+     *
+     * @param {*} month
+     * @param {*} year
+     * @function getBlogDashBoard
+     * @returns
+     */
+
     async getBlogDashBoard(month, year) {
         const blog_by_this_time = await prisma.blog.count({
             where: {
@@ -184,6 +208,14 @@ class DashboardService {
         }
         return result
     }
+
+    /**
+     *
+     * @param {*} month
+     * @param {*} year
+     * @function getBookingDashboard
+     * @returns
+     */
 
     async getBookingDashboard(month, year) {
         // get total booking by this time
@@ -278,6 +310,14 @@ class DashboardService {
         }
     }
 
+    /**
+     *
+     * @param {*} month
+     * @param {*} year
+     * @function getPremiumDashboard
+     * @returns
+     */
+
     async getPremiumDashboard(month, year) {
         // get total premium by this time
         const total_premium_by_this_time = await prisma.premiumAccount.findMany({
@@ -350,10 +390,28 @@ class DashboardService {
             }
             return acc
         }, 0)
+        // get total of last month
+        const revenue_last_month = await this.getIncomeDashboard(month - 1, year)
+        // compare revenue
+        const compare_revenue = await this.compareLastMonth(
+            total_revenues_booking + total_revenues_premium,
+            revenue_last_month.revenue
+        )
+        // compare income
+        const compare_income = await this.compareLastMonth(
+            total_income_booking + total_revenues_premium,
+            revenue_last_month.income
+        )
 
         return {
-            revenue: total_revenues_booking + total_revenues_premium,
-            income: total_income_booking + total_revenues_premium,
+            revenue: {
+                total_revenue: total_revenues_booking + total_revenues_premium,
+                compare_last_month: compare_revenue,
+            },
+            income: {
+                total_income: total_income_booking + total_revenues_premium,
+                compare_last_month: compare_income,
+            },
         }
     }
 
