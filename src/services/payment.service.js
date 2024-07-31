@@ -134,6 +134,55 @@ class PaymentService {
 
         return transaction
     }
+    /**
+     *
+     * @param {*} transaction_code
+     * @function handleSuccessWithdrawPaymentBank
+     * @returns
+     */
+    async handleSuccessDepositPaymentBank(transaction_code) {
+        // find transaction by code
+        const transaction = await prisma.transaction.findFirst({
+            where: {
+                transaction_code: transaction_code,
+            },
+        })
+        // update transaction status
+        if (!transaction) {
+            global.logger.error(`Transaction not found: ${transaction_code}`)
+            return
+        }
+        if (transaction.status !== 'pending') {
+            global.logger.error(
+                `Transaction have been completed or expired: ${transaction_code}`
+            )
+            return
+        }
+        // update transaction status
+        await prisma.transaction
+            .update({
+                where: {
+                    id: transaction.id,
+                },
+                data: {
+                    status: 'completed',
+                },
+            })
+            .catch((err) => {
+                global.logger.error(`Update transaction status error: ${err.message}`)
+            })
+        // send notification to user
+        await NotificationService.createNotification({
+            receiver_id: transaction.user_id,
+            content: `Rút tiền khỏi tài khoản với ${transaction.amount}VND thành công `,
+        })
+
+        global.logger.info(
+            `Withdraw status ${transaction.amount} to ${transaction.user_id} completed`
+        )
+
+        return transaction
+    }
 
     async handleCancelDepositPaymentBank(transaction_code) {
         // find transaction by code
