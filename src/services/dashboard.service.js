@@ -7,6 +7,18 @@ class DashboardService {
     async getDashboardData(month, year) {
         month = parseInt(month)
         year = parseInt(year)
+        const revenue_this_month = await this.getIncomeDashboard(month, year)
+        const revenue_last_month = await this.getIncomeDashboard(month - 1, year)
+        // compare revenue
+        let compare_revenue = await this.compareLastMonth(
+            revenue_this_month.total_revenue,
+            revenue_last_month.total_revenue
+        )
+        // compare income
+        let compare_income = await this.compareLastMonth(
+            revenue_this_month.total_income,
+            revenue_last_month.total_income
+        )
 
         return {
             matchs: await this.getListMatchDashBoard(month, year),
@@ -14,7 +26,16 @@ class DashboardService {
             blogs: await this.getBlogDashBoard(month, year),
             bookings: await this.getBookingDashboard(month, year),
             premiums: await this.getPremiumDashboard(month, year),
-            revenues: await this.getIncomeDashboard(month, year),
+            revenues: {
+                revenue: {
+                    total_revenue: revenue_this_month.total_revenue,
+                    compare_last_month: compare_revenue,
+                },
+                income: {
+                    total_income: revenue_this_month.total_income,
+                    compare_last_month: compare_income,
+                },
+            },
         }
     }
 
@@ -390,28 +411,10 @@ class DashboardService {
             }
             return acc
         }, 0)
-        // get total of last month
-        const revenue_last_month = await this.getIncomeDashboard(month - 1, year)
-        // compare revenue
-        const compare_revenue = await this.compareLastMonth(
-            total_revenues_booking + total_revenues_premium,
-            revenue_last_month.revenue
-        )
-        // compare income
-        const compare_income = await this.compareLastMonth(
-            total_income_booking + total_revenues_premium,
-            revenue_last_month.income
-        )
 
         return {
-            revenue: {
-                total_revenue: total_revenues_booking + total_revenues_premium,
-                compare_last_month: compare_revenue,
-            },
-            income: {
-                total_income: total_income_booking + total_revenues_premium,
-                compare_last_month: compare_income,
-            },
+            total_revenue: total_revenues_booking + total_revenues_premium,
+            total_income: total_income_booking + total_revenues_premium,
         }
     }
 
