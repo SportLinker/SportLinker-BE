@@ -64,27 +64,27 @@ class DashboardService {
      */
 
     async getListMatchDashBoard(month, year) {
-        const matchs_by_this_time = await prisma.match.findMany({
-            where: {
-                start_time: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
+        let [matchs_by_this_time, matchs_by_last_month] = await Promise.all([
+            prisma.match.findMany({
+                where: {
+                    start_time: {
+                        gte: new Date(year, month - 1, 1),
+                        lt: new Date(year, month, 1),
+                    },
                 },
-            },
-            orderBy: {
-                start_time: 'asc',
-            },
-        })
-
-        // get list match month before
-        const matchs_by_last_month = await prisma.match.findMany({
-            where: {
-                start_time: {
-                    gte: new Date(year, month - 2, 1),
-                    lt: new Date(year, month - 1, 1),
+                orderBy: {
+                    start_time: 'asc',
                 },
-            },
-        })
+            }),
+            prisma.match.findMany({
+                where: {
+                    start_time: {
+                        gte: new Date(year, month - 2, 1),
+                        lt: new Date(year, month - 1, 1),
+                    },
+                },
+            }),
+        ])
 
         // reduce by time
         let match_reduce_by_time = matchs_by_this_time.reduce((acc, match) => {
@@ -128,70 +128,64 @@ class DashboardService {
 
     async getListUserDashBoard(month, year) {
         // Get player
-        const player_by_this_time = await prisma.user.count({
-            where: {
-                createdAt: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
+        const [
+            player_by_this_time,
+            player_by_last_month,
+            total_stadium_account_this_time,
+            total_stadium_account_last_month,
+        ] = await Promise.all([
+            prisma.user.count({
+                where: {
+                    createdAt: {
+                        gte: new Date(year, month - 1, 1),
+                        lt: new Date(year, month, 1),
+                    },
+                    role: 'player',
                 },
-                role: 'player',
-            },
-        })
-
-        // get list player month before
-        const player_by_last_month = await prisma.user.count({
-            where: {
-                createdAt: {
-                    gte: new Date(year, month - 2, 1),
-                    lt: new Date(year, month - 1, 1),
+            }),
+            prisma.user.count({
+                where: {
+                    createdAt: {
+                        gte: new Date(year, month - 2, 1),
+                        lt: new Date(year, month - 1, 1),
+                    },
+                    role: 'player',
                 },
-                role: 'player',
-            },
-        })
+            }),
+            prisma.user.count({
+                where: {
+                    createdAt: {
+                        gte: new Date(year, month - 1, 1),
+                        lt: new Date(year, month, 1),
+                    },
+                    role: 'stadium',
+                },
+            }),
+            prisma.user.count({
+                where: {
+                    createdAt: {
+                        gte: new Date(year, month - 2, 1),
+                        lt: new Date(year, month - 1, 1),
+                    },
+                    role: 'stadium',
+                },
+            }),
+        ])
+        // define data return
+        const [compare_last_month, compare_last_month_stadium] = await Promise.all([
+            this.compareLastMonth(player_by_this_time, player_by_last_month),
+            this.compareLastMonth(
+                total_stadium_account_this_time,
+                total_stadium_account_last_month
+            ),
+        ])
 
-        // get total player
-        const total_user_by_this_time = player_by_this_time
-        const total_user_by_last_month = player_by_last_month
-        // compare with last month to percent
-        let compare_last_month = await this.compareLastMonth(
-            total_user_by_this_time,
-            total_user_by_last_month
-        )
-
-        let player = {
-            total_player: total_user_by_this_time,
+        const player = {
+            total_player: player_by_this_time,
             compare_last_month: compare_last_month,
         }
 
-        // get total stadium account
-        const total_stadium_account_this_time = await prisma.user.count({
-            where: {
-                createdAt: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
-                },
-                role: 'stadium',
-            },
-        })
-
-        // get total stadium account month before
-        const total_stadium_account_last_month = await prisma.user.count({
-            where: {
-                createdAt: {
-                    gte: new Date(year, month - 2, 1),
-                    lt: new Date(year, month - 1, 1),
-                },
-                role: 'stadium',
-            },
-        })
-
-        // compare with last month to percent
-        let compare_last_month_stadium = await this.compareLastMonth(
-            total_stadium_account_this_time,
-            total_stadium_account_last_month
-        )
-
-        let stadiums = {
+        const stadiums = {
             total_stadium_account: total_stadium_account_this_time,
             compare_last_month: compare_last_month_stadium,
         }
@@ -211,36 +205,33 @@ class DashboardService {
      */
 
     async getBlogDashBoard(month, year) {
-        const blog_by_this_time = await prisma.blog.count({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
+        let [blog_by_this_time, blog_by_last_month] = await Promise.all([
+            prisma.blog.count({
+                where: {
+                    created_at: {
+                        gte: new Date(year, month - 1, 1),
+                        lt: new Date(year, month, 1),
+                    },
                 },
-            },
-        })
-
-        // get list blog month before
-        const blog_by_last_month = await prisma.blog.count({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 2, 1),
-                    lt: new Date(year, month - 1, 1),
+            }),
+            prisma.blog.count({
+                where: {
+                    created_at: {
+                        gte: new Date(year, month - 2, 1),
+                        lt: new Date(year, month - 1, 1),
+                    },
                 },
-            },
-        })
+            }),
+        ])
 
-        // get total blog
-        const total_blog_by_this_time = blog_by_this_time
-        const total_blog_by_last_month = blog_by_last_month
         // compare with last month to percent
         let compare_last_month = await this.compareLastMonth(
-            total_blog_by_this_time,
-            total_blog_by_last_month
+            blog_by_this_time,
+            blog_by_last_month
         )
 
         let result = {
-            total_blog: total_blog_by_this_time,
+            total_blog: blog_by_this_time,
             compare_last_month: compare_last_month,
         }
         return result
@@ -256,31 +247,33 @@ class DashboardService {
 
     async getBookingDashboard(month, year) {
         // get total booking by this time
-        const total_booking_by_this_time = await prisma.bookingYard.findMany({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
-                },
-                status: 'accepted',
-            },
-            include: {
-                yard: true,
-            },
-        })
-        // get total booking by last month
-        const total_booking_by_last_month = await prisma.bookingYard.findMany({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 2, 1),
-                    lt: new Date(year, month - 1, 1),
-                },
-                status: 'accepted',
-            },
-            include: {
-                yard: true,
-            },
-        })
+        const [total_booking_by_this_time, total_booking_by_last_month] =
+            await Promise.all([
+                // get total booking by this time
+                prisma.bookingYard.findMany({
+                    where: {
+                        created_at: {
+                            gte: new Date(year, month - 1, 1),
+                            lt: new Date(year, month, 1),
+                        },
+                    },
+                    include: {
+                        yard: true,
+                    },
+                }),
+                // get total booking by last month
+                prisma.bookingYard.findMany({
+                    where: {
+                        created_at: {
+                            gte: new Date(year, month - 2, 1),
+                            lt: new Date(year, month - 1, 1),
+                        },
+                    },
+                    include: {
+                        yard: true,
+                    },
+                }),
+            ])
         // compare with last month to percent
         let compare_booking = await this.compareLastMonth(
             total_booking_by_this_time.length,
@@ -357,23 +350,25 @@ class DashboardService {
 
     async getPremiumDashboard(month, year) {
         // get total premium by this time
-        const total_premium_by_this_time = await prisma.premiumAccount.findMany({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
-                },
-            },
-        })
-        // get total premium by last month
-        const total_premium_by_last_month = await prisma.premiumAccount.findMany({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 2, 1),
-                    lt: new Date(year, month - 1, 1),
-                },
-            },
-        })
+        const [total_premium_by_this_time, total_premium_by_last_month] =
+            await Promise.all([
+                prisma.premiumAccount.findMany({
+                    where: {
+                        created_at: {
+                            gte: new Date(year, month - 1, 1),
+                            lt: new Date(year, month, 1),
+                        },
+                    },
+                }),
+                prisma.premiumAccount.findMany({
+                    where: {
+                        created_at: {
+                            gte: new Date(year, month - 2, 1),
+                            lt: new Date(year, month - 1, 1),
+                        },
+                    },
+                }),
+            ])
         // compare with last month to percent
         let compare_premium = await this.compareLastMonth(
             total_premium_by_this_time.length,
@@ -387,19 +382,29 @@ class DashboardService {
     }
 
     async getIncomeDashboard(month, year) {
-        // get total booking by this month
-        const total_booking = await prisma.bookingYard.findMany({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
+        // get total booking and premium by this month
+        const [total_booking, total_premium] = await Promise.all([
+            prisma.bookingYard.findMany({
+                where: {
+                    created_at: {
+                        gte: new Date(year, month - 1, 1),
+                        lt: new Date(year, month, 1),
+                    },
+                    status: 'accepted',
                 },
-                status: 'accepted',
-            },
-            include: {
-                yard: true,
-            },
-        })
+                include: {
+                    yard: true,
+                },
+            }),
+            prisma.premiumAccount.findMany({
+                where: {
+                    created_at: {
+                        gte: new Date(year, month - 1, 1),
+                        lt: new Date(year, month, 1),
+                    },
+                },
+            }),
+        ])
         // get total revenues of booking
         const total_revenues_booking = total_booking.reduce((acc, booking) => {
             const total_hour = (booking.time_end - booking.time_start) / 3600000
@@ -408,15 +413,7 @@ class DashboardService {
         }, 0)
         // total revenue of booking
         const total_income_booking = total_revenues_booking * 0.5
-        // get total premium by this month
-        const total_premium = await prisma.premiumAccount.findMany({
-            where: {
-                created_at: {
-                    gte: new Date(year, month - 1, 1),
-                    lt: new Date(year, month, 1),
-                },
-            },
-        })
+
         // get total revenues of premium
         const total_revenues_premium = total_premium.reduce((acc, premium) => {
             if (premium.type === 'year') {
@@ -435,11 +432,15 @@ class DashboardService {
     }
 
     async compareLastMonth(total_this_month, total_last_month) {
+        let result = 0
         if (total_last_month === 0) {
-            return total_this_month
+            result = total_this_month
         } else {
-            return ((total_this_month - total_last_month) / total_last_month) * 100
+            result = ((total_this_month - total_last_month) / total_last_month) * 100
         }
+        // convert result to .2f
+        result = result.toFixed(2)
+        return result
     }
 
     async combineByDayOfWeek(data) {
