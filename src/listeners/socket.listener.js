@@ -50,9 +50,12 @@ const socketListener = () => {
         // disconnect
         socket.on('disconnect', () => {
             // remove user from online user
-            global.onLineUser.delete(socket.id)
-            global.logger.info(`Total online user: ${global.onLineUser.size}`)
+            const userId = Array.from(global.onLineUser).find(
+                ([key, value]) => value === socket.id
+            )
+            global.onLineUser.delete(userId)
             global.logger.info(`User disconnected: ${socket.id}`)
+            global.logger.info(`Total online user: ${global.onLineUser.size}`)
         })
     })
 }
