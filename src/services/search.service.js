@@ -14,6 +14,9 @@ class SearchService {
     }
 
     async search(pageSize, pageNumber, search, type, lat, long, userId) {
+        if (!lat || !long) {
+            throw new BadRequestError('Bạn chưa cung cấp vị trí của bạn')
+        }
         return this.searchStrategy[type](pageSize, pageNumber, search, lat, long, userId)
     }
     // search user

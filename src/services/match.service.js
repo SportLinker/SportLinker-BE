@@ -104,6 +104,9 @@ class MatchService {
      * @param {*} sport_name array (sport name)
      */
     async getListMatch(lat, long, distance, start_time, end_time, sport_name, user_id) {
+        if (!lat || !long) {
+            throw new BadRequestError('Bạn chưa cung cấp vị trí của bạn!')
+        }
         let listMatchByTimeAndSportName = []
         // check sport_name is empty
         if (!sport_name) {
@@ -257,6 +260,9 @@ class MatchService {
      */
 
     async getMatchByUser(user_id, lat, long) {
+        if (!lat || !long) {
+            throw new BadRequestError('Bạn chưa cung cấp vị trí của bạn!')
+        }
         // 1. Get match by user
         const match_by_user = await prisma.match.findMany({
             where: {
