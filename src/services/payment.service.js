@@ -39,7 +39,7 @@ class PaymentService {
 
     async depositBank(userId, body) {
         // create code for deposit bank include random 8 char
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+        let code = Math.random().toString(36).substring(2, 8).toUpperCase()
         // check if code is exist
         const isExist = await prisma.transaction.findFirst({
             where: {
@@ -49,6 +49,7 @@ class PaymentService {
         if (isExist) {
             return this.depositBank(userId, body)
         }
+        code = code + ' ' + 'NAP TIEN VAO VI SPORTLINKER'
         // create transaction
         const transaction = await prisma.transaction
             .create({
