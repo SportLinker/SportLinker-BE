@@ -11,62 +11,81 @@ class UserService {
         pageSize = parseInt(pageSize)
         pageNumber = parseInt(pageNumber)
         // convert is_premium to boolean
-        let list_user
+        let [list_user, total_user] = [[], 0]
 
         if (is_premium) {
-            list_user = await prisma.user.findMany({
-                where: {
-                    name: {
-                        contains: name,
+            ;[list_user, total_user] = await Promise.all([
+                prisma.user.findMany({
+                    where: {
+                        name: {
+                            contains: name,
+                        },
+                        is_premium: {
+                            equals: is_premium === 'true',
+                        },
                     },
-                    is_premium: {
-                        equals: is_premium === 'true',
+                    skip: pageSize * (pageNumber - 1),
+                    take: pageSize,
+                    orderBy: [
+                        {
+                            status: 'asc',
+                        },
+                        {
+                            role: 'asc',
+                        },
+                        {
+                            is_premium: 'desc',
+                        },
+                        {
+                            createdAt: 'desc',
+                        },
+                    ],
+                }),
+                prisma.user.count({
+                    where: {
+                        name: {
+                            contains: name,
+                        },
+                        is_premium: {
+                            equals: is_premium === 'true',
+                        },
                     },
-                },
-                skip: pageSize * (pageNumber - 1),
-                take: pageSize,
-                orderBy: [
-                    {
-                        status: 'asc',
-                    },
-                    {
-                        role: 'asc',
-                    },
-                    {
-                        is_premium: 'desc',
-                    },
-                    {
-                        createdAt: 'desc',
-                    },
-                ],
-            })
+                }),
+            ])
         } else {
-            list_user = await prisma.user.findMany({
-                where: {
-                    name: {
-                        contains: name,
+            ;[list_user, total_user] = await Promise.all([
+                prisma.user.findMany({
+                    where: {
+                        name: {
+                            contains: name,
+                        },
                     },
-                },
-                skip: pageSize * (pageNumber - 1),
-                take: pageSize,
-                orderBy: [
-                    {
-                        status: 'asc',
+                    skip: pageSize * (pageNumber - 1),
+                    take: pageSize,
+                    orderBy: [
+                        {
+                            status: 'asc',
+                        },
+                        {
+                            role: 'asc',
+                        },
+                        {
+                            is_premium: 'desc',
+                        },
+                        {
+                            createdAt: 'desc',
+                        },
+                    ],
+                }),
+                prisma.user.count({
+                    where: {
+                        name: {
+                            contains: name,
+                        },
                     },
-                    {
-                        role: 'asc',
-                    },
-                    {
-                        is_premium: 'desc',
-                    },
-                    {
-                        createdAt: 'desc',
-                    },
-                ],
-            })
+                }),
+            ])
         }
-        // count total user
-        const total_user = await prisma.user.count()
         // check total page
         const total_page = Math.ceil(total_user / pageSize)
         return {
