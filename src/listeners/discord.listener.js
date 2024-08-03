@@ -16,7 +16,9 @@ const discordListener = () => {
 
     client.on('messageCreate', async (message) => {
         try {
-            if (message.channelId === '1252932322697678900') {
+            // 1252932322697678900
+            // test 1269271299142717565
+            if (message.channelId === '1269271299142717565') {
                 let row_mess = message.content.split('\n')
                 let price = row_mess[0]
                 price = price.split(' ')[5].trim()
@@ -35,15 +37,49 @@ const discordListener = () => {
                 } else if (price === 'tăng') {
                     let transaction_code = message.content.split('\n')[1]
                     transaction_code = transaction_code.split(':')[1].trim()
-                    transaction_code = transaction_code.split(' ')[0].trim()
-                    // Call service
-                    if (transaction_code) {
+                    /**
+                     * 1. Condition user send by momo
+                     */
+                    if (transaction_code.includes('MB')) {
+                        transaction_code = transaction_code.split(' ')[2].trim()
+                        // make transacition_code to 6 characters E4RDDT-
+                        transaction_code = transaction_code.slice(0, 6)
+                        global.logger.info(
+                            `Payment by condition user send by momo includes MB`,
+                            transaction_code
+                        )
                         await PaymentService.handleSuccessDepositPaymentBank(
                             transaction_code
                         )
-                    } else {
                         return
                     }
+                    /**
+                     * 2. Condition user send by other bank
+                     */
+                    const hyphenCount = (transaction_code.match(/-/g) || []).length
+
+                    if (hyphenCount > 1) {
+                        transaction_code = transaction_code.split('-')[1].trim()
+                        global.logger.info(
+                            `Payment by condition user send by other bank`,
+                            transaction_code
+                        )
+                        await PaymentService.handleSuccessDepositPaymentBank(
+                            transaction_code
+                        )
+                        return
+                    }
+                    /**
+                     * 3. Normal case
+                     */
+
+                    global.logger.info(
+                        `Payment by condition normal case`,
+                        transaction_code
+                    )
+                    await PaymentService.handleSuccessDepositPaymentBank(transaction_code)
+
+                    return
                 } else {
                     return
                 }
