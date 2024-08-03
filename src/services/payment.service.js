@@ -140,7 +140,7 @@ class PaymentService {
      * @function handleSuccessWithdrawPaymentBank
      * @returns
      */
-    async handleSuccessDepositPaymentBank(transaction_code) {
+    async handleSuccessWithdrawPaymentBank(transaction_code) {
         // find transaction by code
         const transaction = await prisma.transaction.findFirst({
             where: {
