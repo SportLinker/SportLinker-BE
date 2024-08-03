@@ -49,7 +49,6 @@ class PaymentService {
         if (isExist) {
             return this.depositBank(userId, body)
         }
-        code = code + ' ' + 'NAP TIEN VAO VI SPORTLINKER'
         // create transaction
         const transaction = await prisma.transaction
             .create({
