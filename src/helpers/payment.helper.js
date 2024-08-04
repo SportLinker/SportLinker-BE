@@ -1,7 +1,9 @@
 'use strict'
 
 const bankQRLink = (amount, transaction_code) => {
-    return `https://api.vietqr.io/image/970422-0825999871-kjt0tfL.jpg?accountName=HUYNH CHI BAO&amount=${amount}&addInfo=${transaction_code}`
+    // `https://api.vietqr.io/image/970422-0825999871-kjt0tfL.jpg?accountName=HUYNH CHI BAO&amount=${amount}&addInfo=${transaction_code}`
+    // ninh https://api.vietqr.io/image/970422-0386041438-7mcVbmE.jpg?accountName=PHAM%20DANG%20NINH&amount=${amount}&addInfo=${transaction_code}
+    return `https://api.vietqr.io/image/970422-0386041438-7mcVbmE.jpg?accountName=PHAM%20DANG%20NINH&amount=${amount}&addInfo=${transaction_code}`
 }
 
 const createQRCodeForAdmin = ({

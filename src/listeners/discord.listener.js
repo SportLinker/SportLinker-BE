@@ -18,7 +18,7 @@ const discordListener = () => {
         try {
             // 1252932322697678900
             // test 1269271299142717565
-            if (message.channelId === '1269271299142717565') {
+            if (message.channelId === '1252932322697678900') {
                 let row_mess = message.content.split('\n')
                 let price = row_mess[0]
                 price = price.split(' ')[5].trim()
