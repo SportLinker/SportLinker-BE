@@ -42,40 +42,40 @@ const runSchedule = () => {
         return
     })
 
-    // check list transaction is out of date
-    schedule.scheduleJob(listScheduleTime.validTransaction, async () => {
-        // get list transaction is pending and expired
-        const list_transaction = await prisma.transaction
-            .findMany({
-                where: {
-                    expired_at: {
-                        lt: new Date(),
-                    },
-                    status: 'pending',
-                    type: 'deposit',
-                },
-            })
-            .catch((err) => {
-                global.logger.error(
-                    `Schedule, get list transaction is pending and expired error: ${err.message}`
-                )
-                return []
-            })
-        // set status to cancel
-        for (let i = 0; i < list_transaction.length; i++) {
-            await prisma.transaction.update({
-                where: {
-                    id: list_transaction[i].id,
-                },
-                data: {
-                    status: 'cancelled',
-                },
-            })
-        }
+    // // check list transaction is out of date
+    // schedule.scheduleJob(listScheduleTime.validTransaction, async () => {
+    //     // get list transaction is pending and expired
+    //     const list_transaction = await prisma.transaction
+    //         .findMany({
+    //             where: {
+    //                 expired_at: {
+    //                     lt: new Date(),
+    //                 },
+    //                 status: 'pending',
+    //                 type: 'deposit',
+    //             },
+    //         })
+    //         .catch((err) => {
+    //             global.logger.error(
+    //                 `Schedule, get list transaction is pending and expired error: ${err.message}`
+    //             )
+    //             return []
+    //         })
+    //     // set status to cancel
+    //     for (let i = 0; i < list_transaction.length; i++) {
+    //         await prisma.transaction.update({
+    //             where: {
+    //                 id: list_transaction[i].id,
+    //             },
+    //             data: {
+    //                 status: 'cancelled',
+    //             },
+    //         })
+    //     }
 
-        // global.logger.info(`Schedule: Set status transaction`)
-        return
-    })
+    //     // global.logger.info(`Schedule: Set status transaction`)
+    //     return
+    // })
 
     global.logger.info(`Schedule job is running`)
 }

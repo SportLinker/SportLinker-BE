@@ -64,7 +64,7 @@ const discordListener = () => {
                     if (hyphenCount > 1) {
                         transaction_code = transaction_code.split('-')[1].trim()
                         global.logger.info(
-                            `Payment by condition user send by other bank ${transaction_code}`
+                            `Payment by condition user send by momo ${transaction_code}`
                         )
                         await PaymentService.handleSuccessDepositPaymentBank(
                             transaction_code
@@ -72,9 +72,24 @@ const discordListener = () => {
                         return
                     }
                     /**
-                     * 3. Normal case
+                     * 3. Condition user send by vcb bank
+                     */
+                    const dotCount = (transaction_code.match(/\./g) || []).length
+                    if (dotCount > 1) {
+                        transaction_code = transaction_code.split('.')[3].trim()
+                        global.logger.info(
+                            `Payment by condition user send by vcb ${transaction_code}`
+                        )
+                        await PaymentService.handleSuccessDepositPaymentBank(
+                            transaction_code
+                        )
+                        return
+                    }
+                    /**
+                     * 4. Normal case
                      */
                     transaction_code = transaction_code.split(' ')[0].trim()
+                    transaction_code = transaction_code.slice(0, 6)
 
                     global.logger.info(
                         `Payment by condition normal case ${transaction_code}`
