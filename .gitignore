@@ -1,3 +1,6 @@
 node_modules
 logs
 backup
+.env
+.env.development
+.env.production
