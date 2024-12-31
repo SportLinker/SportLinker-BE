@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=production node index.js",
+    "start": "node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
-    "prisma:generate": "npx prisma generate",
-    "prisma:push": "npx prisma db push"
+    "prisma:generate:dev": "dotenv -e .env.development -- npx prisma generate",
+    "prisma:push:dev": "dotenv -e .env.development -- npx prisma db push"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +20,6 @@
     "cloudinary": "^2.2.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.3",
     "discord.js": "^14.15.3",
     "dotenv": "^16.3.2",
     "express": "^4.18.2",
@@ -40,6 +39,8 @@
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv-cli": "^8.0.0",
     "mysql2": "^3.9.8",
     "nodemon": "^3.1.1"
   }
