@@ -27,18 +27,8 @@ app.use(cors(corsOptions))
 global.config = config
 // test function
 ;(async () => {
-    // connect to database Redis
-    await require('./configs/redis.config').connect()
-    // // connect to database MySQL
-    await require('./configs/prisma.config').connect()
-    // // test function
-    // const { test } = require('./test/index')
-    // await test()
-    // // run schedule
-    // const runSchedule = require('./services/schedule.service')
-    // runSchedule()
-    // // // listen bot discord
-    // // require('./src/listeners/discord.listener').discordListener()
+    await require('./configs/redis.config').connect() /// connect to database Redis
+    await require('./configs/prisma.config').connect() // connect to database MySQL
 })()
 //init route
 app.use('/v1/api', require('./routes/index'))

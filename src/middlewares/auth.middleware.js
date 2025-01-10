@@ -63,12 +63,17 @@ const authentication = asyncHandler(async (req, res, next) => {
     }
 })
 
-const authorization = asyncHandler(async (req, res, next) => {
-    if (req.user.role !== 'admin')
-        throw new ForbiddenError('Middleware Error: You are not authorized')
-    return next()
-})
+const authorization = (roles = []) => {
+    return asyncHandler(async (req, res, next) => {
+        const { user } = req
+        if (!user) throw new ForbiddenError('Middleware Error: You are not authorized')
+        if (roles.length && !roles.includes(user.role))
+            throw new ForbiddenError('Middleware Error: You are not authorized')
+        return next()
+    })
+}
 
 module.exports = {
     authentication,
+    authorization,
 }

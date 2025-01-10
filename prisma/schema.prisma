@@ -27,11 +27,9 @@ model User {
   date_of_birth         DateTime?
   role                  UserRole           @default(player)
   wallet_blance         Float              @default(0)
+  status                UserStatus         @default(active)
   createdAt             DateTime           @default(now())
   updatedAt             DateTime?          @updatedAt
-  last_active_time      DateTime?
-  is_premium            Boolean            @default(false)
-  status                UserStatus         @default(active)
   // Relation
   Match                 Match[]
   MatchJoin             MatchJoin[]
@@ -75,6 +73,7 @@ model Sport {
   sport_name String  @unique
   slug       String?
   icon       String?
+  // Relation
   Match      Match[]
   Blog       Blog[]
 
@@ -94,9 +93,9 @@ model Match {
   slug           String?
   start_time     DateTime
   end_time       DateTime
+  status         MatchStatus @default(upcomming)
   created_at     DateTime    @default(now())
   updated_at     DateTime    @updatedAt
-  status         MatchStatus @default(upcomming)
   // Relation
   user_create    User        @relation(fields: [user_create_id], references: [id])
   sport          Sport       @relation(fields: [sport_id], references: [id])
@@ -109,7 +108,7 @@ model MatchJoin {
   id           Int             @id @default(autoincrement())
   user_join_id String
   match_id     String
-  time_join_at DateTime        @default(now())
+  join_at      DateTime        @default(now())
   status       MatchJoinStatus @default(pending)
   // Relation
   match        Match           @relation(fields: [match_id], references: [match_id])
@@ -146,24 +145,11 @@ model Notification {
   @@map("notifications")
 }
 
-// Message Chat
-model Message {
-  message_id       String       @id @default(cuid())
-  message_to       String
-  message_from     String
-  content          String
-  created_at       DateTime     @default(now())
-  // Relation
-  user_from        User         @relation(fields: [message_from], references: [id])
-  group_message_to GroupMessage @relation(fields: [message_to], references: [group_message_id])
-
-  @@map("messages")
-}
-
 model GroupMessage {
   group_message_id       String             @id @default(cuid())
   group_message_name     String
   group_message_thumnail String?
+  slug                   String?
   created_at             DateTime           @default(now())
   expired_at             DateTime?
   last_active_time       DateTime?          @default(now())
@@ -179,6 +165,19 @@ enum GroupMessageType {
   single
   match
   club
+}
+
+model Message {
+  message_id       String       @id @default(cuid())
+  message_to       String
+  message_from     String
+  content          String
+  created_at       DateTime     @default(now())
+  // Relation
+  user_from        User         @relation(fields: [message_from], references: [id])
+  group_message_to GroupMessage @relation(fields: [message_to], references: [group_message_id])
+
+  @@map("messages")
 }
 
 model GroupMessageJoin {
