@@ -1,5 +1,13 @@
-on: push
-name: 🚀 Deploy website on push
+name: 🚀 CI-CD Sportlinker - BE
+
+on:
+    push:
+        branches:
+            - production
+    pull_request:
+        branches:
+            - production
+
 jobs:
     web-deploy:
         name: 🎉 Deploy
