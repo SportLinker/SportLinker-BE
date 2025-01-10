@@ -6,7 +6,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.0.x"]
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -14,48 +14,40 @@ datasource db {
   url      = env("MYSQL_URL")
 }
 
-// define 
-// field first 
-// relation second'
-
-// User
 model User {
-  id                    String                @id @default(cuid())
-  phone                 String?               @unique
-  email                 String?               @unique
-  username              String?               @unique
+  id                    String             @id @default(cuid())
+  phone                 String?            @unique
+  email                 String?            @unique
+  username              String?            @unique
   name                  String
   password              String?
   bio                   String?
   avatar_url            String?
   gender                UserGender
   date_of_birth         DateTime?
-  role                  UserRole              @default(player)
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime?             @updatedAt
+  role                  UserRole           @default(player)
+  wallet_blance         Float              @default(0)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime?          @updatedAt
   last_active_time      DateTime?
-  is_premium            Boolean               @default(false)
-  status                UserStatus            @default(active)
+  is_premium            Boolean            @default(false)
+  status                UserStatus         @default(active)
   // Relation
-  AuthenOTPs            AuthenOTP[]
-  Wallet                Wallet?
   Match                 Match[]
   MatchJoin             MatchJoin[]
-  receivedNotifications Notification[]        @relation("ReceivedNotifications")
+  receivedNotifications Notification[]     @relation("ReceivedNotifications")
   Message               Message[]
   GroupMessageJoin      GroupMessageJoin[]
-  NotificationMessage   NotificationMessage[]
   Stadium               Stadium[]
   VoucherUser           VoucherUser[]
   Transaction           Transaction[]
-  BookingYard           BookingYard[]
   Notification          Notification[]
   Blog                  Blog[]
-  BlogUser              BlogUser[]
   BlogComment           BlogComment[]
   StadiumRating         StadiumRating[]
   BlogReact             BlogReact[]
-  PremiumAccount        PremiumAccount[]
+
+  @@map("users")
 }
 
 enum UserStatus {
@@ -77,67 +69,44 @@ enum UserGender {
   other
 }
 
-// Authen OTP
-model AuthenOTP {
-  id         String   @id @default(cuid())
-  user_id    String
-  created_at DateTime @default(now())
-  expired_at DateTime
-  type       OTPType
-  user       User     @relation(fields: [user_id], references: [id])
-}
-
-enum OTPType {
-  sms
-  email
-}
-
-// Wallet
-model Wallet {
-  user_id    String   @unique
-  balance    Int      @default(0)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  user       User     @relation(fields: [user_id], references: [id])
-}
-
 // Sport
 model Sport {
-  sport_name  String  @id @unique
-  value       String?
-  icon        String?
-  Match       Match[]
-  StadiumYard Yard[]
-  Blog        Blog[]
+  id         Int     @id @default(autoincrement())
+  sport_name String  @unique
+  slug       String?
+  icon       String?
+  Match      Match[]
+  Blog       Blog[]
+
+  @@map("sports")
 }
 
 // Match
 model Match {
-  match_id       String       @id @default(cuid())
+  match_id       String      @id @default(cuid())
   match_name     String
   user_create_id String
+  description    String?
   cid            String
-  sport_name     String
-  total_join     Int          @default(1)
-  maximum_join   Int          @default(10)
+  sport_id       Int
+  budget         Float?
+  maximum_join   Int         @default(20)
+  slug           String?
   start_time     DateTime
   end_time       DateTime
-  created_at     DateTime     @default(now())
-  updated_at     DateTime     @updatedAt
-  status         MatchStatus  @default(upcomming)
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+  status         MatchStatus @default(upcomming)
   // Relation
-  user_create    User         @relation(fields: [user_create_id], references: [id])
-  sport          Sport        @relation(fields: [sport_name], references: [sport_name])
+  user_create    User        @relation(fields: [user_create_id], references: [id])
+  sport          Sport       @relation(fields: [sport_id], references: [id])
   match_join     MatchJoin[]
-  option         MatchOption?
 
-  // index 
-  @@index([start_time, sport_name, status], name: "match_index")
-  @@index([sport_name, status], name: "match_index_2")
+  @@map("matches")
 }
 
 model MatchJoin {
-  id           String          @id @default(cuid())
+  id           Int             @id @default(autoincrement())
   user_join_id String
   match_id     String
   time_join_at DateTime        @default(now())
@@ -145,14 +114,8 @@ model MatchJoin {
   // Relation
   match        Match           @relation(fields: [match_id], references: [match_id])
   user_join    User            @relation(fields: [user_join_id], references: [id])
-}
 
-model MatchOption {
-  match_id String  @unique
-  budget   Float?
-  note     String?
-  // Relation
-  match    Match   @relation(fields: [match_id], references: [match_id])
+  @@map("match_joins")
 }
 
 enum MatchStatus {
@@ -179,19 +142,22 @@ model Notification {
   receiver User    @relation("ReceivedNotifications", fields: [receiver_id], references: [id])
   User     User?   @relation(fields: [userId], references: [id])
   userId   String?
+
+  @@map("notifications")
 }
 
 // Message Chat
 model Message {
-  message_id          String                @id @default(cuid())
-  message_to          String
-  message_from        String
-  content             String
-  created_at          DateTime              @default(now())
+  message_id       String       @id @default(cuid())
+  message_to       String
+  message_from     String
+  content          String
+  created_at       DateTime     @default(now())
   // Relation
-  user_from           User                  @relation(fields: [message_from], references: [id])
-  group_message_to    GroupMessage          @relation(fields: [message_to], references: [group_message_id])
-  NotificationMessage NotificationMessage[]
+  user_from        User         @relation(fields: [message_from], references: [id])
+  group_message_to GroupMessage @relation(fields: [message_to], references: [group_message_id])
+
+  @@map("messages")
 }
 
 model GroupMessage {
@@ -205,6 +171,8 @@ model GroupMessage {
   type                   GroupMessageType
   GroupMessageJoin       GroupMessageJoin[]
   Message                Message[]
+
+  @@map("group_messages")
 }
 
 enum GroupMessageType {
@@ -221,17 +189,8 @@ model GroupMessageJoin {
   // Relation
   group_message    GroupMessage @relation(fields: [group_message_id], references: [group_message_id])
   user_join        User         @relation(fields: [user_join_id], references: [id])
-}
 
-model NotificationMessage {
-  id         String   @id @default(cuid())
-  user_id    String
-  message_id String
-  is_seen    Boolean  @default(false)
-  created_at DateTime @default(now())
-  // Relation
-  user       User     @relation(fields: [user_id], references: [id])
-  message    Message  @relation(fields: [message_id], references: [message_id])
+  @@map("group_message_joins")
 }
 
 // Stadium
@@ -250,8 +209,9 @@ model Stadium {
   created_at          DateTime        @default(now())
   // Relation
   owner               User            @relation(fields: [stadium_owner_id], references: [id])
-  yards               Yard[]
   ratings             StadiumRating[]
+
+  @@map("stadiums")
 }
 
 model StadiumRating {
@@ -264,21 +224,6 @@ model StadiumRating {
   // Relation
   stadium    Stadium  @relation(fields: [stadium_id], references: [id])
   user       User     @relation(fields: [user_id], references: [id])
-}
-
-model Yard {
-  yard_id          String        @id @default(cuid())
-  stadium_id       String
-  yard_name        String
-  yard_sport       String
-  yard_description String
-  price_per_hour   Float
-  yard_status      YardStatus    @default(avaiable)
-  created_at       DateTime      @default(now())
-  // Relation
-  stadium          Stadium       @relation(fields: [stadium_id], references: [id])
-  sport            Sport         @relation(fields: [yard_sport], references: [sport_name])
-  BookingYard      BookingYard[]
 }
 
 enum StadiumStatus {
@@ -295,19 +240,6 @@ enum YardStatus {
   avaiable
   mantainance
   deleted
-}
-
-model BookingYard {
-  id         String        @id @default(cuid())
-  yard_id    String
-  user_id    String
-  time_start DateTime
-  time_end   DateTime
-  status     BookingStatus @default(pending)
-  created_at DateTime      @default(now())
-  // Relation
-  yard       Yard          @relation(fields: [yard_id], references: [yard_id])
-  user       User          @relation(fields: [user_id], references: [id])
 }
 
 enum BookingStatus {
@@ -389,39 +321,28 @@ enum TransactionStatus {
 // Blog
 
 model Blog {
-  id              String        @id @default(cuid())
-  blog_owner      String
-  blog_content    String
-  blog_address    String?
-  blog_sport      String?
-  total_like      Int           @default(0)
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
-  status          BlogStatus?   @default(approved)
+  id           String        @id @default(cuid())
+  blog_owner   String
+  blog_content String
+  blog_address String?
+  blog_sport   String?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  status       BlogStatus?   @default(approved)
   // Relation
-  owner           User          @relation(fields: [blog_owner], references: [id])
-  blog_link       BlogLink[]
-  BlogUser        BlogUser[]
-  Sport           Sport?        @relation(fields: [sportSport_name], references: [sport_name])
-  sportSport_name String?
-  BlogComment     BlogComment[]
-  BlogReact       BlogReact[]
+  owner        User          @relation(fields: [blog_owner], references: [id])
+  blog_link    BlogLink[]
+  BlogComment  BlogComment[]
+  BlogReact    BlogReact[]
+  Sport        Sport?        @relation(fields: [sportId], references: [id])
+  sportId      Int?
+
+  @@map("blogs")
 }
 
 enum BlogStatus {
   approved
   deleted
-}
-
-model BlogUser {
-  id         String   @id @default(cuid())
-  user_id    String
-  blog_id    String
-  is_read    Boolean  @default(false)
-  created_at DateTime @default(now())
-  // Relation
-  user       User     @relation(fields: [user_id], references: [id])
-  blog       Blog     @relation(fields: [blog_id], references: [id])
 }
 
 model BlogLink {
@@ -431,6 +352,8 @@ model BlogLink {
   type    BlogLinkType
   // Relation
   Blog    Blog?        @relation(fields: [blog_id], references: [id])
+
+  @@map("blog_links")
 }
 
 enum BlogLinkType {
@@ -448,34 +371,22 @@ model BlogComment {
   // Relation
   user           User     @relation(fields: [user_id], references: [id])
   blog           Blog     @relation(fields: [blog_id], references: [id])
+
+  @@map("blog_comments")
 }
 
 model BlogReact {
-  id      String @id @default(cuid())
-  blog_id String
-  user_id String
-  // Relation
-  blog    Blog   @relation(fields: [blog_id], references: [id])
-  user    User   @relation(fields: [user_id], references: [id])
-}
-
-model PremiumAccount {
   id         String        @id @default(cuid())
+  blog_id    String
   user_id    String
-  expired_at DateTime
-  created_at DateTime      @default(now())
-  type       PremiumType
-  status     PremiumStatus @default(active)
+  react_type BlogReactType
   // Relation
+  blog       Blog          @relation(fields: [blog_id], references: [id])
   user       User          @relation(fields: [user_id], references: [id])
+
+  @@map("blog_reacts")
 }
 
-enum PremiumType {
-  month
-  year
-}
-
-enum PremiumStatus {
-  active
-  expired
+enum BlogReactType {
+  like
 }

@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const fs = require('fs')
-// const LoggerService = require('../services/logger.service')
-// const log = new LoggerService(module.filename)
+const LoggerService = require('../services/logger.service')
+const logger = new LoggerService({ className: 'Router' })
 const router = require('express').Router()
 
 // load all routers in this directory and assign router based on filename.router.js
@@ -11,7 +11,7 @@ fs.readdirSync(__dirname).forEach((file) => {
         try {
             router.use(`/${routerName}`, require(`./${file}`))
         } catch (err) {
-            console.error(`Error loading router: ${routerName}, error: ${err}`)
+            logger.error(`Error loading router: ${routerName}, error: ${err}`)
         }
     }
 })

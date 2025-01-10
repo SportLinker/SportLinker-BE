@@ -4,11 +4,11 @@ const { customLevels, loggerAppConfig } = require('../utils/logger.util')
 
 class LoggerService {
     constructor({ app = 'app', className = 'Unknown' }) {
-        this.className = className // Thêm className vào constructor
+        this.className = className
 
         this.logger = winston.createLogger({
             levels: customLevels.levels, // Use custom levels
-            format: winston.format.combine(winston.format.json()), // Định dạng chung cho logging
+            format: winston.format.combine(winston.format.json()),
             transports: [
                 new winston.transports.Console({
                     format: winston.format.printf(

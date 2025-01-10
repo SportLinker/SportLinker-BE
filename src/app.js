@@ -30,8 +30,7 @@ global.config = config
     // connect to database Redis
     await require('./configs/redis.config').connect()
     // // connect to database MySQL
-    // const prisma = require('./configs/prisma.config')
-    // await prisma.connect()
+    await require('./configs/prisma.config').connect()
     // // test function
     // const { test } = require('./test/index')
     // await test()
