@@ -1,10 +1,10 @@
 const { PrismaClient } = require('@prisma/client')
-const LoggerService = require('../services/logger.service')
+const Logger = require('../../loggers/logger.config')
 
-class MySQLConnection {
-    logger = new LoggerService({ className: 'MySQLConnection' })
+class MySQL {
+    logger = new Logger({ className: 'MySQL' })
     constructor() {
-        if (!MySQLConnection.instance) {
+        if (!MySQL.instance) {
             this.client = new PrismaClient({
                 datasources: {
                     db: {
@@ -20,9 +20,9 @@ class MySQLConnection {
                     },
                 ],
             })
-            MySQLConnection.instance = this
+            MySQL.instance = this
         }
-        return MySQLConnection.instance
+        return MySQL.instance
     }
 
     async connect() {
@@ -38,4 +38,4 @@ class MySQLConnection {
     }
 }
 
-module.exports = new MySQLConnection()
+module.exports = new MySQL()

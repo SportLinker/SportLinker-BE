@@ -1,11 +1,11 @@
 const { createClient } = require('redis')
-const LoggerService = require('../services/logger.service')
+const Logger = require('../../loggers/logger.config')
 
-class RedisConnection {
-    logger = new LoggerService({ className: 'RedisConnection' })
+class Redis {
+    logger = new Logger({ className: 'Redis' })
 
     constructor() {
-        if (!RedisConnection.instance) {
+        if (!Redis.instance) {
             this.client = createClient({
                 // host: global.config.get('REDIS_HOST'), // Host of the Redis server
                 // port: global.config.get('REDIS_PORT'), // Port of the Redis server
@@ -15,9 +15,9 @@ class RedisConnection {
                     port: global.config.get('REDIS_PORT'),
                 },
             })
-            RedisConnection.instance = this
+            Redis.instance = this
         }
-        return RedisConnection.instance
+        return Redis.instance
     }
 
     async connect() {
@@ -37,4 +37,4 @@ class RedisConnection {
     }
 }
 
-module.exports = new RedisConnection()
+module.exports = new Redis()
