@@ -21,10 +21,6 @@ jobs:
               with:
                   node-version: '20'
 
-            # - name: 🏗️ Build prisma
-            #   run: |
-            #       npx prisma generate
-
             - name: 📂 Sync files
               uses: SamKirkland/FTP-Deploy-Action@4.0.0
               with:

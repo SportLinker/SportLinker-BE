@@ -1,10 +1,10 @@
 const { PrismaClient } = require('@prisma/client')
 const LoggerService = require('../services/logger.service')
-const logger = new LoggerService({ className: 'Prisma' })
 
-class MySQL {
+class MySQLConnection {
+    logger = new LoggerService({ className: 'MySQLConnection' })
     constructor() {
-        if (!Prisma.instance) {
+        if (!MySQLConnection.instance) {
             this.client = new PrismaClient({
                 datasources: {
                     db: {
@@ -20,21 +20,22 @@ class MySQL {
                     },
                 ],
             })
-            Prisma.instance = this
+            MySQLConnection.instance = this
         }
-        return Prisma.instance
+        return MySQLConnection.instance
     }
 
     async connect() {
         await this.client
             .$connect()
             .then(() => {
-                logger.info('Connected to database')
+                this.logger.info('Connected to database')
             })
             .catch((error) => {
-                logger.error(`Err connecting MySQL`, error.message)
+                console.log('Error connecting to database', error)
+                this.logger.error(`Err connecting MySQL`, error.message)
             })
     }
 }
 
-module.exports = new Prisma()
+module.exports = new MySQLConnection()

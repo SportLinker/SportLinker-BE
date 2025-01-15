@@ -28,7 +28,7 @@ global.config = config
 // test function
 ;(async () => {
     await require('./configs/redis.config').connect() /// connect to database Redis
-    await require('./configs/prisma.config').connect() // connect to database MySQL
+    await require('./configs/mysql.config').connect() // connect to database MySQL
 })()
 //init route
 app.use('/v1/api', require('./routes/index'))

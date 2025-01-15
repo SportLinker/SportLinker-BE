@@ -28,7 +28,7 @@ The `src` directory contains the following structure:
     ├── services/       # Contains business logic and service functions
     ├── utils/          # Contains utility functions and helpers
     ├── config/         # Contains configuration files
-    └── index.ts        # Entry point of the application
-index.js
+    └── app.js          # Entry point of the application
+├──index.js
 </pre>
 ```

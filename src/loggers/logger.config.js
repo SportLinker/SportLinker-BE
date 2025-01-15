@@ -2,7 +2,7 @@ const winston = require('winston')
 const time = require('../helpers/timestamp.helper')
 const { customLevels, loggerAppConfig } = require('../utils/logger.util')
 
-class LoggerService {
+class Logger {
     constructor({ app = 'app', className = 'Unknown' }) {
         this.className = className
 
@@ -41,7 +41,7 @@ class LoggerService {
             ],
         })
 
-        // Gán các phương thức của winston vào đối tượng LoggerService
+        // create a new instance of the logger with the new configuration
         Object.keys(this.logger.levels).forEach((level) => {
             this[level] = (message) => {
                 this.logger.log(level, message)
@@ -50,4 +50,4 @@ class LoggerService {
     }
 }
 
-module.exports = LoggerService
+module.exports = Logger

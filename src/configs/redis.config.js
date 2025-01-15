@@ -1,8 +1,9 @@
 const { createClient } = require('redis')
 const LoggerService = require('../services/logger.service')
-const loggerService = new LoggerService({ className: 'Redis' })
 
 class RedisConnection {
+    logger = new LoggerService({ className: 'RedisConnection' })
+
     constructor() {
         if (!RedisConnection.instance) {
             this.client = createClient({
@@ -21,17 +22,17 @@ class RedisConnection {
 
     async connect() {
         this.client.on('connect', () => {
-            loggerService.info('Connected to Redis')
+            this.logger.info('Connected to Redis')
         })
 
         this.client.on('error', (err) => {
-            loggerService.error(`Error connecting to Redis: ${err.message}`)
+            this.logger.error(`Error connecting to Redis: ${err.message}`)
         })
 
         try {
             await this.client.connect()
         } catch (err) {
-            loggerService.error(`Failed to connect to Redis: ${err.message}`)
+            this.logger.error(`Failed to connect to Redis: ${err.message}`)
         }
     }
 }
