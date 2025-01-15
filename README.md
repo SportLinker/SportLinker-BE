@@ -6,13 +6,12 @@ Sport-Linker is a platform designed to connect sports enthusiasts, allowing them
 
 -   Node.js
 -   Express.js
--   MongoDB
--   Mongoose
+-   MySQL
+-   Prisma for ORM DB
 -   JWT for authentication
 -   Socket.io for real-time communication
 -   Docker for containerization
--   TypeScript for type safety
--   Jest for testing
+-   RambitMQ for queue proceduce
 
 ## Project structure
 

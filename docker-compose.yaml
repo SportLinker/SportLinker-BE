@@ -30,6 +30,15 @@ services:
     networks:
       - backend
 
+  # rmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq-container
+  #   ports:
+  #     - '5672:5672'
+  #     - '15672:15672'
+  #   networks:
+  #     - backend
+
   app:
     build:
       context: .
