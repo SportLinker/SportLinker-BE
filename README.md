@@ -1,26 +1,34 @@
-## Install environment and library
-```bash
-$ npm ci
-$ npm i --force
-```
-## Development
+## Project overview
 
-```bash
-$ npm run dev
-```
-## Product
+Sport-Linker is a platform designed to connect sports enthusiasts, allowing them to find and join local sports events, teams, and activities. The backend of this project is built to handle user authentication, event management, and real-time notifications.
 
-```bash
-$ npm run start
-```
+## Tech stack
 
-## Library
-```bash
-$ 
-```
+-   Node.js
+-   Express.js
+-   MongoDB
+-   Mongoose
+-   JWT for authentication
+-   Socket.io for real-time communication
+-   Docker for containerization
+-   TypeScript for type safety
+-   Jest for testing
 
-## Third party
-```bash
-$ 
-```
+## Project structure
 
+The `src` directory contains the following structure:
+
+```
+<pre>
+├──src/
+    ├── controllers/    # Contains the logic for handling requests and responses
+    ├── models/         # Contains the Mongoose models for MongoDB
+    ├── routes/         # Contains the route definitions
+    ├── middlewares/    # Contains middleware functions
+    ├── services/       # Contains business logic and service functions
+    ├── utils/          # Contains utility functions and helpers
+    ├── config/         # Contains configuration files
+    └── index.ts        # Entry point of the application
+index.js
+</pre>
+```

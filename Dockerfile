@@ -15,10 +15,8 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Generate Prisma client (make sure Prisma is installed)
+# Run prima
 RUN npx prisma generate
-
-RUN npx prisma db push
 
 # Expose the port for the app (optional, change based on your app setup)
 EXPOSE 8080
