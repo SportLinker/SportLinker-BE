@@ -28,7 +28,7 @@ global.config = config
 // test function
 ;(async () => {
     await require('./databases/redis/redis.config').connect()
-    await require('./databases/mysql').connect()
+    await require('./databases/mysql/mysql.config').connect()
 })()
 //init route
 // app.use('/v1/api', require('./routes/index'))
