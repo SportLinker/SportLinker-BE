@@ -7,13 +7,7 @@ class Redis {
     constructor() {
         if (!Redis.instance) {
             this.client = createClient({
-                // host: global.config.get('REDIS_HOST'), // Host of the Redis server
-                // port: global.config.get('REDIS_PORT'), // Port of the Redis server
-                // password: global.config.get('REDIS_PASSWORD'), // Password for authentication
-                socket: {
-                    host: global.config.get('REDIS_HOST'),
-                    port: global.config.get('REDIS_PORT'),
-                },
+                // password: global.config.get('REDIS_PASSWORD'),
             })
             Redis.instance = this
         }
@@ -34,6 +28,10 @@ class Redis {
         } catch (err) {
             this.logger.error(`Failed to connect to Redis: ${err.message}`)
         }
+    }
+
+    getClient() {
+        return this.client
     }
 }
 

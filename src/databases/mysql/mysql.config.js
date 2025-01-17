@@ -3,6 +3,7 @@ const Logger = require('../../loggers/logger.config')
 
 class MySQL {
     logger = new Logger({ className: 'MySQL' })
+
     constructor() {
         if (!MySQL.instance) {
             this.client = new PrismaClient({
@@ -35,6 +36,10 @@ class MySQL {
                 console.log('Error connecting to database', error)
                 this.logger.error(`Err connecting MySQL`, error.message)
             })
+    }
+
+    getClient() {
+        return this.client
     }
 }
 

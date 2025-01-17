@@ -1,7 +1,8 @@
 'use strict'
-const prisma = require('../configs/prisma.config').client
+
+const mysql = require('../databases/mysql/mysql.config').getClient()
+const redisClient = require('../databases/redis/redis.config').getClient()
 const { BadRequestError } = require('../core/error.response')
-const redisClient = require('../configs/redis.config').client
 const bcrypt = require('bcryptjs')
 const authUtil = require('../utils/auth.utils')
 
@@ -33,7 +34,7 @@ class AuthenService {
 
     async registerWithPhone(user) {
         // check phone exist
-        const phoneExist = await prisma.user.findUnique({
+        const phoneExist = await mysql.user.findUnique({
             where: {
                 phone: user.phone,
             },
@@ -42,7 +43,7 @@ class AuthenService {
         // generate hash password
         const newPass = await bcrypt.hash(user.password, 8)
         // create user
-        const newUser = await prisma.user
+        const newUser = await mysql.user
             .create({
                 data: {
                     phone: user.phone,
@@ -61,14 +62,14 @@ class AuthenService {
         await redisClient.set(`favorite:${newUser.id}`, JSON.stringify(user.favorite))
         // logs
         // creat wallet for this user
-        await prisma.wallet.create({
+        await mysql.wallet.create({
             data: {
                 user_id: newUser.id,
                 balance: 0,
             },
         })
         // find all blog active
-        const list_blog = await prisma.blog.findMany({
+        const list_blog = await mysql.blog.findMany({
             where: {
                 status: 'approved',
             },
@@ -78,7 +79,7 @@ class AuthenService {
         })
         // create blog for new user
         for (let i = 0; i < list_blog.length; i++) {
-            await prisma.blogUser.create({
+            await mysql.blogUser.create({
                 data: {
                     user_id: newUser.id,
                     blog_id: list_blog[i].id,
@@ -95,7 +96,7 @@ class AuthenService {
 
     async registerWithUsername(user) {
         // check username exist
-        const usernameExist = await prisma.user.findUnique({
+        const usernameExist = await mysql.user.findUnique({
             where: {
                 username: user.username,
             },
@@ -104,7 +105,7 @@ class AuthenService {
         // generate hash password
         const newPass = await bcrypt.hash(user.password, 8)
         // create user
-        const newUser = await prisma.user
+        const newUser = await mysql.user
             .create({
                 data: {
                     username: user.username,
@@ -123,7 +124,7 @@ class AuthenService {
         await redisClient.set(`favorite:${newUser.id}`, JSON.stringify(user.favorite))
         // logs
         // creat wallet for this user
-        await prisma.wallet.create({
+        await mysql.wallet.create({
             data: {
                 user_id: newUser.id,
                 balance: 0,
@@ -131,7 +132,7 @@ class AuthenService {
         })
         // create blog for new user
         // find all blog active
-        const list_blog = await prisma.blog.findMany({
+        const list_blog = await mysql.blog.findMany({
             where: {
                 status: 'approved',
             },
@@ -141,7 +142,7 @@ class AuthenService {
         })
         // create blog for new user
         for (let i = 0; i < list_blog.length; i++) {
-            await prisma.blogUser.create({
+            await mysql.blogUser.create({
                 data: {
                     user_id: newUser.id,
                     blog_id: list_blog[i].id,
@@ -163,7 +164,7 @@ class AuthenService {
 
     async loginWithGoogle(user) {
         //find user by email
-        const is_exist_user = await prisma.user.findUnique({
+        const is_exist_user = await mysql.user.findUnique({
             where: {
                 email: user.email,
             },
@@ -196,7 +197,7 @@ class AuthenService {
             }
         }
         // if user not exist
-        const new_user = await prisma.user.create({
+        const new_user = await mysql.user.create({
             data: {
                 ...user,
             },
@@ -230,7 +231,7 @@ class AuthenService {
 
     async loginWithPhone(user) {
         // check login
-        const userExist = await prisma.user.findUnique({
+        const userExist = await mysql.user.findUnique({
             where: {
                 phone: user.phone,
             },
@@ -272,7 +273,7 @@ class AuthenService {
 
     async loginWithUsername(user) {
         // check login
-        const userExist = await prisma.user.findUnique({
+        const userExist = await mysql.user.findUnique({
             where: {
                 username: user.username,
             },

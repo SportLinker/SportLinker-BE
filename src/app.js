@@ -31,7 +31,7 @@ global.config = config
     await require('./databases/mysql/mysql.config').connect()
 })()
 //init route
-// app.use('/v1/api', require('./routes/index'))
+// app.use('/v1', require('./routes/index'))
 
 app.get('/', (req, res) => {
     res.json({

@@ -1,8 +1,5 @@
 FROM node:20-alpine AS builder
 
-# Install necessary dependencies, including openssl
-RUN apk add --no-cache openssl
-
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -10,13 +7,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install node dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
-
-# Run prima
-RUN npx prisma generate
 
 # Expose the port for the app (optional, change based on your app setup)
 EXPOSE 8080
