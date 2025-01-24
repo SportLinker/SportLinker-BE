@@ -177,7 +177,7 @@ class AuthenService {
                 email: is_exist_user.email,
                 role: is_exist_user.role,
             }
-            const token = await authUtil.createTokenPair(payload)
+            const token = authUtil.createTokenPair(payload)
             // save refreshToken , public key to redis
             await redisClient.set(
                 `keyToken:${is_exist_user.id}`,
@@ -209,7 +209,7 @@ class AuthenService {
             email: new_user.email,
             role: new_user.role,
         }
-        const token = await authUtil.createTokenPair(payload)
+        const token = authUtil.createTokenPair(payload)
         // save refreshToken , public key to redis
         await redisClient.set(
             `keyToken:${new_user.id}`,
@@ -241,7 +241,7 @@ class AuthenService {
         if (userExist.status !== 'active')
             throw new BadRequestError('User is not active. Please contact admin.')
         // check password
-        const validPass = await bcrypt.compare(user.password, userExist.password)
+        const validPass = bcrypt.compare(user.password, userExist.password)
         if (!validPass) throw new BadRequestError('Invalid phone or password.')
         // create token
         const payload = {
@@ -250,7 +250,7 @@ class AuthenService {
             role: userExist.role,
             name: userExist.name,
         }
-        const token = await authUtil.createTokenPair(payload)
+        const token = authUtil.createTokenPair(payload)
         // console.log('token::', token)
         // save refreshToken , public key to redis
         await redisClient.set(
@@ -283,7 +283,7 @@ class AuthenService {
         if (userExist.status !== 'active')
             throw new BadRequestError('User is not active. Please contact admin.')
         // check password
-        const validPass = await bcrypt.compare(user.password, userExist.password)
+        const validPass = bcrypt.compare(user.password, userExist.password)
         if (!validPass) throw new BadRequestError('Invalid phone or password.')
         // create token
         const payload = {
@@ -292,7 +292,7 @@ class AuthenService {
             role: userExist.role,
             name: userExist.name,
         }
-        const token = await authUtil.createTokenPair(payload)
+        const token = authUtil.createTokenPair(payload)
         // console.log('token::', token)
         // save refreshToken , public key to redis
         await redisClient.set(

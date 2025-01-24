@@ -1,7 +1,7 @@
 const JWT = require('jsonwebtoken')
 const crypto = require('node:crypto')
 
-const createTokenPair = async (payload) => {
+const createTokenPair = (payload) => {
     try {
         // console.log('payload::', payload)
         const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
@@ -16,12 +16,12 @@ const createTokenPair = async (payload) => {
             },
         })
         // accessToken
-        const accessToken = await JWT.sign(payload, privateKey, {
+        const accessToken = JWT.sign(payload, privateKey, {
             algorithm: 'RS256',
             expiresIn: '2 days',
         })
         // refreshToken
-        const refreshToken = await JWT.sign(payload, privateKey, {
+        const refreshToken = JWT.sign(payload, privateKey, {
             algorithm: 'RS256',
             expiresIn: '7 days',
         })

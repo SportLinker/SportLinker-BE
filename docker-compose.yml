@@ -49,12 +49,6 @@ services:
         condition: service_healthy
     networks:
       - sportlinker
-    command: 
-      - /bin/sh
-      - -c
-      - |
-        npx prisma generate
-        npx prisma db push
 
 networks:
   sportlinker:
